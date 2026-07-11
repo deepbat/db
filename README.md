@@ -18,12 +18,7 @@ A modern, responsive personal portfolio website.
 - `script.js` — menu, scroll reveal, video, gallery lightbox
 - `images/` — photos & cinematic video
 
-## Usage
-Open the folder in Visual Studio Code and use the **Live Server** extension, or just open `index.html`.
 
-## Customize
-1. Replace `your@email.com` and phone in `#contact`.
-2. Edit placeholder text in About / Experience / Projects.
 3. Add or remove photos by editing the `.g-item` links in the Gallery section.
 4. Publish on GitHub Pages.
 
