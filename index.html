@@ -3,73 +3,147 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Deepak Batra — Office Professional, Documentation Specialist & Technology Enthusiast. Portfolio, gallery and showreel.">
 <title>Deepak Batra | Office Professional & Technology Enthusiast</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div id="bg"></div>
-<nav>
-<div class="brand">Deepak Batra</div>
-<ul>
-<li><a href="#about">About</a></li>
-<li><a href="#experience">Experience</a></li>
-<li><a href="#skills">Skills</a></li>
-<li><a href="#projects">Projects</a></li>
-<li><a href="#contact">Contact</a></li>
-</ul>
+<div class="cursor-glow" id="cursorGlow"></div>
+
+<nav id="nav">
+  <div class="brand">Deepak<span>Batra</span></div>
+  <ul>
+    <li><a href="#about">About</a></li>
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#gallery">Gallery</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
 
 <header class="hero">
-<h1>Hi, I'm <span>Deepak Batra</span></h1>
-<p>Office Professional • Documentation Specialist • AI & Technology Enthusiast</p>
-<a href="#projects" class="btn">View My Work</a>
+  <div class="hero-inner">
+    <p class="eyebrow">Welcome to my portfolio</p>
+    <h1>Hi, I'm <span class="typed">Deepak Batra</span></h1>
+    <p class="tagline">Office Professional • Documentation Specialist • AI &amp; Technology Enthusiast</p>
+    <div class="hero-actions">
+      <a href="#projects" class="btn">View My Work</a>
+      <a href="#contact" class="btn ghost">Get In Touch</a>
+    </div>
+  </div>
+  <a href="#about" class="scroll-cue" aria-label="Scroll down"><span></span></a>
 </header>
 
-<section id="about">
-<h2>About Me</h2>
-<p>Replace this with your professional introduction. Explain your experience, strengths and interests.</p>
+<section id="about" class="reveal">
+  <div class="section-head">
+    <h2>About Me</h2>
+    <p class="lead">A detail-driven professional who blends sharp office administration with modern technology.</p>
+  </div>
+  <div class="about-wrap">
+    <div class="about-text">
+      <p>I'm an office professional and documentation specialist with a passion for using technology and AI to work smarter. I thrive on keeping operations organized, communications clear, and teams aligned.</p>
+      <p>Replace this with your professional introduction. Share your background, what you're proud of, and what you're exploring next (e.g. AI productivity, automation, content creation).</p>
+      <ul class="stats">
+        <li><strong>5+</strong><span>Years of Experience</span></li>
+        <li><strong>200+</strong><span>Projects Handled</span></li>
+        <li><strong>∞</strong><span>Curiosity</span></li>
+      </ul>
+    </div>
+    <div class="about-card">
+      <h3>What I bring</h3>
+      <p>Accuracy, reliability and a calm approach to complex workflows — plus the curiosity to keep learning new tools.</p>
+    </div>
+  </div>
 </section>
 
-<section id="experience">
-<h2>Experience</h2>
-<div class="timeline">
-<div class="item"><h3>Office Administration</h3><p>Add your responsibilities and achievements.</p></div>
-<div class="item"><h3>Documentation & Communication</h3><p>Add details here.</p></div>
-<div class="item"><h3>AI Productivity</h3><p>Showcase how you use AI tools in your work.</p></div>
+<section id="experience" class="reveal">
+  <div class="section-head"><h2>Experience</h2></div>
+  <div class="timeline">
+    <div class="item"><span class="dot"></span><h3>Office Administration</h3><p>Add your responsibilities and achievements — scheduling, records, coordination.</p></div>
+    <div class="item"><span class="dot"></span><h3>Documentation &amp; Communication</h3><p>Add details here — reports, SOPs, professional email &amp; stakeholder updates.</p></div>
+    <div class="item"><span class="dot"></span><h3>AI Productivity</h3><p>Showcase how you use AI tools to automate and accelerate everyday work.</p></div>
+  </div>
+</section>
+
+<section id="skills" class="reveal">
+  <div class="section-head"><h2>Skills</h2></div>
+  <div class="grid skills-grid">
+    <div class="card skill"><h3>Microsoft Office</h3><div class="bar"><i style="--v:95%"></i></div></div>
+    <div class="card skill"><h3>Professional Email Writing</h3><div class="bar"><i style="--v:90%"></i></div></div>
+    <div class="card skill"><h3>Documentation</h3><div class="bar"><i style="--v:92%"></i></div></div>
+    <div class="card skill"><h3>Google Workspace</h3><div class="bar"><i style="--v:88%"></i></div></div>
+    <div class="card skill"><h3>AI Tools</h3><div class="bar"><i style="--v:85%"></i></div></div>
+    <div class="card skill"><h3>Problem Solving</h3><div class="bar"><i style="--v:90%"></i></div></div>
+  </div>
+</section>
+
+<section id="projects" class="reveal">
+  <div class="section-head"><h2>Projects</h2></div>
+  <div class="grid">
+    <div class="card project"><span class="badge">Case Study</span><h3>Project 1</h3><p>Description of a project you led or contributed to.</p><a href="#" class="link">Learn more →</a></div>
+    <div class="card project"><span class="badge">Case Study</span><h3>Project 2</h3><p>Description of a project you led or contributed to.</p><a href="#" class="link">Learn more →</a></div>
+    <div class="card project"><span class="badge">Case Study</span><h3>Project 3</h3><p>Description of a project you led or contributed to.</p><a href="#" class="link">Learn more →</a></div>
+  </div>
+</section>
+
+<section id="showreel" class="reveal">
+  <div class="section-head"><h2>Showreel</h2><p class="lead">A cinematic clip from my collection.</p></div>
+  <div class="video-wrap">
+    <video id="showreelVideo" controls preload="metadata" poster="images/IMG20260315170545.jpg">
+      <source src="images/20260301_011203-CINEMATIC.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+  </div>
+</section>
+
+<section id="gallery" class="reveal">
+  <div class="section-head"><h2>Gallery</h2><p class="lead">Moments &amp; memories captured along the way.</p></div>
+  <div class="gallery-grid" id="galleryGrid">
+    <a class="g-item" href="images/IMG20260228231107~2.jpg" data-full="images/IMG20260228231107~2.jpg"><img loading="lazy" src="images/IMG20260228231107~2.jpg" alt="Gallery photo"></a>
+    <a class="g-item" href="images/IMG20260315170545.jpg" data-full="images/IMG20260315170545.jpg"><img loading="lazy" src="images/IMG20260315170545.jpg" alt="Gallery photo"></a>
+    <a class="g-item" href="images/IMG20260326194616.jpg" data-full="images/IMG20260326194616.jpg"><img loading="lazy" src="images/IMG20260326194616.jpg" alt="Gallery photo"></a>
+    <a class="g-item" href="images/IMG20260422221505.jpg" data-full="images/IMG20260422221505.jpg"><img loading="lazy" src="images/IMG20260422221505.jpg" alt="Gallery photo"></a>
+    <a class="g-item" href="images/IMG20260422222113.jpg" data-full="images/IMG20260422222113.jpg"><img loading="lazy" src="images/IMG20260422222113.jpg" alt="Gallery photo"></a>
+    <a class="g-item" href="images/IMG20260505190513_01.jpg" data-full="images/IMG20260505190513_01.jpg"><img loading="lazy" src="images/IMG20260505190513_01.jpg" alt="Gallery photo"></a>
+    <a class="g-item" href="images/IMG20260522210923.jpg" data-full="images/IMG20260522210923.jpg"><img loading="lazy" src="images/IMG20260522210923.jpg" alt="Gallery photo"></a>
+    <a class="g-item" href="images/IMG20260522211004.jpg" data-full="images/IMG20260522211004.jpg"><img loading="lazy" src="images/IMG20260522211004.jpg" alt="Gallery photo"></a>
+    <a class="g-item" href="images/IMG20260522211004-2.jpg" data-full="images/IMG20260522211004-2.jpg"><img loading="lazy" src="images/IMG20260522211004-2.jpg" alt="Gallery photo"></a>
+    <a class="g-item" href="images/IMG20260601210515.jpg" data-full="images/IMG20260601210515.jpg"><img loading="lazy" src="images/IMG20260601210515.jpg" alt="Gallery photo"></a>
+    <a class="g-item" href="images/IMG20260612191010.jpg" data-full="images/IMG20260612191010.jpg"><img loading="lazy" src="images/IMG20260612191010.jpg" alt="Gallery photo"></a>
+    <a class="g-item" href="images/IMG20260614204140.jpg" data-full="images/IMG20260614204140.jpg"><img loading="lazy" src="images/IMG20260614204140.jpg" alt="Gallery photo"></a>
+    <a class="g-item" href="images/IMG20260630183942.jpg" data-full="images/IMG20260630183942.jpg"><img loading="lazy" src="images/IMG20260630183942.jpg" alt="Gallery photo"></a>
+  </div>
+</section>
+
+<section id="contact" class="reveal">
+  <div class="section-head"><h2>Contact</h2><p class="lead">Let's connect and create something great.</p></div>
+  <div class="contact-wrap">
+    <a class="contact-card" href="mailto:your@email.com"><h3>Email</h3><p>your@email.com</p></a>
+    <a class="contact-card" href="tel:+910000000000"><h3>Phone</h3><p>+91-XXXXXXXXXX</p></a>
+    <a class="contact-card" href="#"><h3>Social</h3><p>@deepakbatra</p></a>
+  </div>
+</section>
+
+<footer>
+  <p>© 2026 Deepak Batra. Crafted with care.</p>
+  <button id="toTop" aria-label="Back to top">↑</button>
+</footer>
+
+<div class="lightbox" id="lightbox">
+  <button class="lb-close" id="lbClose" aria-label="Close">×</button>
+  <button class="lb-nav lb-prev" id="lbPrev" aria-label="Previous">‹</button>
+  <img id="lbImg" src="" alt="Enlarged photo">
+  <button class="lb-nav lb-next" id="lbNext" aria-label="Next">›</button>
 </div>
-</section>
 
-<section id="skills">
-<h2>Skills</h2>
-<div class="grid">
-<div class="card">Microsoft Office</div>
-<div class="card">Professional Email Writing</div>
-<div class="card">Documentation</div>
-<div class="card">Google Workspace</div>
-<div class="card">AI Tools</div>
-<div class="card">Problem Solving</div>
-</div>
-</section>
-
-<section id="projects">
-<h2>Projects</h2>
-<div class="grid">
-<div class="card"><h3>Project 1</h3><p>Description</p></div>
-<div class="card"><h3>Project 2</h3><p>Description</p></div>
-<div class="card"><h3>Project 3</h3><p>Description</p></div>
-</div>
-</section>
-
-<section id="contact">
-<h2>Contact</h2>
-<p>Email: your@email.com</p>
-<p>Phone: +91-XXXXXXXXXX</p>
-</section>
-
-<footer>© 2026 Deepak Batra</footer>
 <script src="script.js"></script>
 </body>
 </html>
