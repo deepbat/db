@@ -21,14 +21,3 @@ A clean, professional personal portfolio styled after the University of Bath web
 
 ## Usage
 Open the folder in Visual Studio Code and use the **Live Server** extension, or just open `index.html`.
-
-## Customize
-1. Replace `your@email.com` and phone in the utility bar, contact section and footer.
-2. Edit placeholder text in About / Experience / Projects / Achievements.
-3. Swap the hero video/poster or use a still image if you prefer no autoplay.
-4. Add or remove photos by editing the `.g-item` links in the Gallery section.
-5. Publish on GitHub Pages.
-
-## Notes
-- The hero poster is `images/IMG20260630183942.jpg` — change if you like.
-- `IMG20260522211004.jpg` and `IMG20260522211004-2.jpg` appear to be duplicates; remove one if unwanted.
