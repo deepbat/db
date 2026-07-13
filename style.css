@@ -50,7 +50,7 @@ img{display:block;max-width:100%}
 
 /* Hero */
 .hero{position:relative;min-height:88vh;display:flex;align-items:center;overflow:hidden;color:#fff;
-  background:url('photos/hero.jpg') center/cover no-repeat}
+  background:url('images/hero.jpg') center/cover no-repeat}
 .hero-overlay{position:absolute;inset:0;z-index:-1;
   background:linear-gradient(115deg,rgba(62,28,102,.92),rgba(81,40,134,.72) 55%,rgba(123,76,160,.55))}
 .hero-inner{max-width:760px;padding:120px 0}
