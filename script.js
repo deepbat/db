@@ -1,25 +1,26 @@
-const nav = document.getElementById('nav');
+const header = document.getElementById('siteHeader');
 const menuToggle = document.getElementById('menuToggle');
-const navLinks = document.querySelector('nav ul');
+const navLinks = document.getElementById('navLinks');
 const toTop = document.getElementById('toTop');
-const cursorGlow = document.getElementById('cursorGlow');
 
 menuToggle.addEventListener('click', () => {
-  navLinks.classList.toggle('open');
-  menuToggle.classList.toggle('active');
+  const open = navLinks.classList.toggle('open');
+  menuToggle.classList.toggle('active', open);
+  menuToggle.setAttribute('aria-expanded', open);
 });
 navLinks.querySelectorAll('a').forEach(a => {
   a.addEventListener('click', () => {
     navLinks.classList.remove('open');
     menuToggle.classList.remove('active');
+    menuToggle.setAttribute('aria-expanded', 'false');
   });
 });
 
 window.addEventListener('scroll', () => {
-  nav.classList.toggle('scrolled', window.scrollY > 40);
-  toTop.classList.toggle('show', window.scrollY > 500);
+  header.classList.toggle('scrolled', window.scrollY > 20);
+  if (toTop) toTop.style.opacity = window.scrollY > 500 ? '1' : '.85';
 });
-toTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+if (toTop) toTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 
 document.querySelectorAll('a[href^="#"]').forEach(a => {
   a.addEventListener('click', e => {
@@ -34,13 +35,8 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
 const revealEls = document.querySelectorAll('.reveal');
 const io = new IntersectionObserver((entries) => {
   entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
-}, { threshold: 0.15 });
+}, { threshold: 0.12 });
 revealEls.forEach(el => io.observe(el));
-
-window.addEventListener('mousemove', e => {
-  cursorGlow.style.left = e.clientX + 'px';
-  cursorGlow.style.top = e.clientY + 'px';
-});
 
 const lb = document.getElementById('lightbox');
 const lbImg = document.getElementById('lbImg');
