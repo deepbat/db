@@ -145,15 +145,31 @@ input,textarea,select{font:inherit}
 .card h3{font-size:1.2rem;margin-bottom:8px}
 .card p{color:var(--muted);line-height:1.6}
 
-/* Skills */
+/* Skills progress container updates */
 .skills-grid{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
 .skill{display:flex;flex-direction:column;justify-content:space-between;contain:layout style}
 .skill h3{font-size:1.05rem;margin-bottom:14px}
-.bar{height:9px;border-radius:8px;background:var(--purple-tint);overflow:hidden;position:relative}
-.bar i{display:block;height:100%;width:0;border-radius:8px;
-  background:linear-gradient(90deg,var(--purple),var(--purple-light));transition:width 1.4s ease}
-.reveal.visible .bar i{width:var(--v)}
-.bar-label{display:block;font-size:.75rem;color:var(--purple);margin-top:6px;font-weight:600;text-align:right}
+.bar-container{display:flex;flex-direction:column;gap:6px}
+.bar-container progress{
+  width:100%;
+  height:9px;
+  border-radius:8px;
+  appearance:none;
+  -webkit-appearance:none;
+}
+.bar-container progress::-webkit-progress-bar{
+  background:var(--purple-tint);
+  border-radius:8px;
+}
+.bar-container progress::-webkit-progress-value{
+  background:linear-gradient(90deg,var(--purple),var(--purple-light));
+  border-radius:8px;
+}
+.bar-container progress::-moz-progress-bar{
+  background:linear-gradient(90deg,var(--purple),var(--purple-light));
+  border-radius:8px;
+}
+.bar-label{display:block;font-size:.75rem;color:var(--purple);font-weight:600;text-align:right}
 
 /* Projects */
 .project{padding:0;overflow:hidden;display:flex;flex-direction:column;contain:layout style}
@@ -209,13 +225,14 @@ input,textarea,select{font:inherit}
   cursor:pointer;font-weight:600;transition:background .25s,transform .2s;min-height:44px}
 #toTop:hover{background:var(--purple-light);transform:translateY(-2px)}
 
-/* Lightbox */
+/* Lightbox & Transitions */
 .lightbox{position:fixed;inset:0;background:rgba(31,27,46,.96);display:none;align-items:center;
   justify-content:center;z-index:var(--z-lightbox);flex-direction:column}
 .lightbox.open{display:flex;animation:fadeIn .25s ease}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 .lightbox img{max-width:90%;max-height:78vh;border-radius:8px;box-shadow:0 20px 80px rgba(0,0,0,.5);
-  object-fit:contain;touch-action:none}
+  object-fit:contain;touch-action:none;transition:opacity 0.2s ease-in-out;}
+.lightbox img.fade-out{opacity:0}
 .lb-close{position:absolute;top:20px;right:28px;background:none;border:0;color:#fff;font-size:2.6rem;
   cursor:pointer;line-height:1;width:54px;height:54px;display:flex;align-items:center;justify-content:center;
   border-radius:50%;transition:background .2s;min-height:44px;min-width:44px}
@@ -233,7 +250,7 @@ input,textarea,select{font:inherit}
 .reveal{opacity:0;transform:translateY(40px);transition:opacity .8s ease,transform .8s ease}
 .reveal.visible{opacity:1;transform:translateY(0)}
 
-/* Mobile */
+/* Mobile breakpoint optimizations */
 @media(max-width:900px){
   .highlights-grid{grid-template-columns:repeat(2,1fr)}
   .hl:nth-child(3){border-left:0}
@@ -273,14 +290,14 @@ input,textarea,select{font:inherit}
   .awards{grid-template-columns:1fr}
 }
 
-/* Reduced motion */
+/* Reduced motion support */
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:0.01ms!important;animation-iteration-count:1!important;
     transition-duration:0.01ms!important;scroll-behavior:auto!important}
   .reveal{opacity:1;transform:none}
 }
 
-/* Print */
+/* Standard Print Styling */
 @media print{
   .utility,.site-header,.menu-toggle,.scroll-cue,.lightbox,#toTop,.hero-overlay{display:none!important}
   .hero{min-height:auto;padding:40px 0}

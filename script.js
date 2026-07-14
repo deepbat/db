@@ -116,7 +116,7 @@
     revealEls.forEach(function(el) { el.classList.add('visible'); });
   }
 
-  /* --- Lightbox --- */
+  /* --- Lightbox implementation (Optimized layout-shift transitions) --- */
   var lb = document.getElementById('lightbox');
   var lbImg = document.getElementById('lbImg');
   var lbClose = document.getElementById('lbClose');
@@ -153,11 +153,13 @@
 
     function step(d) {
       var next = (current + d + gItems.length) % gItems.length;
-      lbImg.style.opacity = '0';
-      setTimeout(function() {
+      lbImg.classList.add('fade-out');
+      
+      lbImg.addEventListener('transitionend', function onFade() {
         openLightbox(next);
-        lbImg.style.opacity = '1';
-      }, 150);
+        lbImg.classList.remove('fade-out');
+        lbImg.removeEventListener('transitionend', onFade);
+      }, { once: true });
     }
 
     gItems.forEach(function(it, i) {
@@ -185,7 +187,7 @@
       if (e.key === 'ArrowRight') step(1);
     });
 
-    /* Swipe support for lightbox */
+    /* Swipe gestures for mobile lightbox */
     var touchStartX = 0;
     var touchEndX = 0;
     lb.addEventListener('touchstart', function(e) {
@@ -199,11 +201,9 @@
         else step(-1);
       }
     }, { passive: true });
-
-    lbImg.style.transition = 'opacity .15s ease';
   }
 
-  /* --- Video lazy init --- */
+  /* --- Video loader init --- */
   var video = document.getElementById('showreelVideo');
   if (video) {
     video.addEventListener('loadeddata', function() {
