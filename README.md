@@ -2,6 +2,8 @@
 
 A clean, professional personal portfolio styled after the University of Bath website — light theme, strong typography, Bath purple (`#512886`) accent, and card-based content blocks.
 
+**Live Site:** [deepbat.github.io/db](https://deepbat.github.io/db)
+
 ## Features
 - Bath-style **utility bar** + sticky navigation with mobile hamburger menu
 - **Hero** with purple gradient overlay and scroll indicator
