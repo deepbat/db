@@ -9,6 +9,76 @@
 
   if (footerYear) footerYear.textContent = new Date().getFullYear();
 
+  /* --- Theme toggle --- */
+  var themeToggle = document.getElementById('themeToggle');
+  if (themeToggle) {
+    function currentTheme() {
+      return document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+    }
+    function applyThemeLabel() {
+      var isDark = currentTheme() === 'dark';
+      themeToggle.setAttribute('aria-pressed', String(isDark));
+      themeToggle.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
+    }
+    applyThemeLabel();
+    themeToggle.addEventListener('click', function() {
+      var next = currentTheme() === 'dark' ? 'light' : 'dark';
+      if (next === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      } else {
+        document.documentElement.removeAttribute('data-theme');
+      }
+      try { localStorage.setItem('theme', next); } catch (e) {}
+      applyThemeLabel();
+    });
+  }
+
+  /* --- Project card expand/collapse --- */
+  document.querySelectorAll('.proj-toggle').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var more = btn.nextElementSibling;
+      if (!more || !more.classList.contains('proj-more')) return;
+      var isOpen = more.classList.toggle('open');
+      btn.setAttribute('aria-expanded', String(isOpen));
+      btn.innerHTML = isOpen ? 'Show less &larr;' : 'Learn more &rarr;';
+    });
+  });
+
+  /* --- Contact form (AJAX submit, stays on page) --- */
+  var contactForm = document.getElementById('contactForm');
+  var formStatus = document.getElementById('formStatus');
+  if (contactForm) {
+    contactForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      var submitBtn = contactForm.querySelector('.form-submit');
+      if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Sending...'; }
+      if (formStatus) { formStatus.textContent = ''; formStatus.className = 'form-status'; }
+
+      fetch(contactForm.action, {
+        method: 'POST',
+        body: new FormData(contactForm),
+        headers: { 'Accept': 'application/json' }
+      }).then(function(res) {
+        if (res.ok) {
+          if (formStatus) {
+            formStatus.textContent = 'Message sent \u2014 thank you! I\u2019ll get back to you soon.';
+            formStatus.className = 'form-status success';
+          }
+          contactForm.reset();
+        } else {
+          throw new Error('Request failed');
+        }
+      }).catch(function() {
+        if (formStatus) {
+          formStatus.textContent = 'Something went wrong. Please try emailing deepak.batra@outlook.com directly.';
+          formStatus.className = 'form-status error';
+        }
+      }).finally(function() {
+        if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Send message'; }
+      });
+    });
+  }
+
   if (!header || !menuToggle || !navLinks) return;
 
   /* --- Mobile menu toggle --- */
@@ -116,7 +186,7 @@
     revealEls.forEach(function(el) { el.classList.add('visible'); });
   }
 
-  /* --- Lightbox implementation (Optimized layout-shift transitions) --- */
+  /* --- Lightbox --- */
   var lb = document.getElementById('lightbox');
   var lbImg = document.getElementById('lbImg');
   var lbClose = document.getElementById('lbClose');
@@ -153,13 +223,11 @@
 
     function step(d) {
       var next = (current + d + gItems.length) % gItems.length;
-      lbImg.classList.add('fade-out');
-      
-      lbImg.addEventListener('transitionend', function onFade() {
+      lbImg.style.opacity = '0';
+      setTimeout(function() {
         openLightbox(next);
-        lbImg.classList.remove('fade-out');
-        lbImg.removeEventListener('transitionend', onFade);
-      }, { once: true });
+        lbImg.style.opacity = '1';
+      }, 150);
     }
 
     gItems.forEach(function(it, i) {
@@ -187,7 +255,7 @@
       if (e.key === 'ArrowRight') step(1);
     });
 
-    /* Swipe gestures for mobile lightbox */
+    /* Swipe support for lightbox */
     var touchStartX = 0;
     var touchEndX = 0;
     lb.addEventListener('touchstart', function(e) {
@@ -201,9 +269,11 @@
         else step(-1);
       }
     }, { passive: true });
+
+    lbImg.style.transition = 'opacity .15s ease';
   }
 
-  /* --- Video loader init --- */
+  /* --- Video lazy init --- */
   var video = document.getElementById('showreelVideo');
   if (video) {
     video.addEventListener('loadeddata', function() {

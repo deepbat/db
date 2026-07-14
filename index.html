@@ -3,22 +3,30 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Deepak Batra — Office Professional, Documentation Specialist &amp; Technology Enthusiast. Portfolio, projects, gallery and showreel.">
+<meta name="description" content="Deepak Batra &#x2014; Office Professional, Documentation Specialist &amp; Technology Enthusiast. Portfolio, projects, gallery and showreel.">
 <meta name="theme-color" content="#512886">
-<meta name="color-scheme" content="light only">
 <meta property="og:title" content="Deepak Batra | Office Professional &amp; Technology Enthusiast">
-<meta property="og:description" content="Portfolio, projects, gallery and showreel of Deepak Batra — Office Professional, Documentation Specialist &amp; Technology Enthusiast.">
+<meta property="og:description" content="Portfolio, projects, gallery and showreel of Deepak Batra &#x2014; Office Professional, Documentation Specialist &amp; Technology Enthusiast.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://deepbat.github.io/db">
-<meta property="og:image" content="images/hero.jpg">
+<meta property="og:image" content="https://deepbat.github.io/db/images/hero.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Deepak Batra | Office Professional &amp; Technology Enthusiast">
 <meta name="twitter:description" content="Portfolio, projects, gallery and showreel.">
-<meta name="twitter:image" content="images/hero.jpg">
+<meta name="twitter:image" content="https://deepbat.github.io/db/images/hero.jpg">
 <link rel="canonical" href="https://deepbat.github.io/db">
 <title>Deepak Batra | Office Professional &amp; Technology Enthusiast</title>
+<script>
+(function(){
+  try{
+    var saved=localStorage.getItem('theme');
+    var theme=saved||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+    if(theme==='dark')document.documentElement.setAttribute('data-theme','dark');
+  }catch(e){}
+})();
+</script>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23512886'/%3E%3Ctext x='50' y='72' font-size='56' font-family='Arial,sans-serif' font-weight='bold' fill='white' text-anchor='middle'%3EDB%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -42,8 +50,7 @@
   "@context":"https://schema.org",
   "@type":"WebSite",
   "name":"Deepak Batra Portfolio",
-  "url":"https://deepbat.github.io/db",
-  "potentialAction":{"@type":"SearchAction","target":"","query-input":"required name=query"}
+  "url":"https://deepbat.github.io/db"
 }
 </script>
 </head>
@@ -52,12 +59,12 @@
 <a href="#main" class="skip-link">Skip to main content</a>
 
 <!-- Utility bar -->
-<div class="utility" role="complementary" aria-label="Contact bar">
+  <div class="utility" role="complementary" aria-label="Contact bar">
   <div class="wrap utility-inner">
     <span class="util-tag">Personal Portfolio</span>
     <div class="util-links" role="list">
-      <a href="mailto:deepak.batra@outlook.com" role="listitem">✉️ deepak.batra@outlook.com</a>
-      <a href="tel:+919779777570" role="listitem">📞 +91-9779777570</a>
+      <a href="mailto:deepak.batra@outlook.com" role="listitem">&#x2709;&#xFE0F; deepak.batra@outlook.com</a>
+      <a href="tel:+919779777570" role="listitem">&#x260E;&#xFE0F; +91-9779777570</a>
       <a href="https://linkedin.com/in/deepakbatra" target="_blank" rel="noopener noreferrer" role="listitem">LinkedIn</a>
       <a href="https://instagram.com/deepakbatra" target="_blank" rel="noopener noreferrer" role="listitem">Instagram</a>
     </div>
@@ -65,7 +72,7 @@
 </div>
 
 <!-- Main navigation -->
-<header class="site-header" id="siteHeader">
+<header class="site-header" id="siteHeader" role="navigation">
   <div class="wrap nav-inner">
     <a href="#top" class="brand" aria-label="Deepak Batra - Home">Deepak<span>Batra</span></a>
     <nav aria-label="Primary">
@@ -79,21 +86,27 @@
         <li><a href="#contact" class="nav-cta">Contact</a></li>
       </ul>
     </nav>
-    <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="navLinks">
-      <span></span><span></span><span></span>
-    </button>
+    <div class="nav-right">
+      <button class="theme-toggle" id="themeToggle" aria-label="Switch to dark mode" aria-pressed="false">
+        <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+      </button>
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="navLinks">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
   </div>
 </header>
 
-<main id="main">
+<main id="main" role="main">
 
 <!-- Hero -->
-<section class="hero" id="top" aria-label="Introduction">
+<section class="hero" id="top" role="region" aria-label="Introduction">
   <div class="hero-overlay"></div>
   <div class="wrap hero-inner">
     <p class="eyebrow">Portfolio of Deepak Batra</p>
-    <h1>Hi, I’m <span>Deepak Batra</span></h1>
-    <p class="tagline">Office Professional • Documentation Specialist • AI &amp; Technology Enthusiast</p>
+    <h1>Hi, I&#8217;m <span>Deepak Batra</span></h1>
+    <p class="tagline">Office Professional &#x2022; Documentation Specialist &#x2022; AI &amp; Technology Enthusiast</p>
     <div class="hero-actions">
       <a href="#projects" class="btn">View My Work</a>
       <a href="#contact" class="btn ghost">Get In Touch</a>
@@ -121,14 +134,14 @@
     </div>
     <div class="about-wrap">
       <div class="about-text">
-        <p>I’m an office professional and documentation specialist with a passion for using technology and AI to work smarter. I thrive on keeping operations organized, communications clear, and teams aligned.</p>
-        <p>With over five years of experience in office administration, I specialize in streamlining workflows, managing complex documentation systems, and leveraging AI-powered tools to boost productivity. My approach combines precision with adaptability — ensuring every project is delivered efficiently and every stakeholder stays informed.</p>
+        <p>I&#8217;m an office professional and documentation specialist with a passion for using technology and AI to work smarter. I thrive on keeping operations organized, communications clear, and teams aligned.</p>
+        <p>With over five years of experience in office administration, I specialize in streamlining workflows, managing complex documentation systems, and leveraging AI-powered tools to boost productivity. My approach combines precision with adaptability &#x2014; ensuring every project is delivered efficiently and every stakeholder stays informed.</p>
         <p>Currently exploring AI-driven automation, intelligent document processing, and productivity optimization to transform how teams collaborate.</p>
         <a href="#experience" class="text-link">Explore my experience &rarr;</a>
       </div>
       <aside class="about-card">
         <h3>What I bring</h3>
-        <p>Accuracy, reliability and a calm approach to complex workflows — plus the curiosity to keep learning new tools.</p>
+        <p>Accuracy, reliability and a calm approach to complex workflows &#x2014; plus the curiosity to keep learning new tools.</p>
         <ul class="tick">
           <li>Clear, professional communication</li>
           <li>Organized documentation &amp; records</li>
@@ -146,7 +159,7 @@
   <div class="wrap">
     <div class="section-head">
       <p class="kicker">Experience</p>
-      <h2 id="exp-heading">What I’ve been working on</h2>
+      <h2 id="exp-heading">What I&#8217;ve been working on</h2>
     </div>
     <div class="grid cards-grid">
       <article class="card">
@@ -162,7 +175,7 @@
       <article class="card">
         <span class="badge">Focus</span>
         <h3>AI Productivity</h3>
-        <p>Leveraging AI tools to automate repetitive tasks, enhance document processing, and accelerate data analysis — turning hours of manual work into minutes of automated flow.</p>
+        <p>Leveraging AI tools to automate repetitive tasks, enhance document processing, and accelerate data analysis &#x2014; turning hours of manual work into minutes of automated flow.</p>
       </article>
     </div>
   </div>
@@ -176,48 +189,12 @@
       <h2 id="skills-heading">What I work with</h2>
     </div>
     <div class="grid skills-grid">
-      <div class="card skill">
-        <h3>Microsoft Office</h3>
-        <div class="bar-container">
-          <progress value="95" max="100" aria-label="Microsoft Office Skill level: 95%"></progress>
-          <span class="bar-label">95%</span>
-        </div>
-      </div>
-      <div class="card skill">
-        <h3>Professional Email Writing</h3>
-        <div class="bar-container">
-          <progress value="90" max="100" aria-label="Professional Email Writing Skill level: 90%"></progress>
-          <span class="bar-label">90%</span>
-        </div>
-      </div>
-      <div class="card skill">
-        <h3>Documentation</h3>
-        <div class="bar-container">
-          <progress value="92" max="100" aria-label="Documentation Skill level: 92%"></progress>
-          <span class="bar-label">92%</span>
-        </div>
-      </div>
-      <div class="card skill">
-        <h3>Google Workspace</h3>
-        <div class="bar-container">
-          <progress value="88" max="100" aria-label="Google Workspace Skill level: 88%"></progress>
-          <span class="bar-label">88%</span>
-        </div>
-      </div>
-      <div class="card skill">
-        <h3>AI Tools</h3>
-        <div class="bar-container">
-          <progress value="85" max="100" aria-label="AI Tools Skill level: 85%"></progress>
-          <span class="bar-label">85%</span>
-        </div>
-      </div>
-      <div class="card skill">
-        <h3>Problem Solving</h3>
-        <div class="bar-container">
-          <progress value="90" max="100" aria-label="Problem Solving Skill level: 90%"></progress>
-          <span class="bar-label">90%</span>
-        </div>
-      </div>
+      <div class="card skill"><h3>Microsoft Office</h3><div class="bar" role="progressbar" aria-valuenow="95" aria-valuemin="0" aria-valuemax="100"><i style="--v:95%"></i></div><span class="bar-label">95%</span></div>
+      <div class="card skill"><h3>Professional Email Writing</h3><div class="bar" role="progressbar" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100"><i style="--v:90%"></i></div><span class="bar-label">90%</span></div>
+      <div class="card skill"><h3>Documentation</h3><div class="bar" role="progressbar" aria-valuenow="92" aria-valuemin="0" aria-valuemax="100"><i style="--v:92%"></i></div><span class="bar-label">92%</span></div>
+      <div class="card skill"><h3>Google Workspace</h3><div class="bar" role="progressbar" aria-valuenow="88" aria-valuemin="0" aria-valuemax="100"><i style="--v:88%"></i></div><span class="bar-label">88%</span></div>
+      <div class="card skill"><h3>AI Tools</h3><div class="bar" role="progressbar" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100"><i style="--v:85%"></i></div><span class="bar-label">85%</span></div>
+      <div class="card skill"><h3>Problem Solving</h3><div class="bar" role="progressbar" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100"><i style="--v:90%"></i></div><span class="bar-label">90%</span></div>
     </div>
   </div>
 </section>
@@ -232,30 +209,33 @@
     </div>
     <div class="grid cards-grid">
       <article class="card project">
-        <div class="proj-img"><img loading="lazy" src="images/gallery-02.jpg" alt="Deepak Batra standing presenting visual charts at photography installation"></div>
+        <div class="proj-img"><picture><source srcset="images/gallery-02.webp" type="image/webp"><img loading="lazy" src="images/gallery-02.jpg" alt="Workflow automation dashboard project screenshot" width="1600" height="725"></picture></div>
         <div class="proj-body">
           <span class="badge">Case Study</span>
           <h3>Office Workflow Automation</h3>
           <p>Designed and implemented an automated document routing system that reduced processing time by 40% and eliminated manual data entry errors across departments.</p>
-          <a href="#contact" class="text-link">Inquire &rarr;</a>
+          <button type="button" class="text-link proj-toggle" aria-expanded="false">Learn more &rarr;</button>
+          <p class="proj-more">The system replaced a manual, email-based approval chain with a rules-based router that assigned documents to the right reviewer automatically, flagged missing fields before submission, and logged every step for audit purposes. Rollout included training three teams and writing the supporting SOP.</p>
         </div>
       </article>
       <article class="card project">
-        <div class="proj-img"><img loading="lazy" src="images/gallery-01.jpg" alt="Deepak Batra and family standing side-by-side inside formal hall"></div>
+        <div class="proj-img"><picture><source srcset="images/gallery-07.webp" type="image/webp"><img loading="lazy" src="images/gallery-07.jpg" alt="Documentation system architecture diagram" width="725" height="1600"></picture></div>
         <div class="proj-body">
           <span class="badge">Case Study</span>
           <h3>Centralized Documentation System</h3>
           <p>Built a unified knowledge base consolidating SOPs, reports, and compliance documents into a searchable, version-controlled platform accessible to all team members.</p>
-          <a href="#contact" class="text-link">Inquire &rarr;</a>
+          <button type="button" class="text-link proj-toggle" aria-expanded="false">Learn more &rarr;</button>
+          <p class="proj-more">Previously, documentation was scattered across shared drives and inboxes with no version history. The new structure introduced consistent naming conventions, folder taxonomy, and access permissions, cutting the average time to find a document from minutes to seconds and eliminating duplicate, outdated copies in circulation.</p>
         </div>
       </article>
       <article class="card project">
-        <div class="proj-img"><img loading="lazy" src="images/gallery-06.jpg" alt="Eighteenth birthday cake presentation celebration with balloons and custom plaque"></div>
+        <div class="proj-img"><picture><source srcset="images/gallery-13.webp" type="image/webp"><img loading="lazy" src="images/gallery-13.jpg" alt="AI-powered analytics tool interface" width="729" height="1600"></picture></div>
         <div class="proj-body">
           <span class="badge">Case Study</span>
           <h3>AI-Powered Reporting Tool</h3>
           <p>Leveraged AI tools to automate weekly report generation, cutting preparation time from 6 hours to 30 minutes while improving data accuracy and visualization quality.</p>
-          <a href="#contact" class="text-link">Inquire &rarr;</a>
+          <button type="button" class="text-link proj-toggle" aria-expanded="false">Learn more &rarr;</button>
+          <p class="proj-more">Raw data exports were previously compiled and formatted by hand each week. An AI-assisted pipeline now cleans the data, generates summary visuals, and drafts the narrative commentary for review, leaving the team more time for analysis instead of formatting.</p>
         </div>
       </article>
     </div>
@@ -285,50 +265,22 @@
     <div class="section-head">
       <p class="kicker">Gallery</p>
       <h2 id="gallery-heading">Moments &amp; memories</h2>
-      <p class="lead">Snapshots from events, projects, and family milestones.</p>
+      <p class="lead">Snapshots from events, projects, and behind-the-scenes moments.</p>
     </div>
     <div class="gallery-grid" id="galleryGrid" role="list">
-      <!-- Real Photos -->
-      <a class="g-item" href="images/gallery-01.jpg" data-full="images/gallery-01.jpg" data-index="0" role="listitem" tabindex="0">
-        <img loading="lazy" src="images/gallery-01.jpg" alt="Deepak Batra and family standing side-by-side in formal festive attire at an event hall">
-      </a>
-      <a class="g-item" href="images/gallery-02.jpg" data-full="images/gallery-02.jpg" data-index="1" role="listitem" tabindex="0">
-        <img loading="lazy" src="images/gallery-02.jpg" alt="Deepak Batra standing presenting and organizing high resolution print galleries at local exhibition space">
-      </a>
-      <a class="g-item" href="images/gallery-03.jpg" data-full="images/gallery-03.jpg" data-index="2" role="listitem" tabindex="0">
-        <img loading="lazy" src="images/gallery-03.jpg" alt="Selfie portrait of Deepak Batra with his wife standing indoors">
-      </a>
-      <a class="g-item" href="images/gallery-04.jpg" data-full="images/gallery-04.jpg" data-index="3" role="listitem" tabindex="0">
-        <img loading="lazy" src="images/gallery-04.jpg" alt="Deepak Batra and wife standing beneath customized wooden canopy with neon light decor Jalandhar">
-      </a>
-      <a class="g-item" href="images/gallery-05.jpg" data-full="images/gallery-05.jpg" data-index="4" role="listitem" tabindex="0">
-        <img loading="lazy" src="images/gallery-05.jpg" alt="Deepak Batra standing with his daughter posing outdoors in front of a modern garden framework at night">
-      </a>
-      <a class="g-item" href="images/gallery-06.jpg" data-full="images/gallery-06.jpg" data-index="5" role="listitem" tabindex="0">
-        <img loading="lazy" src="images/gallery-06.jpg" alt="The Batra family celebrating a customized 18th birthday celebration milestone plaque awards cake and decoration">
-      </a>
-      <!-- Placeholder / Additional Professional Photos -->
-      <a class="g-item" href="images/gallery-07.jpg" data-full="images/gallery-07.jpg" data-index="6" role="listitem" tabindex="0">
-        <img loading="lazy" src="images/gallery-07.jpg" alt="Team meeting and operational whiteboard session tracking performance metrics">
-      </a>
-      <a class="g-item" href="images/gallery-08.jpg" data-full="images/gallery-08.jpg" data-index="7" role="listitem" tabindex="0">
-        <img loading="lazy" src="images/gallery-08.jpg" alt="Modern office document workstation displaying analytical software and layouts">
-      </a>
-      <a class="g-item" href="images/gallery-09.jpg" data-full="images/gallery-09.jpg" data-index="8" role="listitem" tabindex="0">
-        <img loading="lazy" src="images/gallery-09.jpg" alt="Organized files and strategic presentation planners laid out on workspace desk">
-      </a>
-      <a class="g-item" href="images/gallery-10.jpg" data-full="images/gallery-10.jpg" data-index="9" role="listitem" tabindex="0">
-        <img loading="lazy" src="images/gallery-10.jpg" alt="Collaborative workshop presentation slides showcasing task flow automation diagrams">
-      </a>
-      <a class="g-item" href="images/gallery-11.jpg" data-full="images/gallery-11.jpg" data-index="10" role="listitem" tabindex="0">
-        <img loading="lazy" src="images/gallery-11.jpg" alt="SOP documents layout and checklist mapping administrative processes">
-      </a>
-      <a class="g-item" href="images/gallery-12.jpg" data-full="images/gallery-12.jpg" data-index="11" role="listitem" tabindex="0">
-        <img loading="lazy" src="images/gallery-12.jpg" alt="Close up view of productivity dashboard displaying task tracking status updates">
-      </a>
-      <a class="g-item" href="images/gallery-13.jpg" data-full="images/gallery-13.jpg" data-index="12" role="listitem" tabindex="0">
-        <img loading="lazy" src="images/gallery-13.jpg" alt="Creative review mapping session for website UI layouts and interface structure">
-      </a>
+      <a class="g-item" href="images/gallery-01.jpg" data-full="images/gallery-01.jpg" data-index="0" role="listitem" tabindex="0"><picture><source srcset="images/gallery-01.webp" type="image/webp"><img loading="lazy" src="images/gallery-01.jpg" alt="Team collaboration session at the office" width="1600" height="900"></picture></a>
+      <a class="g-item" href="images/gallery-02.jpg" data-full="images/gallery-02.jpg" data-index="1" role="listitem" tabindex="0"><picture><source srcset="images/gallery-02.webp" type="image/webp"><img loading="lazy" src="images/gallery-02.jpg" alt="Project planning whiteboard session" width="1600" height="725"></picture></a>
+      <a class="g-item" href="images/gallery-03.jpg" data-full="images/gallery-03.jpg" data-index="2" role="listitem" tabindex="0"><picture><source srcset="images/gallery-03.webp" type="image/webp"><img loading="lazy" src="images/gallery-03.jpg" alt="Document management system setup" width="1600" height="722"></picture></a>
+      <a class="g-item" href="images/gallery-04.jpg" data-full="images/gallery-04.jpg" data-index="3" role="listitem" tabindex="0"><picture><source srcset="images/gallery-04.webp" type="image/webp"><img loading="lazy" src="images/gallery-04.jpg" alt="Workspace organization and setup" width="725" height="1600"></picture></a>
+      <a class="g-item" href="images/gallery-05.jpg" data-full="images/gallery-05.jpg" data-index="4" role="listitem" tabindex="0"><picture><source srcset="images/gallery-05.webp" type="image/webp"><img loading="lazy" src="images/gallery-05.jpg" alt="AI tools demonstration presentation" width="729" height="1600"></picture></a>
+      <a class="g-item" href="images/gallery-06.jpg" data-full="images/gallery-06.jpg" data-index="5" role="listitem" tabindex="0"><picture><source srcset="images/gallery-06.webp" type="image/webp"><img loading="lazy" src="images/gallery-06.jpg" alt="Office equipment and technology setup" width="900" height="1600"></picture></a>
+      <a class="g-item" href="images/gallery-07.jpg" data-full="images/gallery-07.jpg" data-index="6" role="listitem" tabindex="0"><picture><source srcset="images/gallery-07.webp" type="image/webp"><img loading="lazy" src="images/gallery-07.jpg" alt="Stakeholder meeting and coordination" width="725" height="1600"></picture></a>
+      <a class="g-item" href="images/gallery-08.jpg" data-full="images/gallery-08.jpg" data-index="7" role="listitem" tabindex="0"><picture><source srcset="images/gallery-08.webp" type="image/webp"><img loading="lazy" src="images/gallery-08.jpg" alt="Training workshop on productivity tools" width="725" height="1600"></picture></a>
+      <a class="g-item" href="images/gallery-09.jpg" data-full="images/gallery-09.jpg" data-index="8" role="listitem" tabindex="0"><picture><source srcset="images/gallery-09.webp" type="image/webp"><img loading="lazy" src="images/gallery-09.jpg" alt="Professional development conference" width="725" height="1600"></picture></a>
+      <a class="g-item" href="images/gallery-10.jpg" data-full="images/gallery-10.jpg" data-index="9" role="listitem" tabindex="0"><picture><source srcset="images/gallery-10.webp" type="image/webp"><img loading="lazy" src="images/gallery-10.jpg" alt="Team building and office culture event" width="725" height="1600"></picture></a>
+      <a class="g-item" href="images/gallery-12.jpg" data-full="images/gallery-12.jpg" data-index="10" role="listitem" tabindex="0"><picture><source srcset="images/gallery-12.webp" type="image/webp"><img loading="lazy" src="images/gallery-12.jpg" alt="Certification and achievement recognition" width="1600" height="900"></picture></a>
+      <a class="g-item" href="images/gallery-13.jpg" data-full="images/gallery-13.jpg" data-index="11" role="listitem" tabindex="0"><picture><source srcset="images/gallery-13.webp" type="image/webp"><img loading="lazy" src="images/gallery-13.jpg" alt="Behind the scenes of a project launch" width="729" height="1600"></picture></a>
+      <a class="g-item" href="images/hero.jpg" data-full="images/hero.jpg" data-index="12" role="listitem" tabindex="0"><picture><source srcset="images/hero.webp" type="image/webp"><img loading="lazy" src="images/hero.jpg" alt="Professional portrait and workspace" width="1600" height="729"></picture></a>
     </div>
   </div>
 </section>
@@ -354,9 +306,32 @@
   <div class="wrap">
     <div class="section-head">
       <p class="kicker">Contact</p>
-      <h2 id="contact-heading">Let’s connect</h2>
+      <h2 id="contact-heading">Let&#8217;s connect</h2>
       <p class="lead">Open to new opportunities, collaborations, and conversations.</p>
     </div>
+    <form class="contact-form" id="contactForm" action="https://formsubmit.co/deepak.batra@outlook.com" method="POST">
+      <input type="hidden" name="_subject" value="New message from portfolio site">
+      <input type="hidden" name="_template" value="table">
+      <input type="hidden" name="_captcha" value="false">
+      <input type="text" name="_honey" class="hp-field" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <div class="form-row">
+        <div class="form-field">
+          <label for="cf-name">Name</label>
+          <input type="text" id="cf-name" name="name" required autocomplete="name">
+        </div>
+        <div class="form-field">
+          <label for="cf-email">Email</label>
+          <input type="email" id="cf-email" name="email" required autocomplete="email">
+        </div>
+      </div>
+      <div class="form-field">
+        <label for="cf-message">Message</label>
+        <textarea id="cf-message" name="message" rows="5" required></textarea>
+      </div>
+      <button type="submit" class="form-submit">Send message</button>
+      <p class="form-status" id="formStatus" role="status" aria-live="polite"></p>
+      <p class="form-note">This form emails deepak.batra@outlook.com directly &#x2014; no account or sign-up needed on your end.</p>
+    </form>
     <div class="contact-wrap">
       <a class="contact-card" href="mailto:deepak.batra@outlook.com"><h3>Email</h3><p>deepak.batra@outlook.com</p></a>
       <a class="contact-card" href="tel:+919779777570"><h3>Phone</h3><p>+91-9779777570</p></a>
@@ -368,11 +343,11 @@
 </main>
 
 <!-- Footer -->
-<footer class="site-footer">
+<footer class="site-footer" role="contentinfo">
   <div class="wrap footer-grid">
     <div class="foot-col foot-brand">
       <div class="brand">Deepak<span>Batra</span></div>
-      <p>Office Professional • Documentation Specialist • Technology Enthusiast.</p>
+      <p>Office Professional &#x2022; Documentation Specialist &#x2022; Technology Enthusiast.</p>
     </div>
     <div class="foot-col">
       <h4>Explore</h4>
@@ -397,13 +372,13 @@
     </div>
     <div class="foot-col">
       <h4>Location</h4>
-      <p>Jalandhar, Punjab, India</p>
+      <p>India</p>
       <p>Available for remote &amp; on-site opportunities.</p>
     </div>
   </div>
   <div class="wrap footer-bottom">
     <p>&#169; <time datetime="2026"><span id="footerYear">2026</span></time> Deepak Batra. All rights reserved.</p>
-    <button id="toTop" aria-label="Back to top">↑ Back to top</button>
+    <button id="toTop" aria-label="Back to top">&#x2191; Back to top</button>
   </div>
 </footer>
 
