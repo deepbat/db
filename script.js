@@ -1,6 +1,39 @@
 (function(){
   'use strict';
 
+  /* --- Render gallery + skills from content.js (SITE_CONTENT) --- */
+  /* This runs first so every later query for .g-item etc. finds them. */
+  if (typeof SITE_CONTENT !== 'undefined') {
+    var galleryGrid = document.getElementById('galleryGrid');
+    if (galleryGrid && Array.isArray(SITE_CONTENT.gallery)) {
+      var galleryHTML = SITE_CONTENT.gallery.map(function(item, i) {
+        return '<a class="g-item" href="' + item.src + '.jpg" data-full="' + item.src + '.jpg" ' +
+          'data-index="' + i + '" role="listitem" tabindex="0">' +
+          '<picture><source srcset="' + item.src + '.webp" type="image/webp">' +
+          '<img loading="lazy" src="' + item.src + '.jpg" alt="' + item.alt + '"></picture></a>';
+      }).join('');
+      galleryGrid.innerHTML = galleryHTML;
+    }
+
+    var skillsGrid = document.getElementById('skillsGrid');
+    if (skillsGrid && Array.isArray(SITE_CONTENT.skills)) {
+      var CIRC = 100; /* using pathLength="100" so dasharray is just the percentage */
+      var skillsHTML = SITE_CONTENT.skills.map(function(skill) {
+        var pct = Math.max(0, Math.min(100, skill.value));
+        return '<div class="skill-gauge panel">' +
+          '<svg viewBox="0 0 88 88" aria-hidden="true">' +
+          '<circle class="ring-bg" cx="44" cy="44" r="38" pathLength="100"></circle>' +
+          '<circle class="ring-fg" cx="44" cy="44" r="38" pathLength="100" ' +
+          'style="stroke-dasharray:' + pct + ' ' + CIRC + '"></circle>' +
+          '</svg>' +
+          '<span class="pct mono">' + pct + '%</span>' +
+          '<h3>' + skill.name + '</h3>' +
+          '</div>';
+      }).join('');
+      skillsGrid.innerHTML = skillsHTML;
+    }
+  }
+
   var header = document.getElementById('siteHeader');
   var menuToggle = document.getElementById('menuToggle');
   var navLinks = document.getElementById('navLinks');
@@ -9,22 +42,22 @@
 
   if (footerYear) footerYear.textContent = new Date().getFullYear();
 
-  /* --- Theme toggle --- */
+  /* --- Theme toggle (dark is the default theme; light is opt-in) --- */
   var themeToggle = document.getElementById('themeToggle');
   if (themeToggle) {
     function currentTheme() {
-      return document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+      return document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
     }
     function applyThemeLabel() {
-      var isDark = currentTheme() === 'dark';
-      themeToggle.setAttribute('aria-pressed', String(isDark));
-      themeToggle.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
+      var isLight = currentTheme() === 'light';
+      themeToggle.setAttribute('aria-pressed', String(isLight));
+      themeToggle.setAttribute('aria-label', isLight ? 'Switch to dark mode' : 'Switch to light mode');
     }
     applyThemeLabel();
     themeToggle.addEventListener('click', function() {
-      var next = currentTheme() === 'dark' ? 'light' : 'dark';
-      if (next === 'dark') {
-        document.documentElement.setAttribute('data-theme', 'dark');
+      var next = currentTheme() === 'light' ? 'dark' : 'light';
+      if (next === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
       } else {
         document.documentElement.removeAttribute('data-theme');
       }
@@ -131,12 +164,11 @@
     }
   });
 
-  /* --- Sticky header shadow --- */
+  /* --- Back-to-top visibility --- */
   var ticking = false;
   window.addEventListener('scroll', function() {
     if (!ticking) {
       window.requestAnimationFrame(function() {
-        header.classList.toggle('scrolled', window.scrollY > 20);
         if (toTop) {
           toTop.style.opacity = window.scrollY > 500 ? '1' : '.85';
         }
@@ -281,6 +313,30 @@
     });
     video.style.opacity = '0';
     video.style.transition = 'opacity .5s ease';
+  }
+
+  /* --- Rail nav active-tab scrollspy --- */
+  var navAnchors = Array.prototype.slice.call(document.querySelectorAll('#navLinks a[href^="#"]'));
+  var spySections = navAnchors
+    .map(function(a) {
+      var id = a.getAttribute('href').slice(1);
+      var el = document.getElementById(id);
+      return el ? { link: a, el: el } : null;
+    })
+    .filter(Boolean);
+
+  if (spySections.length && 'IntersectionObserver' in window) {
+    var spy = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        var match = spySections.filter(function(s) { return s.el === entry.target; })[0];
+        if (!match) return;
+        if (entry.isIntersecting) {
+          spySections.forEach(function(s) { s.link.classList.remove('is-active'); });
+          match.link.classList.add('is-active');
+        }
+      });
+    }, { threshold: 0, rootMargin: '-45% 0px -50% 0px' });
+    spySections.forEach(function(s) { spy.observe(s.el); });
   }
 
 })();
