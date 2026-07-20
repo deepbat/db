@@ -36,6 +36,37 @@
   if (footerYear) footerYear.textContent = new Date().getFullYear();
 
   /* ==========================================================================
+     Theme toggle (dark / light)
+     ========================================================================== */
+  var themeToggle = document.getElementById('themeToggle');
+  var metaTheme = document.querySelector('meta[name="theme-color"]');
+  function currentTheme() {
+    return document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+  }
+  function applyThemeLabel() {
+    var isLight = currentTheme() === 'light';
+    if (themeToggle) {
+      themeToggle.setAttribute('aria-pressed', String(isLight));
+      themeToggle.setAttribute('aria-label', isLight ? 'Switch to dark mode' : 'Switch to light mode');
+    }
+    if (metaTheme) metaTheme.setAttribute('content', isLight ? '#F6F4EC' : '#0A0A0E');
+  }
+  applyThemeLabel();
+  if (themeToggle) {
+    themeToggle.addEventListener('click', function() {
+      var next = currentTheme() === 'light' ? 'dark' : 'light';
+      if (next === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+      } else {
+        document.documentElement.removeAttribute('data-theme');
+      }
+      try { localStorage.setItem('theme', next); } catch (e) {}
+      applyThemeLabel();
+      document.dispatchEvent(new CustomEvent('themechange'));
+    });
+  }
+
+  /* ==========================================================================
      Mobile menu
      ========================================================================== */
   var menuToggle = document.getElementById('menuToggle');
@@ -301,6 +332,23 @@
       teal: document.getElementById('dotTeal')
     };
     var baseColors = { coral: [255,107,77], violet: [139,92,246], teal: [45,212,200] };
+
+    function hexToRgb(hex) {
+      hex = hex.trim().replace('#', '');
+      if (hex.length === 3) hex = hex.split('').map(function(c){ return c+c; }).join('');
+      var num = parseInt(hex, 16);
+      if (isNaN(num)) return null;
+      return [(num >> 16) & 255, (num >> 8) & 255, num & 255];
+    }
+    function refreshBaseColors() {
+      var cs = getComputedStyle(document.documentElement);
+      ['coral','violet','teal'].forEach(function(k) {
+        var rgb = hexToRgb(cs.getPropertyValue('--' + k) || '');
+        if (rgb) baseColors[k] = rgb;
+      });
+    }
+    refreshBaseColors();
+    document.addEventListener('themechange', refreshBaseColors);
 
     var rect = mixer.getBoundingClientRect();
     function refreshRect() { rect = mixer.getBoundingClientRect(); }
