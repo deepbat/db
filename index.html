@@ -1,478 +1,436 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="description" content="Deepak Batra — Office Professional, Documentation Specialist &amp; Technology Enthusiast. Portfolio, projects, gallery and showreel.">
-<meta name="theme-color" content="#030306">
-<meta property="og:title" content="Deepak Batra | Office Professional &amp; Technology Enthusiast">
-<meta property="og:description" content="Portfolio, projects, gallery and showreel of Deepak Batra — Office Professional, Documentation Specialist &amp; Technology Enthusiast.">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://deepbat.github.io/db">
-<meta property="og:image" content="https://deepbat.github.io/db/images/hero.jpg">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Deepak Batra | Office Professional &amp; Technology Enthusiast">
-<link rel="canonical" href="https://deepbat.github.io/db">
-<title>Deepak Batra — Signal Room</title>
-<script>
-(function(){
-  try{
-    var saved=localStorage.getItem('theme');
-    var theme=saved||(window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');
-    if(theme==='light')document.documentElement.setAttribute('data-theme','light');
-  }catch(e){}
-})();
-</script>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='12' fill='%23030306'/%3E%3Cpath d='M28 72V28h12l20 28V28h12v44H60L40 44v28H28z' fill='%23D4AF37'/%3E%3C/svg%3E">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;600;700;800&amp;family=Outfit:wght@300;400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
-<noscript><style>.reveal,.char,.line-mask,.orbit-ring{opacity:1!important;transform:none!important}</style></noscript>
-<link rel="stylesheet" href="style.css">
-<script type="application/ld+json">
-{"@context":"https://schema.org","@type":"Person","name":"Deepak Batra","jobTitle":"Office Professional & Documentation Specialist","url":"https://deepbat.github.io/db","email":"deepak.batra@outlook.com","telephone":"+91-9779777570","sameAs":["https://linkedin.com/in/deepakbatra","https://instagram.com/deepakbatra"]}
-</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#030306">
+    <title>Deepak Batra — Signal Room</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-<div class="loader" id="loader" aria-hidden="true">
-  <div class="loader-inner">
-    <span class="loader-label mono">Initializing</span>
-    <div class="loader-bar"><span class="loader-fill"></span></div>
-  </div>
-</div>
-
-<div class="ambient" aria-hidden="true">
-  <div class="ambient-orb ambient-orb--a"></div>
-  <div class="ambient-orb ambient-orb--b"></div>
-  <canvas class="ambient-grid" id="gridCanvas" aria-hidden="true"></canvas>
-</div>
-<div class="film-grain" aria-hidden="true"></div>
-
-<div class="scroll-rail" aria-hidden="true">
-  <div class="scroll-rail-fill" id="scrollRail"></div>
-</div>
-
-<div class="cursor" id="cursor" aria-hidden="true">
-  <span class="cursor-dot"></span>
-  <span class="cursor-ring"></span>
-</div>
-
-<a href="#main" class="skip-link">Skip to main content</a>
-
-<header class="nav" id="nav">
-  <div class="shell nav-shell">
-    <a href="#top" class="nav-brand" aria-label="Deepak Batra — Home">
-      <span class="nav-brand-mark">DB</span>
-      <span class="nav-brand-text">Deepak Batra</span>
-    </a>
-    <nav class="nav-menu" id="navMenu" aria-label="Primary">
-      <a href="#about" data-index="01">About</a>
-      <a href="#experience" data-index="02">Experience</a>
-      <a href="#skills" data-index="03">Skills</a>
-      <a href="#projects" data-index="04">Work</a>
-      <a href="#gallery" data-index="05">Gallery</a>
-      <a href="#contact" data-index="06">Contact</a>
-    </nav>
-    <div class="nav-actions">
-      <button class="theme-btn" id="themeBtn" aria-label="Switch to light mode" aria-pressed="false">
-        <svg class="ico-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-        <svg class="ico-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
-      </button>
-      <a href="#contact" class="nav-cta magnetic">Connect</a>
-      <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="navDrawer">
-        <span></span><span></span>
-      </button>
-    </div>
-  </div>
-</header>
-
-<aside class="nav-drawer" id="navDrawer" aria-hidden="true">
-  <nav aria-label="Mobile">
-    <a href="#about"><span class="mono">01</span> About</a>
-    <a href="#experience"><span class="mono">02</span> Experience</a>
-    <a href="#skills"><span class="mono">03</span> Skills</a>
-    <a href="#projects"><span class="mono">04</span> Work</a>
-    <a href="#showreel"><span class="mono">05</span> Showreel</a>
-    <a href="#gallery"><span class="mono">06</span> Gallery</a>
-    <a href="#achievements"><span class="mono">07</span> Recognition</a>
-    <a href="#contact"><span class="mono">08</span> Contact</a>
-  </nav>
-  <div class="nav-drawer-foot">
-    <a href="mailto:deepak.batra@outlook.com">deepak.batra@outlook.com</a>
-    <a href="tel:+919779777570">+91-9779777570</a>
-  </div>
-</aside>
-
-<main id="main">
-
-<!-- HERO -->
-<section class="hero" id="top" aria-label="Introduction">
-  <div class="shell hero-shell">
-    <div class="hero-meta reveal">
-      <span class="pulse-dot" aria-hidden="true"></span>
-      <span class="mono">Open to new opportunities</span>
-      <span class="hero-meta-divider" aria-hidden="true"></span>
-      <span class="mono">India · Remote &amp; on-site</span>
+    <!-- Loader -->
+    <div class="loader" id="loader" aria-hidden="true">
+        <div class="loader-inner">
+            <span class="loader-label mono">Loading</span>
+            <div class="loader-bar"><span class="loader-fill" id="loaderFill"></span></div>
+        </div>
     </div>
 
-    <div class="hero-stage">
-      <h1 class="hero-title" id="heroTitle" aria-label="Deepak Batra — I turn chaos into order">
-        <span class="hero-line"><span class="line-mask"><span class="char-wrap" data-split>Deepak</span></span></span>
-        <span class="hero-line hero-line--accent"><span class="line-mask"><span class="char-wrap" data-split>Batra</span></span></span>
-      </h1>
-      <p class="hero-sub reveal" style="--d:.4s">I turn <em>chaos</em> into order — office professional &amp; documentation specialist who puts AI to work on the busywork, so teams spend less time formatting and more time deciding.</p>
+    <!-- Ambient background -->
+    <canvas class="ambient-grid ocean-canvas" id="oceanCanvas" aria-hidden="true"></canvas>
+    <div class="ambient" aria-hidden="true">
+        <canvas class="ambient-grid" id="gridCanvas"></canvas>
+        <div class="ambient-orb ambient-orb--a"></div>
+        <div class="ambient-orb ambient-orb--b"></div>
+    </div>
+    <div class="film-grain" aria-hidden="true"></div>
+
+    <!-- Custom cursor -->
+    <div class="cursor" id="cursor" aria-hidden="true">
+        <div class="cursor-dot"></div>
+        <div class="cursor-ring"></div>
     </div>
 
-    <div class="hero-bottom">
-      <div class="hero-stats reveal" style="--d:.55s">
-        <div class="stat"><strong data-count="5">0</strong><span class="mono">Years</span></div>
-        <div class="stat"><strong data-count="200">0</strong><span class="mono">Projects</span></div>
-        <div class="stat"><strong data-count="99">0</strong><span class="mono">On-time %</span></div>
-      </div>
-      <div class="hero-actions reveal" style="--d:.65s">
-        <a href="#projects" class="btn btn--gold magnetic">View selected work</a>
-        <a href="#contact" class="btn btn--ghost magnetic">Start a conversation</a>
-      </div>
+    <!-- Scroll rail -->
+    <div class="scroll-rail" aria-hidden="true">
+        <div class="scroll-rail-fill" id="scrollRail"></div>
     </div>
 
-    <div class="hero-orbit reveal" style="--d:.3s" aria-hidden="true">
-      <div class="orbit-ring"></div>
-      <div class="orbit-ring orbit-ring--inner"></div>
-      <picture class="orbit-portrait">
-        <source srcset="images/hero.webp" type="image/webp">
-        <img src="images/hero.jpg" alt="" width="1600" height="729">
-      </picture>
-    </div>
-  </div>
-  <div class="hero-scroll-hint mono reveal" style="--d:.8s" aria-hidden="true">
-    <span>Scroll</span>
-    <span class="scroll-line"></span>
-  </div>
-</section>
+    <!-- Skip link -->
+    <a class="skip-link" href="#main">Skip to main content</a>
 
-<!-- ABOUT -->
-<section id="about" class="section section--about" aria-labelledby="about-h">
-  <div class="section-index mono" aria-hidden="true">01</div>
-  <div class="shell">
-    <header class="section-head reveal">
-      <p class="eyebrow mono">About</p>
-      <h2 id="about-h" class="section-title" data-split-block>The short version</h2>
+    <!-- ====== NAVIGATION ====== -->
+    <header class="nav" id="nav">
+        <div class="nav-shell shell">
+            <div class="nav-brand">
+                <div class="nav-brand-mark">DB</div>
+                <span class="brand-name">Deepak Batra</span>
+            </div>
+            <nav id="navMenu">
+                <ul class="nav-menu">
+                    <li><a href="#about" data-index="01">About</a></li>
+                    <li><a href="#experience" data-index="02">Experience</a></li>
+                    <li><a href="#skills" data-index="03">Skills</a></li>
+                    <li><a href="#projects" data-index="04">Projects</a></li>
+                    <li><a href="#gallery" data-index="05">Gallery</a></li>
+                    <li><a href="#contact" data-index="06">Contact</a></li>
+                </ul>
+            </nav>
+            <div class="nav-actions">
+                <button class="theme-btn magnetic" id="themeBtn" aria-label="Toggle theme">
+                    <svg class="ico-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                    <svg class="ico-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                </button>
+                <a href="#contact" class="nav-cta magnetic">Let's Talk</a>
+                <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false">
+                    <span></span><span></span>
+                </button>
+            </div>
+        </div>
     </header>
-    <div class="about-layout">
-      <figure class="about-visual reveal">
-        <div class="about-frame">
-          <picture>
-            <source srcset="images/hero.webp" type="image/webp">
-            <img src="images/hero.jpg" alt="Deepak Batra" width="1600" height="729" loading="lazy">
-          </picture>
+
+    <!-- Mobile nav drawer -->
+    <div class="nav-drawer" id="navDrawer" aria-hidden="true">
+        <nav>
+            <a href="#about"><span>01</span> About</a>
+            <a href="#experience"><span>02</span> Experience</a>
+            <a href="#skills"><span>03</span> Skills</a>
+            <a href="#projects"><span>04</span> Projects</a>
+            <a href="#gallery"><span>05</span> Gallery</a>
+            <a href="#contact"><span>06</span> Contact</a>
+        </nav>
+        <div class="nav-drawer-foot">
+            <a href="mailto:deepak.batra@outlook.com">deepak.batra@outlook.com</a>
         </div>
-        <figcaption class="mono">Portrait · Workspace · 2026</figcaption>
-      </figure>
-      <div class="about-copy">
-        <blockquote class="about-pull reveal" style="--d:.1s">
-          <p>I keep offices running smoothly — nothing missing, nothing out of order, and everything easy to find when it's needed.</p>
-        </blockquote>
-        <p class="reveal" style="--d:.2s">Five years in, that's meant scheduling, vendor coordination, and being the person who actually knows where things stand. The last couple of years added a second thread — using AI tools to take the repetitive parts of documentation and reporting off everyone's plate.</p>
-        <ul class="about-tags reveal" style="--d:.3s">
-          <li><span class="tag-dot" style="--c:var(--gold)"></span>Office Administration</li>
-          <li><span class="tag-dot" style="--c:var(--periwinkle)"></span>Documentation &amp; Comms</li>
-          <li><span class="tag-dot" style="--c:var(--mint)"></span>AI Productivity</li>
-        </ul>
-      </div>
     </div>
-  </div>
-</section>
 
-<!-- EXPERIENCE — horizontal scroll -->
-<section id="experience" class="section section--experience" aria-labelledby="exp-h">
-  <div class="shell experience-intro">
-    <div class="section-index mono" aria-hidden="true">02</div>
-    <header class="section-head reveal">
-      <p class="eyebrow mono">Experience</p>
-      <h2 id="exp-h" class="section-title" data-split-block>Where I've worked</h2>
-      <p class="section-lead reveal" style="--d:.15s">A record of roles, responsibilities, and the systems I built along the way.</p>
-    </header>
-  </div>
-  <div class="experience-track-wrap" id="expTrackWrap">
-    <div class="experience-track" id="expTrack">
-      <article class="exp-card reveal">
-        <span class="exp-year mono">2023 — Now</span>
-        <h3>Documentation Specialist</h3>
-        <p>Owns the organization's knowledge base and reporting pipeline, including the AI-assisted tooling that automates weekly reports.</p>
-      </article>
-      <article class="exp-card reveal" style="--d:.08s">
-        <span class="exp-year mono">2021 — 2023</span>
-        <h3>Office Administrator</h3>
-        <p>Managed day-to-day operations, vendor relationships, and cross-team scheduling for a 40-person office.</p>
-      </article>
-      <article class="exp-card reveal" style="--d:.16s">
-        <span class="exp-year mono">2019 — 2021</span>
-        <h3>Operations Coordinator</h3>
-        <p>Coordinated logistics and communication between departments, standardizing several recurring reporting workflows.</p>
-      </article>
-      <article class="exp-card reveal" style="--d:.24s">
-        <span class="exp-year mono">2018 — 2019</span>
-        <h3>Administrative Assistant</h3>
-        <p>Handled correspondence, filing, and scheduling while learning the systems that would become a specialty.</p>
-      </article>
+    <!-- ====== MAIN CONTENT ====== -->
+    <main id="main">
+
+        <!-- Hero Section -->
+        <section class="hero section" id="hero">
+            <div class="shell hero-shell">
+                <div class="hero-meta mono">
+                    <span class="pulse-dot"></span>
+                    <span>Available for opportunities</span>
+                    <span class="hero-meta-divider"></span>
+                    <span>Based in India</span>
+                </div>
+                <div class="hero-stage">
+                    <h1 class="hero-title" data-split>
+                        <span class="hero-line"><span class="char-wrap">Deepak</span></span>
+                        <span class="hero-line hero-line--accent"><span class="char-wrap">Batra</span></span>
+                    </h1>
+                    <p class="hero-sub">
+                        Organized professional skilled in <em>Microsoft Office, documentation,</em> 
+                        and <em>AI tools</em> with strong problem-solving abilities.
+                    </p>
+                    <div class="hero-bottom">
+                        <div class="hero-stats">
+                            <div class="stat">
+                                <strong data-count="99">0</strong>
+                                <span class="mono">Proficiency</span>
+                            </div>
+                            <div class="stat">
+                                <strong data-count="6">0</strong>
+                                <span class="mono">Core Skills</span>
+                            </div>
+                        </div>
+                        <div class="hero-actions">
+                            <a href="#projects" class="btn btn--gold magnetic">View Work</a>
+                            <a href="#contact" class="btn btn--ghost magnetic">Get in Touch</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="hero-orbit" aria-hidden="true">
+                    <div class="orbit-ring"></div>
+                    <div class="orbit-ring orbit-ring--inner"></div>
+                    <div class="orbit-portrait">
+                        <img src="images/hero.webp" alt="Deepak Batra" loading="eager">
+                    </div>
+                </div>
+            </div>
+            <div class="hero-scroll-hint" aria-hidden="true">
+                <span class="mono">Scroll</span>
+                <div class="scroll-line"></div>
+            </div>
+            <span class="section-index">00</span>
+        </section>
+
+        <!-- About Section -->
+        <section class="section" id="about">
+            <div class="shell">
+                <div class="section-head reveal">
+                    <span class="eyebrow mono">01 — About</span>
+                    <h2 class="section-title" data-split-block>Who I Am</h2>
+                </div>
+                <div class="about-layout">
+                    <figure class="about-visual reveal">
+                        <div class="about-frame">
+                            <img src="images/gallery-13.webp" alt="Professional workspace" loading="lazy">
+                        </div>
+                        <figcaption class="mono">Workspace</figcaption>
+                    </figure>
+                    <div class="about-copy">
+                        <blockquote class="about-pull reveal">
+                            Detail-oriented professional combining technical proficiency with strong organizational skills.
+                        </blockquote>
+                        <p class="reveal">
+                            I bring expertise in Microsoft Office, Google Workspace, and emerging AI tools. 
+                            My strength lies in documentation, email communication, and problem solving — 
+                            ensuring every task is executed with precision.
+                        </p>
+                        <p class="reveal">
+                            Passionate about leveraging technology to streamline workflows and deliver 
+                            high-quality results consistently.
+                        </p>
+                        <ul class="about-tags reveal">
+                            <li style="--c: var(--gold)"><span class="tag-dot"></span> Microsoft Office</li>
+                            <li style="--c: var(--periwinkle)"><span class="tag-dot"></span> AI Tools</li>
+                            <li style="--c: var(--mint)"><span class="tag-dot"></span> Documentation</li>
+                            <li style="--c: var(--gold)"><span class="tag-dot"></span> Problem Solving</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Experience Section -->
+        <section class="section section--experience" id="experience">
+            <div class="shell">
+                <div class="section-head experience-intro reveal">
+                    <span class="eyebrow mono">02 — Experience</span>
+                    <h2 class="section-title">Where I've Worked</h2>
+                </div>
+            </div>
+            <div class="experience-track-wrap">
+                <div class="experience-track" id="expTrack">
+                    <article class="exp-card reveal">
+                        <span class="exp-year mono">Present</span>
+                        <h3>Current Role</h3>
+                        <p>Applying expertise in office management, documentation, and AI-powered tools to drive productivity.</p>
+                    </article>
+                    <article class="exp-card reveal" style="--d: 0.1s">
+                        <span class="exp-year mono">Recent</span>
+                        <h3>Previous Position</h3>
+                        <p>Managed projects utilizing Microsoft Office suite and developed strong documentation practices.</p>
+                    </article>
+                    <article class="exp-card reveal" style="--d: 0.2s">
+                        <span class="exp-year mono">Earlier</span>
+                        <h3>Early Career</h3>
+                        <p>Built foundational skills in problem solving, communication, and professional tool proficiency.</p>
+                    </article>
+                    <article class="exp-card reveal" style="--d: 0.3s">
+                        <span class="exp-year mono">Background</span>
+                        <h3>Education</h3>
+                        <p>Developed analytical thinking and organizational capabilities through academic pursuits.</p>
+                    </article>
+                </div>
+                <div class="experience-progress mono">
+                    <span id="expProgress">01</span> / 04
+                </div>
+            </div>
+        </section>
+
+        <!-- Skills Section -->
+        <section class="section" id="skills">
+            <div class="shell">
+                <div class="section-head reveal">
+                    <span class="eyebrow mono">03 — Skills</span>
+                    <h2 class="section-title" data-split-block>What I Do Best</h2>
+                    <p class="section-lead">Core competencies honed through years of professional practice.</p>
+                </div>
+                <div class="skills-bento" id="skillsBento"></div>
+            </div>
+        </section>
+
+        <!-- Projects Section -->
+        <section class="section section--projects" id="projects">
+            <div class="shell">
+                <div class="section-head reveal">
+                    <span class="eyebrow mono">04 — Projects</span>
+                    <h2 class="section-title" data-split-block>Selected Work</h2>
+                </div>
+                <div class="project-stack">
+                    <article class="project-panel reveal">
+                        <div class="project-panel-media">
+                            <img src="images/gallery-01.webp" alt="Project 01" loading="lazy">
+                        </div>
+                        <div class="project-panel-content">
+                            <span class="project-index mono">01</span>
+                            <h3>Team Collaboration System</h3>
+                            <p>Implemented streamlined collaboration workflows using modern tools and AI-assisted platforms.</p>
+                            <button class="project-expand magnetic" aria-expanded="false">Read case study</button>
+                            <div class="project-detail">
+                                <p>Designed and deployed a comprehensive collaboration framework that improved team productivity by leveraging Microsoft Office integration and AI tools for automated documentation.</p>
+                            </div>
+                        </div>
+                    </article>
+                    <article class="project-panel project-panel--reverse reveal">
+                        <div class="project-panel-media">
+                            <img src="images/gallery-05.webp" alt="Project 02" loading="lazy">
+                        </div>
+                        <div class="project-panel-content">
+                            <span class="project-index mono">02</span>
+                            <h3>AI Tools Integration</h3>
+                            <p>Pioneered the adoption of AI-powered tools across organizational workflows.</p>
+                            <button class="project-expand magnetic" aria-expanded="false">Read case study</button>
+                            <div class="project-detail">
+                                <p>Researched, evaluated, and integrated multiple AI tools into daily operations, resulting in significant time savings and improved output quality across all departments.</p>
+                            </div>
+                        </div>
+                    </article>
+                    <article class="project-panel reveal">
+                        <div class="project-panel-media">
+                            <img src="images/gallery-03.webp" alt="Project 03" loading="lazy">
+                        </div>
+                        <div class="project-panel-content">
+                            <span class="project-index mono">03</span>
+                            <h3>Document Management</h3>
+                            <p>Built a robust document management system ensuring easy access and version control.</p>
+                            <button class="project-expand magnetic" aria-expanded="false">Read case study</button>
+                            <div class="project-detail">
+                                <p>Created a centralized document repository with proper categorization, metadata tagging, and search functionality using Google Workspace and Microsoft SharePoint.</p>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- Showreel Section -->
+        <section class="section" id="showreel">
+            <div class="shell">
+                <div class="section-head reveal">
+                    <span class="eyebrow mono">05 — Showreel</span>
+                    <h2 class="section-title" data-split-block>See It In Action</h2>
+                </div>
+                <div class="reel-stage reveal">
+                    <div class="reel-frame">
+                        <video id="showreelVideo" autoplay muted loop playsinline preload="metadata">
+                            <source src="images/showreel.mp4" type="video/mp4">
+                        </video>
+                        <div class="reel-vignette"></div>
+                    </div>
+                    <p class="reel-caption mono">Showreel — 2024</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Gallery Section -->
+        <section class="section" id="gallery">
+            <div class="shell">
+                <div class="section-head reveal">
+                    <span class="eyebrow mono">06 — Gallery</span>
+                    <h2 class="section-title" data-split-block>Behind The Scenes</h2>
+                </div>
+                <div class="gallery-marquee reveal" aria-hidden="true">
+                    <div class="gallery-marquee-track" id="galleryMarquee"></div>
+                </div>
+                <div class="gallery-mosaic" id="galleryGrid" role="list"></div>
+            </div>
+        </section>
+
+        <!-- Achievements Section -->
+        <section class="section" id="achievements">
+            <div class="shell">
+                <div class="section-head reveal">
+                    <span class="eyebrow mono">07 — Achievements</span>
+                    <h2 class="section-title" data-split-block>Milestones</h2>
+                </div>
+                <div class="achieve-list">
+                    <div class="achieve-item reveal">
+                        <span class="achieve-num mono">01</span>
+                        <div>
+                            <strong>AI Tools Certification</strong>
+                            <p>Completed advanced certification in AI-powered productivity tools and automation.</p>
+                        </div>
+                    </div>
+                    <div class="achieve-item reveal" style="--d: 0.1s">
+                        <span class="achieve-num mono">02</span>
+                        <div>
+                            <strong>Documentation Excellence Award</strong>
+                            <p>Recognized for creating comprehensive documentation systems adopted organization-wide.</p>
+                        </div>
+                    </div>
+                    <div class="achieve-item reveal" style="--d: 0.2s">
+                        <span class="achieve-num mono">03</span>
+                        <div>
+                            <strong>Google Workspace Expert</strong>
+                            <p>Achieved expert-level proficiency in Google Workspace suite and integrations.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section class="section section--contact" id="contact">
+            <div class="shell">
+                <div class="contact-shell">
+                    <div>
+                        <span class="eyebrow mono reveal">08 — Contact</span>
+                        <h2 class="contact-title reveal">Let's<br><span>Connect</span></h2>
+                        <div class="contact-grid reveal">
+                            <a href="mailto:deepak.batra@outlook.com" class="contact-link magnetic">
+                                <span class="mono">Email</span>
+                                <span>deepak.batra@outlook.com</span>
+                            </a>
+                            <a href="https://linkedin.com" target="_blank" rel="noopener" class="contact-link magnetic">
+                                <span class="mono">LinkedIn</span>
+                                <span>linkedin.com/in/deepakbatra</span>
+                            </a>
+                        </div>
+                    </div>
+                    <form class="contact-form reveal" id="contactForm" action="https://formspree.io/f/xqkrpzae" method="POST">
+                        <div class="field-row">
+                            <div class="field">
+                                <span class="mono">Name</span>
+                                <input type="text" name="name" required placeholder="Your name">
+                            </div>
+                            <div class="field">
+                                <span class="mono">Email</span>
+                                <input type="email" name="email" required placeholder="your@email.com">
+                            </div>
+                        </div>
+                        <div class="field">
+                            <span class="mono">Message</span>
+                            <textarea name="message" required placeholder="Tell me about your project..."></textarea>
+                        </div>
+                        <div class="hp-field" aria-hidden="true">
+                            <input type="text" name="_gotcha" tabindex="-1" autocomplete="off">
+                        </div>
+                        <button type="submit" class="btn btn--gold form-submit magnetic">Send message</button>
+                        <span class="form-note mono">Powered by Formspree</span>
+                        <div class="form-status" id="formStatus" aria-live="polite"></div>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="shell footer-shell">
+            <div class="footer-brand">
+                <span class="footer-mark">DB</span>
+                <p>Organized professional skilled in Microsoft Office, documentation, and AI tools.</p>
+            </div>
+            <div class="footer-nav">
+                <a href="#about">About</a>
+                <a href="#experience">Experience</a>
+                <a href="#skills">Skills</a>
+                <a href="#projects">Projects</a>
+                <a href="#gallery">Gallery</a>
+                <a href="#contact">Contact</a>
+            </div>
+            <div class="footer-social">
+                <a href="https://linkedin.com" target="_blank" rel="noopener">LinkedIn</a>
+                <a href="mailto:deepak.batra@outlook.com">Email</a>
+            </div>
+        </div>
+        <div class="shell footer-bottom">
+            <span class="mono">© <span id="footerYear"></span> Deepak Batra</span>
+            <a href="#hero" class="to-top mono">Back to top ↑</a>
+        </div>
+    </footer>
+
+    <!-- Lightbox -->
+    <div class="lightbox" id="lightbox" hidden aria-hidden="true">
+        <button class="lb-close" id="lbClose" aria-label="Close">✕</button>
+        <button class="lb-nav lb-prev" id="lbPrev" aria-label="Previous">‹</button>
+        <button class="lb-nav lb-next" id="lbNext" aria-label="Next">›</button>
+        <img id="lbImg" src="" alt="">
+        <span class="lb-counter mono" id="lbCounter"></span>
     </div>
-    <div class="experience-progress mono" aria-hidden="true">
-      <span id="expProgress">01</span> / 04
-    </div>
-  </div>
-</section>
 
-<!-- SKILLS -->
-<section id="skills" class="section section--skills" aria-labelledby="skills-h">
-  <div class="section-index mono" aria-hidden="true">03</div>
-  <div class="shell">
-    <header class="section-head reveal">
-      <p class="eyebrow mono">Skills</p>
-      <h2 id="skills-h" class="section-title" data-split-block>What I work with</h2>
-    </header>
-    <div class="skills-bento reveal" id="skillsBento"><!-- content.js --></div>
-  </div>
-</section>
-
-<!-- PROJECTS -->
-<section id="projects" class="section section--projects" aria-labelledby="proj-h">
-  <div class="shell">
-    <div class="section-index mono" aria-hidden="true">04</div>
-    <header class="section-head reveal">
-      <p class="eyebrow mono">Work</p>
-      <h2 id="proj-h" class="section-title" data-split-block>Selected projects</h2>
-      <p class="section-lead reveal" style="--d:.15s">Key projects where I drove impact through organization, automation, and collaboration.</p>
-    </header>
-  </div>
-
-  <div class="project-stack">
-    <article class="project-panel" data-index="01">
-      <div class="project-panel-media">
-        <picture>
-          <source srcset="images/gallery-02.webp" type="image/webp">
-          <img loading="lazy" src="images/gallery-02.jpg" alt="Workflow automation dashboard" width="1600" height="725">
-        </picture>
-      </div>
-      <div class="project-panel-content reveal">
-        <span class="mono project-index">Case 01</span>
-        <h3>Office Workflow Automation</h3>
-        <p>Designed and implemented an automated document routing system that reduced processing time by 40% and eliminated manual data entry errors across departments.</p>
-        <button type="button" class="project-expand" aria-expanded="false">Read case study</button>
-        <div class="project-detail">
-          <p>The system replaced a manual, email-based approval chain with a rules-based router that assigned documents to the right reviewer automatically, flagged missing fields before submission, and logged every step for audit purposes.</p>
-        </div>
-      </div>
-    </article>
-
-    <article class="project-panel project-panel--reverse" data-index="02">
-      <div class="project-panel-media">
-        <picture>
-          <source srcset="images/gallery-07.webp" type="image/webp">
-          <img loading="lazy" src="images/gallery-07.jpg" alt="Documentation system architecture" width="725" height="1600">
-        </picture>
-      </div>
-      <div class="project-panel-content reveal">
-        <span class="mono project-index">Case 02</span>
-        <h3>Centralized Documentation System</h3>
-        <p>Built a unified knowledge base consolidating SOPs, reports, and compliance documents into a searchable, version-controlled platform accessible to all team members.</p>
-        <button type="button" class="project-expand" aria-expanded="false">Read case study</button>
-        <div class="project-detail">
-          <p>Previously, documentation was scattered across shared drives and inboxes with no version history. The new structure introduced consistent naming conventions, folder taxonomy, and access permissions.</p>
-        </div>
-      </div>
-    </article>
-
-    <article class="project-panel" data-index="03">
-      <div class="project-panel-media">
-        <picture>
-          <source srcset="images/gallery-13.webp" type="image/webp">
-          <img loading="lazy" src="images/gallery-13.jpg" alt="AI-powered analytics tool" width="729" height="1600">
-        </picture>
-      </div>
-      <div class="project-panel-content reveal">
-        <span class="mono project-index">Case 03</span>
-        <h3>AI-Powered Reporting Tool</h3>
-        <p>Leveraged AI tools to automate weekly report generation, cutting preparation time from 6 hours to 30 minutes while improving data accuracy and visualization quality.</p>
-        <button type="button" class="project-expand" aria-expanded="false">Read case study</button>
-        <div class="project-detail">
-          <p>An AI-assisted pipeline now cleans the data, generates summary visuals, and drafts the narrative commentary for review, leaving the team more time for analysis instead of formatting.</p>
-        </div>
-      </div>
-    </article>
-  </div>
-</section>
-
-<!-- SHOWREEL -->
-<section id="showreel" class="section section--showreel" aria-labelledby="reel-h">
-  <div class="section-index mono" aria-hidden="true">05</div>
-  <div class="shell">
-    <header class="section-head reveal">
-      <p class="eyebrow mono">Showreel</p>
-      <h2 id="reel-h" class="section-title" data-split-block>Cinematic overview</h2>
-    </header>
-    <div class="reel-stage reveal">
-      <div class="reel-frame">
-        <video id="showreelVideo" controls preload="metadata" poster="images/gallery-02.jpg" playsinline>
-          <source src="images/showreel.mp4" type="video/mp4">
-          Your browser does not support the video tag.
-        </video>
-        <div class="reel-vignette" aria-hidden="true"></div>
-      </div>
-      <p class="reel-caption mono">00:07 — showreel.mp4 · Process &amp; impact</p>
-    </div>
-  </div>
-</section>
-
-<!-- GALLERY -->
-<section id="gallery" class="section section--gallery" aria-labelledby="gallery-h">
-  <div class="section-index mono" aria-hidden="true">06</div>
-  <div class="shell">
-    <header class="section-head reveal">
-      <p class="eyebrow mono">Gallery</p>
-      <h2 id="gallery-h" class="section-title" data-split-block>Moments &amp; memories</h2>
-      <p class="section-lead reveal" style="--d:.15s">Snapshots from events, projects, and behind-the-scenes moments.</p>
-    </header>
-  </div>
-  <div class="gallery-marquee" aria-hidden="true">
-    <div class="gallery-marquee-track" id="galleryMarquee"></div>
-  </div>
-  <div class="shell">
-    <div class="gallery-mosaic reveal" id="galleryGrid" role="list"></div>
-  </div>
-</section>
-
-<!-- ACHIEVEMENTS -->
-<section id="achievements" class="section section--achieve" aria-labelledby="achieve-h">
-  <div class="section-index mono" aria-hidden="true">07</div>
-  <div class="shell">
-    <header class="section-head reveal">
-      <p class="eyebrow mono">Recognition</p>
-      <h2 id="achieve-h" class="section-title" data-split-block>Recognition &amp; results</h2>
-    </header>
-    <ol class="achieve-list">
-      <li class="achieve-item reveal">
-        <span class="achieve-num mono">01</span>
-        <div>
-          <strong>Efficiency Excellence Award</strong>
-          <p>Recognized for implementing workflow automation that saved 20+ hours per week.</p>
-        </div>
-      </li>
-      <li class="achieve-item reveal" style="--d:.08s">
-        <span class="achieve-num mono">02</span>
-        <div>
-          <strong>Documentation Mastery Certification</strong>
-          <p>Completed advanced certification in enterprise document management systems.</p>
-        </div>
-      </li>
-      <li class="achieve-item reveal" style="--d:.16s">
-        <span class="achieve-num mono">03</span>
-        <div>
-          <strong>AI Productivity Badge</strong>
-          <p>Awarded for integrating AI tools into daily operational workflows.</p>
-        </div>
-      </li>
-      <li class="achieve-item reveal" style="--d:.24s">
-        <span class="achieve-num mono">04</span>
-        <div>
-          <strong>Team Collaboration Leader</strong>
-          <p>Consistently rated highest for cross-functional coordination and stakeholder communication.</p>
-        </div>
-      </li>
-    </ol>
-  </div>
-</section>
-
-<!-- CONTACT -->
-<section id="contact" class="section section--contact" aria-labelledby="contact-h">
-  <div class="section-index mono" aria-hidden="true">08</div>
-  <div class="shell contact-shell">
-    <div class="contact-intro reveal">
-      <p class="eyebrow mono">Contact</p>
-      <h2 id="contact-h" class="contact-title">Let's<br><span>connect</span></h2>
-      <p class="section-lead">Open to new opportunities, collaborations, and conversations.</p>
-    </div>
-    <div class="contact-grid">
-      <form class="contact-form reveal" id="contactForm" action="https://formsubmit.co/deepak.batra@outlook.com" method="POST">
-        <input type="hidden" name="_subject" value="New message from portfolio site">
-        <input type="hidden" name="_template" value="table">
-        <input type="hidden" name="_captcha" value="false">
-        <input type="text" name="_honey" class="hp-field" tabindex="-1" autocomplete="off" aria-hidden="true">
-        <div class="field-row">
-          <label class="field">
-            <span class="mono">Name</span>
-            <input type="text" id="cf-name" name="name" required autocomplete="name">
-          </label>
-          <label class="field">
-            <span class="mono">Email</span>
-            <input type="email" id="cf-email" name="email" required autocomplete="email">
-          </label>
-        </div>
-        <label class="field">
-          <span class="mono">Message</span>
-          <textarea id="cf-message" name="message" rows="5" required></textarea>
-        </label>
-        <button type="submit" class="btn btn--gold form-submit magnetic">Send message</button>
-        <p class="form-status" id="formStatus" role="status" aria-live="polite"></p>
-        <p class="form-note mono">Emails deepak.batra@outlook.com directly — no sign-up required.</p>
-      </form>
-      <div class="contact-links reveal" style="--d:.12s">
-        <a class="contact-link magnetic" href="mailto:deepak.batra@outlook.com">
-          <span class="mono">Email</span>
-          <span>deepak.batra@outlook.com</span>
-        </a>
-        <a class="contact-link magnetic" href="tel:+919779777570">
-          <span class="mono">Phone</span>
-          <span>+91-9779777570</span>
-        </a>
-        <a class="contact-link magnetic" href="https://linkedin.com/in/deepakbatra" target="_blank" rel="noopener noreferrer">
-          <span class="mono">LinkedIn</span>
-          <span>/in/deepakbatra</span>
-        </a>
-      </div>
-    </div>
-  </div>
-</section>
-
- </main>
-
-<!-- Back to top button -->
-<button id="backToTop" aria-label="Back to top">&#x2191;</button>
-
-<footer class="footer" role="contentinfo">
-  <div class="shell footer-shell">
-    <div class="footer-brand">
-      <span class="footer-mark">DB</span>
-      <p>Office Professional · Documentation Specialist · Technology Enthusiast</p>
-    </div>
-    <nav class="footer-nav" aria-label="Footer">
-      <a href="#about">About</a>
-      <a href="#experience">Experience</a>
-      <a href="#projects">Work</a>
-      <a href="#gallery">Gallery</a>
-      <a href="#contact">Contact</a>
-    </nav>
-    <div class="footer-social">
-      <a href="https://instagram.com/deepakbatra" target="_blank" rel="noopener noreferrer">Instagram</a>
-      <a href="https://linkedin.com/in/deepakbatra" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-    </div>
-  </div>
-  <div class="shell footer-bottom">
-    <p class="mono">&copy; <span id="footerYear">2026</span> Deepak Batra</p>
-    <button type="button" class="to-top mono" id="toTop" aria-label="Back to top">Back to top ↑</button>
-  </div>
-</footer>
-
-<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Image viewer" hidden>
-  <button class="lb-close" id="lbClose" aria-label="Close">&times;</button>
-  <button class="lb-nav lb-prev" id="lbPrev" aria-label="Previous">&#8249;</button>
-  <img id="lbImg" src="" alt="">
-  <button class="lb-nav lb-next" id="lbNext" aria-label="Next">&#8250;</button>
-  <p class="lb-counter mono" id="lbCounter"></p>
-</div>
-
-<script src="content.js"></script>
-<script defer src="script.js"></script>
+    <!-- Scripts -->
+    <script src="content.js"></script>
+    <script src="ocean-simulation.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
-
