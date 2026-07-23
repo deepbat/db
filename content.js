@@ -24,15 +24,6 @@ const SITE_CONTENT = {
     { src: "images/hero", alt: "Professional portrait and workspace" }
   ],
 
-<<<<<<< HEAD
-  /* ---------------------------------------------------------
-      SKILLS
-      "value" is a percentage from 0-100, shown as a radial
-      gauge with a red arc. Add or remove rows freely — the
-      grid reflows automatically.
-      --------------------------------------------------------- */
-=======
->>>>>>> 9680fa9dc3a77ecc5dca848cceade72956a7ad73
   skills: [
     { name: "Microsoft Office", value: 95 },
     { name: "Email Writing", value: 90 },
@@ -43,3 +34,4 @@ const SITE_CONTENT = {
   ]
 
 };
+
