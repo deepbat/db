@@ -316,15 +316,23 @@
   }
 
   /* ==========================================================================
-     THE OCEAN FLOOR — a live water simulation anchoring the hero.
-     Long-press (or click-and-hold) sculpts the sea floor: the center digs a
-     pool, the displaced material piles up as a ridge at the rim — one
-     gesture, both actions. A tap drops a ripple. Ripple speed is driven by
+     THE OCEAN — a live water simulation behind the entire page, not just
+     the hero. Long-press sculpts the sea floor: the center digs a pool,
+     the displaced material piles up as a ridge at the rim — one gesture,
+     both actions. A tap anywhere drops a ripple. Ripple speed is driven by
      local floor height, so ripples travel faster over ridges and slower
      through pools — wavefronts bend, focus, and throw bright caustic bands
-     exactly like light through a liquid lens. Pure Canvas2D: physics run on
-     a small grid, then the result is upscaled by the browser (soft, no
-     shaders, no WebGL dependency).
+     exactly like light through a liquid lens.
+
+     Scope: on desktop, press-and-hold to sculpt works anywhere on the page
+     (a mouse hold never competes with scrolling). On touch, sculpting is
+     limited to the hero — the one place that already trades away
+     swipe-scroll for the gesture — while a tap anywhere else on the page
+     still drops a ripple without touching scroll behavior. Real controls
+     (links, buttons, form fields) are always left untouched.
+
+     Pure Canvas2D: physics run on a small grid, then the result is
+     upscaled by the browser (soft, no shaders, no WebGL dependency).
      ========================================================================== */
   (function initOceanSim() {
     var canvas = document.getElementById('heroGrid');
@@ -373,8 +381,8 @@
     }
 
     function sizeFromRect() {
-      var rect = canvas.getBoundingClientRect();
-      var aspect = rect.width / Math.max(1, rect.height);
+      var vw = window.innerWidth, vh = window.innerHeight;
+      var aspect = vw / Math.max(1, vh);
       var w, h;
       if (aspect >= 1) { w = TARGET_LONG_AXIS; h = Math.round(TARGET_LONG_AXIS / aspect); }
       else { h = TARGET_LONG_AXIS; w = Math.round(TARGET_LONG_AXIS * aspect); }
@@ -506,35 +514,48 @@
       ctx.putImageData(img, 0, 0);
     }
 
-    // ---- interaction: long-press to sculpt, tap to ripple ------------------
-    var pointerActive = false, sculpting = false;
+    // ---- interaction: long-press to sculpt, tap to ripple — anywhere on
+    // the page. Real controls (links, buttons, form fields) are left alone
+    // so nothing here ever competes with normal site navigation. Touch
+    // scrolling is precious everywhere except the hero (which already
+    // trades it away via touch-action:none), so on touch, sculpting is
+    // only enabled inside the hero; elsewhere a touch always resolves to
+    // a single ripple on release, never a drag-scroll-eating hold.
+    var heroEl = document.querySelector('.hero');
+    var INTERACTIVE_SEL = 'a, button, input, textarea, select, label, [role="button"], [contenteditable]';
+
+    var pointerActive = false, sculpting = false, allowSculpt = false;
     var downTime = 0, downClientX = 0, downClientY = 0;
     var lastGrid = { x: simW / 2, y: simH / 2 };
     var lastInteraction = performance.now(), lastAmbient = performance.now();
 
     function toGrid(e) {
-      var rect = canvas.getBoundingClientRect();
-      var relX = clamp((e.clientX - rect.left) / rect.width, 0, 1);
-      var relY = clamp((e.clientY - rect.top) / rect.height, 0, 1);
+      var relX = clamp(e.clientX / window.innerWidth, 0, 1);
+      var relY = clamp(e.clientY / window.innerHeight, 0, 1);
       return { x: relX * simW, y: relY * simH };
     }
 
-    canvas.addEventListener('pointerdown', function(e) {
+    window.addEventListener('pointerdown', function(e) {
       if (e.pointerType === 'mouse' && e.button !== 0) return;
-      try { canvas.setPointerCapture(e.pointerId); } catch (_) {}
+      if (e.target && e.target.closest && e.target.closest(INTERACTIVE_SEL)) return; // never hijack real controls
+
+      var isHero = !!(e.target && e.target.closest && e.target.closest('.hero'));
+      allowSculpt = e.pointerType !== 'touch' || isHero;
+
       pointerActive = true; sculpting = false;
       downTime = performance.now();
       downClientX = e.clientX; downClientY = e.clientY;
       lastGrid = toGrid(e);
       lastInteraction = downTime;
-      e.preventDefault();
+
+      if (e.pointerType === 'touch' && isHero) e.preventDefault(); // matches the hero's existing touch-action:none trade-off
     }, { passive: false });
 
-    canvas.addEventListener('pointermove', function(e) {
+    window.addEventListener('pointermove', function(e) {
       if (!pointerActive) return;
       var moved = Math.hypot(e.clientX - downClientX, e.clientY - downClientY);
       var held = performance.now() - downTime;
-      if (!sculpting && (held > TAP_MAX_MS || moved > TAP_MAX_MOVE)) sculpting = true;
+      if (allowSculpt && !sculpting && (held > TAP_MAX_MS || moved > TAP_MAX_MOVE)) sculpting = true;
       lastGrid = toGrid(e);
       if (sculpting) { sculptAt(lastGrid.x, lastGrid.y, 1); lastInteraction = performance.now(); }
     });
@@ -543,24 +564,24 @@
       if (pointerActive) {
         var held = performance.now() - downTime;
         var moved = Math.hypot(e.clientX - downClientX, e.clientY - downClientY);
-        if (!sculpting && held <= TAP_MAX_MS && moved <= TAP_MAX_MOVE) {
+        var withinTapTime = allowSculpt ? held <= TAP_MAX_MS : true; // outside the hero on touch, any non-drag release ripples
+        if (!sculpting && moved <= TAP_MAX_MOVE && withinTapTime) {
           var p = toGrid(e);
           addRipple(p.x, p.y);
           lastInteraction = performance.now();
         }
       }
       pointerActive = false; sculpting = false;
-      try { canvas.releasePointerCapture(e.pointerId); } catch (_) {}
     }
-    canvas.addEventListener('pointerup', finishPointer);
-    canvas.addEventListener('pointercancel', finishPointer);
-    canvas.addEventListener('contextmenu', function(e) { e.preventDefault(); });
+    window.addEventListener('pointerup', finishPointer);
+    window.addEventListener('pointercancel', finishPointer);
+    if (heroEl) heroEl.addEventListener('contextmenu', function(e) { e.preventDefault(); });
 
     // ---- main loop -----------------------------------------------------------
     function frame(now) {
       if (pointerActive) {
         if (sculpting) { sculptAt(lastGrid.x, lastGrid.y, 1); }
-        else if (now - downTime > TAP_MAX_MS) { sculpting = true; }
+        else if (allowSculpt && now - downTime > TAP_MAX_MS) { sculpting = true; }
       }
       if (!reduceMotion && now - lastInteraction > AMBIENT_MS && now - lastAmbient > AMBIENT_MS) {
         addRipple(simW * (0.32 + Math.random() * 0.36), simH * (0.32 + Math.random() * 0.36), 0.5, 3);

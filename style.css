@@ -44,6 +44,9 @@
 
   --nav-bg: rgba(5,11,20,.68);
   --hero-glow: #0B1D2E;
+  --bg-veil: rgba(5,11,20,.86);
+  --bg-elev-veil: rgba(10,22,36,.88);
+  --bg-elev-2-veil: rgba(13,27,44,.9);
 
   --font-display: "Archivo", ui-sans-serif, system-ui, sans-serif;
   --font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -89,6 +92,9 @@
 
   --nav-bg: rgba(243,250,249,.72);
   --hero-glow: #DCF1EF;
+  --bg-veil: rgba(243,250,249,.88);
+  --bg-elev-veil: rgba(255,255,255,.9);
+  --bg-elev-2-veil: rgba(233,243,242,.92);
   color-scheme: light;
 }
 
@@ -132,7 +138,7 @@ h1,h2,h3,h4,p,figure{ margin:0; }
   background-size: 100% 3px, 120px 120px;
 }
 .caustic-field{
-  position:fixed; inset:-10%; pointer-events:none; z-index:0; opacity:.5;
+  position:fixed; inset:-10%; pointer-events:none; z-index:1; opacity:.5;
   background-image:
     radial-gradient(38% 30% at 15% 20%, rgba(63,224,208,.10), transparent 70%),
     radial-gradient(30% 26% at 82% 12%, rgba(140,107,255,.09), transparent 70%),
@@ -299,8 +305,8 @@ h1,h2,h3,h4,p,figure{ margin:0; }
 /* ==========================================================================
    LAYOUT / SECTIONS — shimmering waterline dividers instead of hard rules
    ========================================================================== */
-main{ position:relative; z-index:1; }
-.section{ padding:120px 0; position:relative; }
+main{ position:relative; z-index:2; }
+.section{ padding:120px 0; position:relative; background:var(--bg-veil); }
 .section:not(:last-of-type)::after{
   content:""; position:absolute; left:0; right:0; bottom:0; height:1px;
   background:linear-gradient(90deg, transparent, var(--line-bright) 22%, var(--accent) 50%, var(--line-bright) 78%, transparent);
@@ -342,19 +348,21 @@ h2.section-title{
 }
 
 /* ==========================================================================
-   HERO — live water simulation. Long-press sculpts the ocean floor;
-   a tap drops a ripple that refracts around the sculpted terrain.
+   THE OCEAN — a full-page live water simulation sitting behind everything.
+   Long-press sculpts the seabed (desktop anywhere, touch within the hero);
+   a tap anywhere on the page drops a ripple that refracts around whatever
+   terrain has been sculpted. Content sections sit on a translucent veil so
+   text stays legible while the water still shows through underneath.
    ========================================================================== */
-.hero{ position:relative; padding:calc(var(--nav-h) + 40px) 0 0; min-height:100vh; display:flex; align-items:center; overflow:hidden; background:var(--bg); }
-.hero-canvas{
-  position:absolute; inset:0; width:100%; height:100%; z-index:0;
-  display:block; cursor:crosshair;
-  touch-action:none; -webkit-touch-callout:none; user-select:none;
+.ocean-bg{
+  position:fixed; inset:0; width:100vw; height:100vh; z-index:0;
+  display:block; pointer-events:none;
   background:radial-gradient(120% 90% at 50% 20%, var(--hero-glow) 0%, var(--bg) 68%);
 }
+.hero{ position:relative; padding:calc(var(--nav-h) + 40px) 0 0; min-height:100vh; display:flex; align-items:center; overflow:hidden; background:transparent; cursor:crosshair; touch-action:none; -webkit-touch-callout:none; user-select:none; }
 .hero-scrim{
   position:absolute; inset:0; z-index:1; pointer-events:none;
-  background:linear-gradient(180deg, var(--bg) 0%, rgba(5,11,20,.42) 30%, rgba(5,11,20,.68) 72%, var(--bg) 100%);
+  background:linear-gradient(180deg, var(--bg) 0%, rgba(5,11,20,.42) 30%, rgba(5,11,20,.68) 72%, var(--bg-veil) 100%);
 }
 .hero-content{ position:relative; z-index:2; width:100%; padding-bottom:64px; pointer-events:none; }
 .hero-content > *{ pointer-events:auto; }
@@ -575,7 +583,7 @@ h2.section-title{
 /* ==========================================================================
    CONTACT — glass terminal panel
    ========================================================================== */
-#contact{ background:var(--bg-elev); color:var(--text); }
+#contact{ background:var(--bg-elev-veil); color:var(--text); }
 #contact .eyebrow{ color:var(--text-faint); }
 #contact .section-lead{ color:var(--text-soft); }
 .contact-grid{ display:grid; grid-template-columns:1.3fr 1fr; gap:26px; }
@@ -621,7 +629,7 @@ h2.section-title{
 /* ==========================================================================
    FOOTER
    ========================================================================== */
-.site-footer{ padding:60px 0 32px; background:var(--bg-elev-2); color:var(--text); }
+.site-footer{ padding:60px 0 32px; background:var(--bg-elev-2-veil); color:var(--text); }
 .footer-grid{ display:grid; grid-template-columns:1.4fr 1fr 1fr 1fr; gap:32px; padding-bottom:36px; border-bottom:1px solid var(--line-soft); }
 @media (max-width:700px){ .footer-grid{ grid-template-columns:1fr 1fr; } }
 .foot-brand .brand-name{ font-size:18px; margin-bottom:8px; }

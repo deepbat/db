@@ -28,6 +28,7 @@
 <body>
 
 <div class="grain" aria-hidden="true"></div>
+<canvas class="ocean-bg" id="heroGrid" role="img" aria-label="Interactive water background: press and hold to sculpt the seabed, tap anywhere for a ripple"></canvas>
 <div class="caustic-field" aria-hidden="true"></div>
 <div class="cursor-dot" id="cursorDot" aria-hidden="true"></div>
 <a href="#main" class="skip-link">Skip to main content</a>
@@ -74,9 +75,8 @@
 
 <!-- ============ HERO ============ -->
 <section class="hero" id="top" role="region" aria-label="Introduction">
-  <canvas class="hero-canvas" id="heroGrid" role="img" aria-label="Interactive ocean floor: press and hold to sculpt, tap to send a ripple"></canvas>
   <div class="hero-scrim" aria-hidden="true"></div>
-  <p class="sim-hint mono" aria-hidden="true"><span class="ring"></span>Hold to sculpt the floor · Tap for ripples</p>
+  <p class="sim-hint mono" aria-hidden="true"><span class="ring"></span>Hold to sculpt · Tap anywhere for ripples</p>
   <div class="wrap hero-content">
     <span class="status-pill reveal"><span class="status-dot" aria-hidden="true"></span>Open to new opportunities</span>
     <h1 class="split-heading">Hi, I&#8217;m Deepak Batra.<br>I turn chaos into <span class="accent">order.</span></h1>
