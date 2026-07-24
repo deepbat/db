@@ -1,373 +1,227 @@
-(function () {
+(function(){
   'use strict';
 
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var finePointer = window.matchMedia('(pointer: fine)').matches;
 
-  /* ---- Loader ---- */
-  var loader = document.getElementById('loader');
-  var loaderFill = loader && loader.querySelector('.loader-fill');
-  document.body.classList.add('is-loading');
+  /* ==========================================================================
+     Dark / light theme toggle. The initial state is already applied by the
+     inline script in <head> (reads localStorage, falls back to the OS
+     preference) so there's no flash; this just wires up the button.
+     ========================================================================== */
+  (function initThemeToggle() {
+    var btn = document.getElementById('themeToggle');
+    if (!btn) return;
+    var root = document.documentElement;
 
-  function finishLoader() {
-    if (!loader) return;
-    loader.classList.add('is-done');
-    document.body.classList.remove('is-loading');
-    document.querySelector('.hero') && document.querySelector('.hero').classList.add('is-ready');
-  }
-
-  if (loaderFill && !reduceMotion) {
-    var progress = 0;
-    var loadTimer = setInterval(function () {
-      progress += Math.random() * 18 + 8;
-      if (progress >= 100) {
-        progress = 100;
-        clearInterval(loadTimer);
-        setTimeout(finishLoader, 200);
-      }
-      loaderFill.style.width = progress + '%';
-    }, 80);
-    window.addEventListener('load', function () {
-      clearInterval(loadTimer);
-      loaderFill.style.width = '100%';
-      setTimeout(finishLoader, 300);
-    });
-  } else {
-    finishLoader();
-  }
-
-  /* ---- Ambient grid canvas ---- */
-  var gridCanvas = document.getElementById('gridCanvas');
-  if (gridCanvas && !reduceMotion) {
-    var gctx = gridCanvas.getContext('2d');
-    var mouse = { x: 0.5, y: 0.5 };
-
-    function resizeGrid() {
-      gridCanvas.width = window.innerWidth;
-      gridCanvas.height = window.innerHeight;
+    function reflect(theme) {
+      btn.setAttribute('aria-label', theme === 'light' ? 'Switch to dark theme' : 'Switch to light theme');
+      btn.setAttribute('aria-pressed', theme === 'light' ? 'true' : 'false');
     }
-    resizeGrid();
-    window.addEventListener('resize', resizeGrid);
-
-    window.addEventListener('mousemove', function (e) {
-      mouse.x = e.clientX / window.innerWidth;
-      mouse.y = e.clientY / window.innerHeight;
-    });
-
-    function drawGrid() {
-      if (!gctx) return;
-      gctx.clearRect(0, 0, gridCanvas.width, gridCanvas.height);
-      var spacing = 48;
-      var offsetX = (mouse.x - 0.5) * 20;
-      var offsetY = (mouse.y - 0.5) * 20;
-      gctx.strokeStyle = 'rgba(237,232,220,0.04)';
-      gctx.lineWidth = 1;
-      for (var x = offsetX % spacing; x < gridCanvas.width; x += spacing) {
-        gctx.beginPath();
-        gctx.moveTo(x, 0);
-        gctx.lineTo(x, gridCanvas.height);
-        gctx.stroke();
-      }
-      for (var y = offsetY % spacing; y < gridCanvas.height; y += spacing) {
-        gctx.beginPath();
-        gctx.moveTo(0, y);
-        gctx.lineTo(gridCanvas.width, y);
-        gctx.stroke();
-      }
-      requestAnimationFrame(drawGrid);
+    function apply(theme) {
+      if (theme === 'light') root.setAttribute('data-theme', 'light');
+      else root.removeAttribute('data-theme');
+      try { localStorage.setItem('db-theme', theme); } catch (e) {}
+      reflect(theme);
     }
-    drawGrid();
-  }
 
-  /* ---- Render content from content.js ---- */
+    reflect(root.getAttribute('data-theme') === 'light' ? 'light' : 'dark');
+    btn.addEventListener('click', function() {
+      var current = root.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+      apply(current === 'light' ? 'dark' : 'light');
+    });
+  })();
+
+  /* ==========================================================================
+     Render gallery + skills from content.js (SITE_CONTENT)
+     ========================================================================== */
   if (typeof SITE_CONTENT !== 'undefined') {
-    var skillsBento = document.getElementById('skillsBento');
-    if (skillsBento && Array.isArray(SITE_CONTENT.skills)) {
-      skillsBento.innerHTML = SITE_CONTENT.skills.map(function (skill) {
-        var pct = Math.max(0, Math.min(100, skill.value));
-        return '<article class="skill-card reveal" style="--pct:' + pct + '">' +
-          '<div class="skill-ring" aria-hidden="true">' +
-          '<svg viewBox="0 0 64 64"><circle class="track" cx="32" cy="32" r="26"/><circle class="fill" cx="32" cy="32" r="26"/></svg>' +
-          '</div>' +
-          '<h3>' + skill.name + '</h3>' +
-          '<span class="skill-pct mono">' + pct + '%</span>' +
-          '</article>';
+    var galleryGrid = document.getElementById('galleryGrid');
+    if (galleryGrid && Array.isArray(SITE_CONTENT.gallery)) {
+      galleryGrid.innerHTML = SITE_CONTENT.gallery.map(function(item, i) {
+        return '<a class="g-item" href="' + item.src + '.jpg" data-full="' + item.src + '.jpg" ' +
+          'data-index="' + i + '" role="listitem" tabindex="0">' +
+          '<picture><source srcset="' + item.src + '.webp" type="image/webp">' +
+          '<img loading="lazy" src="' + item.src + '.jpg" alt="' + item.alt + '"></picture>' +
+          '<span class="g-cap mono">' + item.alt + '</span>' +
+          '</a>';
       }).join('');
     }
 
-    var galleryGrid = document.getElementById('galleryGrid');
-    var galleryMarquee = document.getElementById('galleryMarquee');
-    if (Array.isArray(SITE_CONTENT.gallery)) {
-      if (galleryGrid) {
-        galleryGrid.innerHTML = SITE_CONTENT.gallery.map(function (item, i) {
-          return '<a class="g-item" href="' + item.src + '.jpg" data-full="' + item.src + '.jpg" ' +
-            'data-index="' + i + '" role="listitem" tabindex="0">' +
-            '<picture><source srcset="' + item.src + '.webp" type="image/webp">' +
-            '<img loading="lazy" src="' + item.src + '.jpg" alt="' + item.alt + '"></picture>' +
-            '<span class="g-cap mono">' + item.alt + '</span></a>';
-        }).join('');
-      }
-      if (galleryMarquee) {
-        var marqueeItems = SITE_CONTENT.gallery.slice(0, 8).map(function (item) {
-          return '<img loading="lazy" src="' + item.src + '.jpg" alt="" draggable="false">';
-        }).join('');
-        galleryMarquee.innerHTML = marqueeItems + marqueeItems;
-      }
+    var skillsList = document.getElementById('skillsList');
+    if (skillsList && Array.isArray(SITE_CONTENT.skills)) {
+      skillsList.innerHTML = SITE_CONTENT.skills.map(function(skill) {
+        var pct = Math.max(0, Math.min(100, skill.value));
+        return '<div class="skill-row">' +
+          '<h3>' + skill.name + '</h3>' +
+          '<div class="skill-track"><div class="skill-fill" data-pct="' + pct + '"></div></div>' +
+          '<span class="pct mono">' + pct + '%</span>' +
+          '</div>';
+      }).join('');
     }
   }
 
   var footerYear = document.getElementById('footerYear');
   if (footerYear) footerYear.textContent = new Date().getFullYear();
 
-  /* ---- Hero character split ---- */
-  document.querySelectorAll('[data-split]').forEach(function (el) {
-    var text = el.textContent;
-    el.textContent = '';
-    text.split('').forEach(function (ch, i) {
-      var span = document.createElement('span');
-      span.className = 'char';
-      span.style.setProperty('--ci', i);
-      span.textContent = ch === ' ' ? '\u00A0' : ch;
-      el.appendChild(span);
+  /* ==========================================================================
+     Mobile menu
+     ========================================================================== */
+  var menuToggle = document.getElementById('menuToggle');
+  var mobileMenu = document.getElementById('mobileMenu');
+  if (menuToggle && mobileMenu) {
+    menuToggle.addEventListener('click', function() {
+      var isOpen = mobileMenu.classList.toggle('open');
+      menuToggle.classList.toggle('active', isOpen);
+      menuToggle.setAttribute('aria-expanded', String(isOpen));
+      document.body.style.overflow = isOpen ? 'hidden' : '';
     });
-  });
-
-  /* ---- Block heading word split ---- */
-  function splitBlock(el) {
-    var words = el.textContent.trim().split(/\s+/);
-    el.innerHTML = '';
-    words.forEach(function (w, i) {
-      var wrap = document.createElement('span');
-      wrap.className = 'split-word';
-      wrap.style.setProperty('--i', i);
-      var inner = document.createElement('span');
-      inner.textContent = w + (i < words.length - 1 ? '\u00A0' : '');
-      wrap.appendChild(inner);
-      el.appendChild(wrap);
+    mobileMenu.querySelectorAll('a').forEach(function(a) {
+      a.addEventListener('click', function() {
+        mobileMenu.classList.remove('open');
+        menuToggle.classList.remove('active');
+        menuToggle.setAttribute('aria-expanded', 'false');
+        document.body.style.overflow = '';
+      });
     });
-  }
-  document.querySelectorAll('[data-split-block]').forEach(splitBlock);
-
-  /* ---- Theme toggle ---- */
-  var themeBtn = document.getElementById('themeBtn');
-  var metaTheme = document.querySelector('meta[name="theme-color"]');
-  function currentTheme() {
-    return document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
-  }
-  function applyThemeMeta() {
-    var light = currentTheme() === 'light';
-    if (themeBtn) {
-      themeBtn.setAttribute('aria-pressed', String(light));
-      themeBtn.setAttribute('aria-label', light ? 'Switch to dark mode' : 'Switch to light mode');
-    }
-    if (metaTheme) metaTheme.setAttribute('content', light ? '#f4f1ea' : '#030306');
-  }
-  applyThemeMeta();
-  if (themeBtn) {
-    themeBtn.addEventListener('click', function () {
-      var next = currentTheme() === 'light' ? 'dark' : 'light';
-      if (next === 'light') document.documentElement.setAttribute('data-theme', 'light');
-      else document.documentElement.removeAttribute('data-theme');
-      try { localStorage.setItem('theme', next); } catch (e) {}
-      applyThemeMeta();
-    });
-  }
-
-  /* ---- Mobile nav ---- */
-  var navToggle = document.getElementById('navToggle');
-  var navDrawer = document.getElementById('navDrawer');
-  function closeDrawer() {
-    if (!navDrawer) return;
-    navDrawer.classList.remove('is-open');
-    navDrawer.setAttribute('aria-hidden', 'true');
-    navToggle && navToggle.classList.remove('is-active');
-    navToggle && navToggle.setAttribute('aria-expanded', 'false');
-    document.body.classList.remove('menu-open');
-  }
-  if (navToggle && navDrawer) {
-    navToggle.addEventListener('click', function () {
-      var open = navDrawer.classList.toggle('is-open');
-      navDrawer.setAttribute('aria-hidden', String(!open));
-      navToggle.classList.toggle('is-active', open);
-      navToggle.setAttribute('aria-expanded', String(open));
-      document.body.classList.toggle('menu-open', open);
-    });
-    navDrawer.querySelectorAll('a').forEach(function (a) {
-      a.addEventListener('click', closeDrawer);
-    });
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape' && navDrawer.classList.contains('is-open')) {
-        closeDrawer();
-        navToggle.focus();
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && mobileMenu.classList.contains('open')) {
+        mobileMenu.classList.remove('open');
+        menuToggle.classList.remove('active');
+        menuToggle.setAttribute('aria-expanded', 'false');
+        document.body.style.overflow = '';
+        menuToggle.focus();
       }
     });
   }
 
-  /* ---- Smooth anchor scroll ---- */
-  document.querySelectorAll('a[href^="#"]').forEach(function (a) {
-    a.addEventListener('click', function (e) {
-      var id = a.getAttribute('href');
-      if (id.length <= 1) return;
-      var target = document.querySelector(id);
-      if (!target) return;
-      e.preventDefault();
-      closeDrawer();
-      target.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
-    });
-  });
-
   var toTop = document.getElementById('toTop');
   if (toTop) {
-    toTop.addEventListener('click', function () {
+    toTop.addEventListener('click', function() {
       window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
     });
   }
 
-  /* ---- Scroll rail + nav state ---- */
-  var scrollRail = document.getElementById('scrollRail');
-  var nav = document.getElementById('nav');
-  function onScroll() {
-    var scrollTop = window.scrollY;
-    var docH = document.documentElement.scrollHeight - window.innerHeight;
-    var pct = docH > 0 ? (scrollTop / docH) * 100 : 0;
-    if (scrollRail) scrollRail.style.height = pct + '%';
-    if (nav) nav.classList.toggle('is-scrolled', scrollTop > 40);
-  }
-  window.addEventListener('scroll', onScroll, { passive: true });
-  onScroll();
-
-  /* ---- Intersection reveals ---- */
-  var revealEls = document.querySelectorAll('.reveal, [data-split-block], .project-panel');
-  if ('IntersectionObserver' in window) {
-    var revealIO = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (!entry.isIntersecting) return;
-        entry.target.classList.add('is-visible');
-        if (entry.target.hasAttribute('data-split-block')) {
-          entry.target.classList.add('split-in');
+  /* ==========================================================================
+     Smooth scroll for anchor links
+     ========================================================================== */
+  document.querySelectorAll('a[href^="#"]').forEach(function(a) {
+    a.addEventListener('click', function(e) {
+      var id = a.getAttribute('href');
+      if (id.length > 1) {
+        var el = document.querySelector(id);
+        if (el) {
+          e.preventDefault();
+          el.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
         }
-        revealIO.unobserve(entry.target);
-      });
-    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
-    revealEls.forEach(function (el) { revealIO.observe(el); });
-  } else {
-    revealEls.forEach(function (el) {
-      el.classList.add('is-visible', 'split-in');
-    });
-  }
-
-  /* ---- Counter animation ---- */
-  document.querySelectorAll('[data-count]').forEach(function (el) {
-    var target = parseInt(el.getAttribute('data-count'), 10);
-    var suffix = target === 99 ? '%' : '+';
-    if (reduceMotion || !('IntersectionObserver' in window)) {
-      el.textContent = target + suffix;
-      return;
-    }
-    var counted = false;
-    var counterIO = new IntersectionObserver(function (entries) {
-      if (!entries[0].isIntersecting || counted) return;
-      counted = true;
-      var start = performance.now();
-      var duration = 1400;
-      function tick(now) {
-        var t = Math.min(1, (now - start) / duration);
-        var eased = 1 - Math.pow(1 - t, 3);
-        var val = Math.round(target * eased);
-        el.textContent = val + (t >= 1 ? suffix : '');
-        if (t < 1) requestAnimationFrame(tick);
       }
-      requestAnimationFrame(tick);
-      counterIO.disconnect();
-    }, { threshold: 0.5 });
-    counterIO.observe(el);
-  });
-
-  /* ---- Nav scrollspy ---- */
-  var navLinks = Array.prototype.slice.call(document.querySelectorAll('#navMenu a[href^="#"]'));
-  var spyMap = navLinks.map(function (a) {
-    var el = document.querySelector(a.getAttribute('href'));
-    return el ? { link: a, el: el } : null;
-  }).filter(Boolean);
-  if (spyMap.length && 'IntersectionObserver' in window) {
-    var spyIO = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (!entry.isIntersecting) return;
-        var match = spyMap.filter(function (s) { return s.el === entry.target; })[0];
-        if (!match) return;
-        spyMap.forEach(function (s) { s.link.classList.remove('is-active'); });
-        match.link.classList.add('is-active');
-      });
-    }, { threshold: 0, rootMargin: '-45% 0px -50% 0px' });
-    spyMap.forEach(function (s) { spyIO.observe(s.el); });
-  }
-
-  /* ---- Experience track progress ---- */
-  var expTrack = document.getElementById('expTrack');
-  var expProgress = document.getElementById('expProgress');
-  if (expTrack && expProgress) {
-    expTrack.addEventListener('scroll', function () {
-      var cards = expTrack.querySelectorAll('.exp-card');
-      if (!cards.length) return;
-      var scrollLeft = expTrack.scrollLeft;
-      var idx = Math.round(scrollLeft / (cards[0].offsetWidth + 24)) + 1;
-      expProgress.textContent = String(Math.min(cards.length, Math.max(1, idx))).padStart(2, '0');
-    }, { passive: true });
-  }
-
-  /* ---- Project expand ---- */
-  document.querySelectorAll('.project-expand').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      var panel = btn.closest('.project-panel');
-      var open = panel.classList.toggle('is-expanded');
-      btn.setAttribute('aria-expanded', String(open));
-      btn.textContent = open ? 'Close case study' : 'Read case study';
     });
   });
 
-  /* ---- Skill card spotlight ---- */
-  document.querySelectorAll('.skill-card').forEach(function (card) {
-    card.addEventListener('mousemove', function (e) {
-      var r = card.getBoundingClientRect();
-      card.style.setProperty('--mx', ((e.clientX - r.left) / r.width) * 100 + '%');
-      card.style.setProperty('--my', ((e.clientY - r.top) / r.height) * 100 + '%');
+  /* ==========================================================================
+     Project card expand/collapse
+     ========================================================================== */
+  document.querySelectorAll('.proj-toggle').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var more = btn.nextElementSibling;
+      if (!more || !more.classList.contains('proj-more')) return;
+      var isOpen = more.classList.toggle('open');
+      btn.setAttribute('aria-expanded', String(isOpen));
+      btn.innerHTML = isOpen ? 'Show less &larr;' : 'Learn more &rarr;';
     });
   });
 
-  /* ---- Contact form ---- */
+  /* ==========================================================================
+     Contact form (AJAX submit, stays on page)
+     ========================================================================== */
   var contactForm = document.getElementById('contactForm');
   var formStatus = document.getElementById('formStatus');
   if (contactForm) {
-    contactForm.addEventListener('submit', function (e) {
+    contactForm.addEventListener('submit', function(e) {
       e.preventDefault();
       var submitBtn = contactForm.querySelector('.form-submit');
-      if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Sending…'; }
+      if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Sending...'; }
       if (formStatus) { formStatus.textContent = ''; formStatus.className = 'form-status'; }
 
       fetch(contactForm.action, {
         method: 'POST',
         body: new FormData(contactForm),
-        headers: { Accept: 'application/json' }
-      }).then(function (res) {
+        headers: { 'Accept': 'application/json' }
+      }).then(function(res) {
         if (res.ok) {
           if (formStatus) {
-            formStatus.textContent = 'Message sent — thank you! I\u2019ll get back to you soon.';
+            formStatus.textContent = 'Message sent \u2014 thank you! I\u2019ll get back to you soon.';
             formStatus.className = 'form-status success';
           }
           contactForm.reset();
-        } else throw new Error('fail');
-      }).catch(function () {
+        } else {
+          throw new Error('Request failed');
+        }
+      }).catch(function() {
         if (formStatus) {
-          formStatus.textContent = 'Something went wrong. Please email deepak.batra@outlook.com directly.';
+          formStatus.textContent = 'Something went wrong. Please try emailing deepak.batra@outlook.com directly.';
           formStatus.className = 'form-status error';
         }
-      }).finally(function () {
+      }).finally(function() {
         if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Send message'; }
       });
     });
   }
 
-  /* ---- Lightbox ---- */
+  /* ==========================================================================
+     Split text into words for scroll-triggered typography reveal
+     ========================================================================== */
+  function splitIntoWords(el) {
+    var text = el.textContent;
+    var words = text.split(/\s+/).filter(Boolean);
+    el.innerHTML = '';
+    var wrap = document.createElement('span');
+    wrap.className = 'split-line';
+    words.forEach(function(w, i) {
+      var span = document.createElement('span');
+      span.className = 'split-word';
+      span.style.setProperty('--i', i);
+      span.textContent = w + (i < words.length - 1 ? '\u00A0' : '');
+      wrap.appendChild(span);
+    });
+    el.appendChild(wrap);
+  }
+  document.querySelectorAll('.split-heading').forEach(function(el){
+    // hero h1 contains inline markup (accent span) — split only plain-text headings
+    if (el.querySelector('.accent')) { el.classList.add('split-in'); return; }
+    splitIntoWords(el);
+  });
+
+  /* ==========================================================================
+     Scroll reveal + skill liquid-fill bars
+     ========================================================================== */
+  var revealEls = document.querySelectorAll('.reveal, .split-heading:not(.split-in)');
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          if (entry.target.classList.contains('split-heading')) {
+            entry.target.classList.add('split-in');
+          }
+          if (entry.target.id === 'skillsList') {
+            entry.target.querySelectorAll('.skill-fill').forEach(function(fill) {
+              var pct = fill.getAttribute('data-pct');
+              requestAnimationFrame(function() { fill.style.width = pct + '%'; });
+            });
+          }
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+    revealEls.forEach(function(el) { io.observe(el); });
+  } else {
+    revealEls.forEach(function(el) { el.classList.add('visible', 'split-in'); });
+    document.querySelectorAll('.skill-fill').forEach(function(fill) { fill.style.width = fill.getAttribute('data-pct') + '%'; });
+  }
+
+  /* ==========================================================================
+     Lightbox
+     ========================================================================== */
   var lb = document.getElementById('lightbox');
   var lbImg = document.getElementById('lbImg');
   var lbClose = document.getElementById('lbClose');
@@ -375,114 +229,386 @@
   var lbNext = document.getElementById('lbNext');
   var lbCounter = document.getElementById('lbCounter');
   var gItems = Array.prototype.slice.call(document.querySelectorAll('.g-item'));
-  var lbIndex = 0;
+  var current = 0;
   var lbOpen = false;
 
-  function openLb(i) {
-    if (!lb || !lbImg || i < 0 || i >= gItems.length) return;
-    lbIndex = i;
-    lb.removeAttribute('hidden');
-    requestAnimationFrame(function () { lb.classList.add('is-open'); });
-    var src = gItems[i].dataset.full || gItems[i].href;
-    lbImg.src = src;
-    lbImg.alt = (gItems[i].querySelector('img') || {}).alt || 'Gallery image';
-    document.body.style.overflow = 'hidden';
-    lbOpen = true;
-    if (lbCounter) lbCounter.textContent = (i + 1) + ' / ' + gItems.length;
-    lbClose && lbClose.focus();
-  }
-  function closeLb() {
-    if (!lb) return;
-    lb.classList.remove('is-open');
-    lbOpen = false;
-    document.body.style.overflow = '';
-    setTimeout(function () { lb.setAttribute('hidden', ''); }, 350);
-    if (gItems[lbIndex]) gItems[lbIndex].focus();
-  }
-  function stepLb(d) {
-    var next = (lbIndex + d + gItems.length) % gItems.length;
-    lbImg.style.opacity = '0';
-    setTimeout(function () { openLb(next); lbImg.style.opacity = '1'; }, 150);
-  }
-
-  if (lb && gItems.length) {
-    gItems.forEach(function (item, i) {
-      item.addEventListener('click', function (e) { e.preventDefault(); openLb(i); });
-      item.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openLb(i); }
+  if (lb && lbImg && gItems.length > 0) {
+    function openLightbox(i) {
+      if (i < 0 || i >= gItems.length) return;
+      current = i;
+      var img = gItems[i].querySelector('img');
+      var fullSrc = gItems[i].dataset.full || gItems[i].href;
+      lbImg.src = fullSrc;
+      lbImg.alt = img ? img.alt : 'Gallery image ' + (i + 1);
+      lb.classList.add('open');
+      lbOpen = true;
+      document.body.style.overflow = 'hidden';
+      if (lbCounter) lbCounter.textContent = (i + 1) + ' / ' + gItems.length;
+      lbClose.focus();
+    }
+    function closeLightbox() {
+      lb.classList.remove('open');
+      lbOpen = false;
+      document.body.style.overflow = '';
+      if (gItems[current]) gItems[current].focus();
+    }
+    function step(d) {
+      var next = (current + d + gItems.length) % gItems.length;
+      lbImg.style.opacity = '0';
+      setTimeout(function() { openLightbox(next); lbImg.style.opacity = '1'; }, 150);
+    }
+    gItems.forEach(function(it, i) {
+      it.addEventListener('click', function(e) { e.preventDefault(); openLightbox(i); });
+      it.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openLightbox(i); }
       });
     });
-    lbClose && lbClose.addEventListener('click', closeLb);
-    lbPrev && lbPrev.addEventListener('click', function () { stepLb(-1); });
-    lbNext && lbNext.addEventListener('click', function () { stepLb(1); });
-    lb.addEventListener('click', function (e) { if (e.target === lb) closeLb(); });
-    document.addEventListener('keydown', function (e) {
+    if (lbClose) lbClose.addEventListener('click', closeLightbox);
+    if (lbPrev) lbPrev.addEventListener('click', function() { step(-1); });
+    if (lbNext) lbNext.addEventListener('click', function() { step(1); });
+    if (lb) lb.addEventListener('click', function(e) { if (e.target === lb) closeLightbox(); });
+    document.addEventListener('keydown', function(e) {
       if (!lbOpen) return;
-      if (e.key === 'Escape') closeLb();
-      if (e.key === 'ArrowLeft') stepLb(-1);
-      if (e.key === 'ArrowRight') stepLb(1);
+      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'ArrowLeft') step(-1);
+      if (e.key === 'ArrowRight') step(1);
     });
     lbImg.style.transition = 'opacity .15s ease';
   }
 
-  /* ---- Custom cursor ---- */
-  var cursor = document.getElementById('cursor');
-  if (cursor && finePointer && !reduceMotion) {
-    var ring = cursor.querySelector('.cursor-ring');
-    var cx = 0, cy = 0, rx = 0, ry = 0;
-    window.addEventListener('mousemove', function (e) {
-      cx = e.clientX; cy = e.clientY;
-      cursor.querySelector('.cursor-dot').style.transform = 'translate(' + cx + 'px,' + cy + 'px) translate(-50%,-50%)';
+  /* ==========================================================================
+     Nav scrollspy + glass bar strengthening on scroll
+     ========================================================================== */
+  var navAnchors = Array.prototype.slice.call(document.querySelectorAll('#navLinks a[href^="#"]'));
+  var spySections = navAnchors.map(function(a) {
+    var id = a.getAttribute('href').slice(1);
+    var el = document.getElementById(id);
+    return el ? { link: a, el: el } : null;
+  }).filter(Boolean);
+  if (spySections.length && 'IntersectionObserver' in window) {
+    var spy = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        var match = spySections.filter(function(s) { return s.el === entry.target; })[0];
+        if (!match) return;
+        if (entry.isIntersecting) {
+          spySections.forEach(function(s) { s.link.classList.remove('is-active'); });
+          match.link.classList.add('is-active');
+        }
+      });
+    }, { threshold: 0, rootMargin: '-45% 0px -50% 0px' });
+    spySections.forEach(function(s) { spy.observe(s.el); });
+  }
+
+  /* ==========================================================================
+     Custom cursor
+     ========================================================================== */
+  var cursorDot = document.getElementById('cursorDot');
+  if (cursorDot && !reduceMotion && window.matchMedia('(pointer: fine)').matches) {
+    window.addEventListener('mousemove', function(e) {
+      cursorDot.style.transform = 'translate(' + e.clientX + 'px,' + e.clientY + 'px) translate(-50%,-50%)';
     });
-    function animCursor() {
-      rx += (cx - rx) * 0.15;
-      ry += (cy - ry) * 0.15;
-      if (ring) ring.style.transform = 'translate(' + rx + 'px,' + ry + 'px) translate(-50%,-50%)';
-      requestAnimationFrame(animCursor);
+    document.querySelectorAll('a, button, .g-item').forEach(function(el) {
+      el.addEventListener('mouseenter', function() { cursorDot.classList.add('hover'); });
+      el.addEventListener('mouseleave', function() { cursorDot.classList.remove('hover'); });
+    });
+  } else if (cursorDot) {
+    cursorDot.style.display = 'none';
+  }
+
+  /* ==========================================================================
+     THE OCEAN FLOOR — a live water simulation anchoring the hero.
+     Long-press (or click-and-hold) sculpts the sea floor: the center digs a
+     pool, the displaced material piles up as a ridge at the rim — one
+     gesture, both actions. A tap drops a ripple. Ripple speed is driven by
+     local floor height, so ripples travel faster over ridges and slower
+     through pools — wavefronts bend, focus, and throw bright caustic bands
+     exactly like light through a liquid lens. Pure Canvas2D: physics run on
+     a small grid, then the result is upscaled by the browser (soft, no
+     shaders, no WebGL dependency).
+     ========================================================================== */
+  (function initOceanSim() {
+    var canvas = document.getElementById('heroGrid');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    if (!ctx) return; // extremely old browser; canvas stays empty, rest of page unaffected
+
+    // ---- tunables ---------------------------------------------------------
+    var TARGET_LONG_AXIS = 132;   // sim-grid cells along the longer canvas side
+    var SPEED_MIN = 0.34, SPEED_MAX = 0.86; // wave speed over deep water vs. over a ridge
+    var DAMPING = 0.05;           // energy loss per step
+    var DT = 0.6;                 // integration step (Courant-safe: SPEED_MAX*DT < 1/sqrt(2))
+    var SUBSTEPS = 2;             // physics steps per animation frame
+    var EDGE_BAND = 9;            // cells over which the shoreline absorbs waves
+    var BRUSH_R = 10;             // sculpt brush radius in cells
+    var DIG_RATE = 1.15, RIDGE_RATE = 0.55; // sculpt strength (spoil piles up as a rim)
+    var TAP_MAX_MS = 220, TAP_MAX_MOVE = 9; // px thresholds separating a tap from a sculpt hold
+    var AMBIENT_MS = 5200;        // idle auto-ripple cadence (skipped for reduced motion)
+
+    var simW = 60, simH = 40;
+    var height, velocity, terrain, edgeDamp, img;
+
+    function clamp(v, lo, hi) { return v < lo ? lo : (v > hi ? hi : v); }
+    function smoothstep(e0, e1, x) {
+      var t = clamp((x - e0) / (e1 - e0), 0, 1);
+      return t * t * (3 - 2 * t);
     }
-    animCursor();
-    document.querySelectorAll('a, button, .g-item, .skill-card, .contact-link, .magnetic').forEach(function (el) {
-      el.addEventListener('mouseenter', function () { cursor.classList.add('is-hover'); });
-      el.addEventListener('mouseleave', function () { cursor.classList.remove('is-hover'); });
-    });
-  } else if (cursor) {
-    cursor.style.display = 'none';
-  }
 
-  /* ---- Magnetic buttons ---- */
-  if (finePointer && !reduceMotion) {
-    document.querySelectorAll('.magnetic').forEach(function (el) {
-      el.addEventListener('mousemove', function (e) {
-        var r = el.getBoundingClientRect();
-        var x = e.clientX - r.left - r.width / 2;
-        var y = e.clientY - r.top - r.height / 2;
-        el.style.transform = 'translate(' + (x * 0.18) + 'px,' + (y * 0.18) + 'px)';
-      });
-      el.addEventListener('mouseleave', function () {
-        el.style.transform = '';
-      });
-    });
-  }
-
-  /* ---- Hero orbit parallax ---- */
-  var heroOrbit = document.querySelector('.hero-orbit');
-  if (heroOrbit && !reduceMotion) {
-    window.addEventListener('scroll', function () {
-      if (window.innerWidth <= 960) {
-        heroOrbit.style.transform = '';
-        return;
+    function allocate(w, h) {
+      simW = w; simH = h;
+      height = new Float32Array(simW * simH);
+      velocity = new Float32Array(simW * simH);
+      terrain = new Float32Array(simW * simH);
+      edgeDamp = new Float32Array(simW * simH);
+      for (var j = 0; j < simH; j++) {
+        for (var i = 0; i < simW; i++) {
+          var d = Math.min(i, simW - 1 - i, j, simH - 1 - j);
+          edgeDamp[j * simW + i] = 0.15 + 0.85 * clamp(d / EDGE_BAND, 0, 1);
+        }
       }
-      var y = window.scrollY;
-      heroOrbit.style.transform = 'translateY(calc(-50% + ' + (y * 0.12) + 'px)) rotate(' + (y * 0.02) + 'deg)';
-    }, { passive: true });
-  }
+      canvas.width = simW;
+      canvas.height = simH;
+      img = ctx.createImageData(simW, simH);
+      var a = img.data;
+      for (var p = 3; p < a.length; p += 4) a[p] = 255;
+    }
 
-  /* ---- Showreel fade ---- */
+    function sizeFromRect() {
+      var rect = canvas.getBoundingClientRect();
+      var aspect = rect.width / Math.max(1, rect.height);
+      var w, h;
+      if (aspect >= 1) { w = TARGET_LONG_AXIS; h = Math.round(TARGET_LONG_AXIS / aspect); }
+      else { h = TARGET_LONG_AXIS; w = Math.round(TARGET_LONG_AXIS * aspect); }
+      w = clamp(w, 50, 220); h = clamp(h, 50, 220);
+      allocate(w, h);
+    }
+    sizeFromRect();
+
+    var resizeTimer = null;
+    window.addEventListener('resize', function() {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(sizeFromRect, 220);
+    });
+
+    // ---- physics ------------------------------------------------------------
+    function sculptAt(gx, gy, rate) {
+      var minI = Math.max(0, Math.floor(gx - BRUSH_R - 1));
+      var maxI = Math.min(simW - 1, Math.ceil(gx + BRUSH_R + 1));
+      var minJ = Math.max(0, Math.floor(gy - BRUSH_R - 1));
+      var maxJ = Math.min(simH - 1, Math.ceil(gy + BRUSH_R + 1));
+      for (var j = minJ; j <= maxJ; j++) {
+        for (var i = minI; i <= maxI; i++) {
+          var dx = i - gx, dy = j - gy;
+          var d = Math.sqrt(dx * dx + dy * dy);
+          if (d > BRUSH_R) continue;
+          var core = smoothstep(BRUSH_R * 0.55, 0, d);          // 1 at center -> 0 by mid-radius
+          var rim = smoothstep(0, BRUSH_R * 0.55, d) * smoothstep(BRUSH_R, BRUSH_R * 0.55, d); // ring
+          var idx = j * simW + i;
+          var v = terrain[idx] + rate * (-DIG_RATE * core + RIDGE_RATE * rim);
+          terrain[idx] = clamp(v, -1.3, 1.3);
+        }
+      }
+    }
+
+    function addRipple(gx, gy, amp, sigma) {
+      amp = amp === undefined ? 1.0 : amp;
+      sigma = sigma === undefined ? 2.6 : sigma;
+      var r = Math.ceil(sigma * 3);
+      var minI = Math.max(0, Math.floor(gx - r)), maxI = Math.min(simW - 1, Math.ceil(gx + r));
+      var minJ = Math.max(0, Math.floor(gy - r)), maxJ = Math.min(simH - 1, Math.ceil(gy + r));
+      for (var j = minJ; j <= maxJ; j++) {
+        for (var i = minI; i <= maxI; i++) {
+          var dx = i - gx, dy = j - gy;
+          var d2 = dx * dx + dy * dy;
+          var g = Math.exp(-d2 / (2 * sigma * sigma));
+          var idx = j * simW + i;
+          height[idx] += amp * g;
+          velocity[idx] += amp * 0.6 * g;
+        }
+      }
+    }
+
+    function stepWave() {
+      var w = simW;
+      for (var j = 1; j < simH - 1; j++) {
+        var row = j * w;
+        for (var i = 1; i < w - 1; i++) {
+          var idx = row + i;
+          var h = height[idx];
+          var lap = height[idx - 1] + height[idx + 1] + height[idx - w] + height[idx + w] - 4 * h;
+          var tnorm = clamp((terrain[idx] + 1) * 0.5, 0, 1);
+          var speed = SPEED_MIN + (SPEED_MAX - SPEED_MIN) * tnorm;
+          var v = velocity[idx] + (speed * speed * lap - DAMPING * velocity[idx]) * DT;
+          velocity[idx] = v * edgeDamp[idx];
+        }
+      }
+      for (var k = 0; k < height.length; k++) height[k] += velocity[k] * DT;
+    }
+
+    // ---- render (low-res buffer, CSS-scaled up for a soft liquid look) ----
+    var PALETTES = {
+      dark:  { deep: [7, 13, 24],    shallow: [58, 168, 190],  causticCyan: [63, 224, 208],  causticViolet: [160, 122, 255] },
+      light: { deep: [122, 196, 192], shallow: [246, 251, 250], causticCyan: [10, 150, 140],  causticViolet: [106, 79, 224] }
+    };
+    function activePalette() {
+      return document.documentElement.getAttribute('data-theme') === 'light' ? PALETTES.light : PALETTES.dark;
+    }
+    var CAUSTIC_K = 5.2, RELIEF_K = 1.6;
+
+    function render(now) {
+      var pal = activePalette();
+      var DEEP = pal.deep, SHALLOW = pal.shallow, CAUSTIC_CYAN = pal.causticCyan, CAUSTIC_VIOLET = pal.causticViolet;
+      var w = simW, hgt = simH, data = img.data;
+      for (var j = 0; j < hgt; j++) {
+        var jU = j === 0 ? 0 : j - 1, jD = j === hgt - 1 ? hgt - 1 : j + 1;
+        for (var i = 0; i < w; i++) {
+          var iL = i === 0 ? 0 : i - 1, iR = i === w - 1 ? w - 1 : i + 1;
+          var idx = j * w + i;
+          var t = terrain[idx];
+
+          var tL = terrain[j * w + iL], tR = terrain[j * w + iR];
+          var tU = terrain[jU * w + i], tD = terrain[jD * w + i];
+          var hL = height[j * w + iL], hR = height[j * w + iR];
+          var hU = height[jU * w + i], hD = height[jD * w + i];
+
+          var tgx = tR - tL, tgy = tD - tU;
+          var hgx = hR - hL, hgy = hD - hU;
+
+          var gradMag = Math.sqrt(hgx * hgx + hgy * hgy);
+          var caustic = clamp(gradMag * CAUSTIC_K, 0, 1);
+
+          var relief = clamp(0.5 - (tgx + tgy) * RELIEF_K, 0, 1);
+          var reliefMul = 0.7 + relief * 0.55;
+
+          var depthNorm = clamp((t + 1) * 0.5, 0, 1);
+          var baseR = (DEEP[0] + (SHALLOW[0] - DEEP[0]) * depthNorm) * reliefMul;
+          var baseG = (DEEP[1] + (SHALLOW[1] - DEEP[1]) * depthNorm) * reliefMul;
+          var baseB = (DEEP[2] + (SHALLOW[2] - DEEP[2]) * depthNorm) * reliefMul;
+
+          var angle = Math.atan2(hgy, hgx);
+          var mixT = 0.5 + 0.5 * Math.sin(angle * 2.0 + now * 0.0012);
+          var causR = CAUSTIC_CYAN[0] + (CAUSTIC_VIOLET[0] - CAUSTIC_CYAN[0]) * mixT;
+          var causG = CAUSTIC_CYAN[1] + (CAUSTIC_VIOLET[1] - CAUSTIC_CYAN[1]) * mixT;
+          var causB = CAUSTIC_CYAN[2] + (CAUSTIC_VIOLET[2] - CAUSTIC_CYAN[2]) * mixT;
+
+          var r = baseR + (causR - baseR) * caustic * 0.85;
+          var g = baseG + (causG - baseG) * caustic * 0.85;
+          var b = baseB + (causB - baseB) * caustic * 0.85;
+
+          var core = caustic * caustic;
+          r += core * 42; g += core * 48; b += core * 54;
+
+          var p = idx * 4;
+          data[p] = r < 0 ? 0 : (r > 255 ? 255 : r);
+          data[p + 1] = g < 0 ? 0 : (g > 255 ? 255 : g);
+          data[p + 2] = b < 0 ? 0 : (b > 255 ? 255 : b);
+        }
+      }
+      ctx.putImageData(img, 0, 0);
+    }
+
+    // ---- interaction: long-press to sculpt, tap to ripple ------------------
+    var pointerActive = false, sculpting = false;
+    var downTime = 0, downClientX = 0, downClientY = 0;
+    var lastGrid = { x: simW / 2, y: simH / 2 };
+    var lastInteraction = performance.now(), lastAmbient = performance.now();
+
+    function toGrid(e) {
+      var rect = canvas.getBoundingClientRect();
+      var relX = clamp((e.clientX - rect.left) / rect.width, 0, 1);
+      var relY = clamp((e.clientY - rect.top) / rect.height, 0, 1);
+      return { x: relX * simW, y: relY * simH };
+    }
+
+    canvas.addEventListener('pointerdown', function(e) {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      try { canvas.setPointerCapture(e.pointerId); } catch (_) {}
+      pointerActive = true; sculpting = false;
+      downTime = performance.now();
+      downClientX = e.clientX; downClientY = e.clientY;
+      lastGrid = toGrid(e);
+      lastInteraction = downTime;
+      e.preventDefault();
+    }, { passive: false });
+
+    canvas.addEventListener('pointermove', function(e) {
+      if (!pointerActive) return;
+      var moved = Math.hypot(e.clientX - downClientX, e.clientY - downClientY);
+      var held = performance.now() - downTime;
+      if (!sculpting && (held > TAP_MAX_MS || moved > TAP_MAX_MOVE)) sculpting = true;
+      lastGrid = toGrid(e);
+      if (sculpting) { sculptAt(lastGrid.x, lastGrid.y, 1); lastInteraction = performance.now(); }
+    });
+
+    function finishPointer(e) {
+      if (pointerActive) {
+        var held = performance.now() - downTime;
+        var moved = Math.hypot(e.clientX - downClientX, e.clientY - downClientY);
+        if (!sculpting && held <= TAP_MAX_MS && moved <= TAP_MAX_MOVE) {
+          var p = toGrid(e);
+          addRipple(p.x, p.y);
+          lastInteraction = performance.now();
+        }
+      }
+      pointerActive = false; sculpting = false;
+      try { canvas.releasePointerCapture(e.pointerId); } catch (_) {}
+    }
+    canvas.addEventListener('pointerup', finishPointer);
+    canvas.addEventListener('pointercancel', finishPointer);
+    canvas.addEventListener('contextmenu', function(e) { e.preventDefault(); });
+
+    // ---- main loop -----------------------------------------------------------
+    function frame(now) {
+      if (pointerActive) {
+        if (sculpting) { sculptAt(lastGrid.x, lastGrid.y, 1); }
+        else if (now - downTime > TAP_MAX_MS) { sculpting = true; }
+      }
+      if (!reduceMotion && now - lastInteraction > AMBIENT_MS && now - lastAmbient > AMBIENT_MS) {
+        addRipple(simW * (0.32 + Math.random() * 0.36), simH * (0.32 + Math.random() * 0.36), 0.5, 3);
+        lastAmbient = now;
+      }
+      for (var s = 0; s < SUBSTEPS; s++) stepWave();
+      render(now);
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+
+    // a couple of opening ripples so the surface isn't perfectly flat on load
+    addRipple(simW * 0.42, simH * 0.46, 0.7, 4);
+    addRipple(simW * 0.63, simH * 0.58, 0.5, 3);
+  })();
+
+  /* ==========================================================================
+     Ripple press effect for buttons — the site's core interaction (sculpt the
+     floor, tap for ripples) echoed in miniature on every primary control.
+     ========================================================================== */
+  (function initButtonRipples() {
+    var targets = document.querySelectorAll('.btn, .nav-cta, .form-submit');
+    targets.forEach(function(el) {
+      el.style.position = el.style.position || 'relative';
+      el.style.overflow = 'hidden';
+      el.addEventListener('pointerdown', function(e) {
+        var rect = el.getBoundingClientRect();
+        var size = Math.max(rect.width, rect.height) * 1.6;
+        var span = document.createElement('span');
+        span.className = 'ripple-fx';
+        span.style.width = size + 'px';
+        span.style.height = size + 'px';
+        span.style.left = (e.clientX - rect.left) + 'px';
+        span.style.top = (e.clientY - rect.top) + 'px';
+        el.appendChild(span);
+        span.addEventListener('animationend', function() { span.remove(); });
+      });
+    });
+  })();
+
+  /* ==========================================================================
+     Video fade-in once ready
+     ========================================================================== */
   var video = document.getElementById('showreelVideo');
   if (video) {
     video.style.opacity = '0';
-    video.style.transition = 'opacity .6s ease';
-    video.addEventListener('loadeddata', function () { video.style.opacity = '1'; });
+    video.style.transition = 'opacity .5s ease';
+    video.addEventListener('loadeddata', function() { video.style.opacity = '1'; });
   }
 
 })();

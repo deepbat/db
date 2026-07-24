@@ -1,13 +1,25 @@
 /* ============================================================
    SITE CONTENT — EDIT THIS FILE TO UPDATE THE SITE
    ============================================================
-   Update gallery photos and skill proficiency here.
-   Everything else (About, Experience, Projects, Awards,
-   Contact) lives in index.html.
+   This is the ONE file you need to touch to add or change:
+     - Gallery photos
+     - Skills (with the little radial percentage gauges)
+
+   You do NOT need to touch index.html or style.css for these.
+   Everything else (About text, Experience, Projects, Awards,
+   Contact info) lives directly in index.html — search for the
+   matching "EDIT HERE" comment in that file.
    ============================================================ */
 
 const SITE_CONTENT = {
 
+  /* ---------------------------------------------------------
+     GALLERY
+     Add a new photo: drop the image file in /images, then add
+     one line below. "src" is the filename WITHOUT extension —
+     the site automatically looks for both a .webp and a .jpg
+     version, so provide both files with the same name.
+     --------------------------------------------------------- */
   gallery: [
     { src: "images/gallery-01", alt: "Team collaboration session at the office" },
     { src: "images/gallery-02", alt: "Project planning whiteboard session" },
@@ -24,6 +36,12 @@ const SITE_CONTENT = {
     { src: "images/hero", alt: "Professional portrait and workspace" }
   ],
 
+  /* ---------------------------------------------------------
+     SKILLS
+     "value" is a percentage from 0-100, shown as a glowing
+     radial gauge. Add or remove rows freely — the grid
+     reflows automatically.
+     --------------------------------------------------------- */
   skills: [
     { name: "Microsoft Office", value: 95 },
     { name: "Email Writing", value: 90 },
@@ -34,4 +52,3 @@ const SITE_CONTENT = {
   ]
 
 };
-
