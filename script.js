@@ -619,8 +619,8 @@
     if (!ctx) return;
 
     var ANCHOR_Y = 78;            // hangs from just under the fixed nav
-    var SEGMENTS = 8;             // droplets per strand (including the pinned top one)
-    var SEG_LEN = 24;             // resting distance between droplets, px
+    var SEGMENTS = 13;            // droplets per strand (including the pinned top one)
+    var SEG_LEN = 26;             // resting distance between droplets, px
     var GRAVITY = 0.3;
     var DAMPING = 0.986;
     var ITERATIONS = 6;
@@ -651,14 +651,14 @@
 
     function buildStrands() {
       var vw = window.innerWidth;
-      var spacing = 112;
-      var count = Math.max(6, Math.round(vw / spacing));
+      var spacing = 62;
+      var count = Math.max(10, Math.round(vw / spacing));
       var margin = (vw - (count - 1) * spacing) / 2;
       strands = [];
       for (var i = 0; i < count; i++) {
-        var jitter = (Math.sin(i * 12.9898) * 43758.5453 % 1) * 18 - 9; // deterministic pseudo-random offset
+        var jitter = (Math.sin(i * 12.9898) * 43758.5453 % 1) * 14 - 7; // deterministic pseudo-random offset
         var x = margin + i * spacing + jitter;
-        var lenFactor = 0.82 + (Math.abs(Math.sin(i * 7.233)) * 0.4); // 0.82 - 1.22, organic irregularity
+        var lenFactor = 1.0 + (Math.abs(Math.sin(i * 7.233)) * 0.55); // 1.0 - 1.55, organic irregularity
         strands.push(makeStrand(x, lenFactor));
       }
     }
