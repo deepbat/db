@@ -599,6 +599,216 @@
   })();
 
   /* ==========================================================================
+     CHIMES — strands of water droplets hanging from just under the nav,
+     fixed in place across the whole site (they stay put as you scroll,
+     like a curtain in a doorway you keep walking back through). Each
+     strand is a small verlet rope: gravity pulls it down, your cursor
+     passing nearby pushes it aside like wind, and you can grab any
+     droplet and drag it — it swings back and settles once released.
+
+     Same non-invasive interaction pattern as the ocean sim: the canvas is
+     pointer-events:none, so every click always reaches the real page
+     underneath. Grabbing only happens if a pointerdown starts within a
+     tight radius of an actual droplet, and never on top of a real
+     control (link, button, form field).
+     ========================================================================== */
+  (function initChimeCurtain() {
+    var canvas = document.getElementById('chimeCurtain');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    var ANCHOR_Y = 78;            // hangs from just under the fixed nav
+    var SEGMENTS = 8;             // droplets per strand (including the pinned top one)
+    var SEG_LEN = 24;             // resting distance between droplets, px
+    var GRAVITY = 0.3;
+    var DAMPING = 0.986;
+    var ITERATIONS = 6;
+    var WIND_RADIUS = 95;
+    var WIND_STRENGTH = 5.5;
+    var GRAB_RADIUS = 22;
+    var INTERACTIVE_SEL = 'a, button, input, textarea, select, label, [role="button"], [contenteditable]';
+
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var strands = [];
+
+    var PALETTES = {
+      dark:  { line: 'rgba(160,215,255,.28)', dropA: 'rgba(216,251,255,.95)', dropB: 'rgba(63,224,208,.55)', glint: 'rgba(255,255,255,.9)' },
+      light: { line: 'rgba(10,60,70,.22)',    dropA: 'rgba(255,255,255,.95)', dropB: 'rgba(11,166,156,.5)',  glint: 'rgba(255,255,255,.95)' }
+    };
+    function palette() {
+      return document.documentElement.getAttribute('data-theme') === 'light' ? PALETTES.light : PALETTES.dark;
+    }
+
+    function makeStrand(x, lenFactor) {
+      var particles = [];
+      for (var i = 0; i < SEGMENTS; i++) {
+        var y = ANCHOR_Y + i * SEG_LEN * lenFactor;
+        particles.push({ x: x, y: y, ox: x, oy: y, pinned: i === 0, grabbed: false });
+      }
+      return { baseX: x, lenFactor: lenFactor, particles: particles };
+    }
+
+    function buildStrands() {
+      var vw = window.innerWidth;
+      var spacing = 112;
+      var count = Math.max(6, Math.round(vw / spacing));
+      var margin = (vw - (count - 1) * spacing) / 2;
+      strands = [];
+      for (var i = 0; i < count; i++) {
+        var jitter = (Math.sin(i * 12.9898) * 43758.5453 % 1) * 18 - 9; // deterministic pseudo-random offset
+        var x = margin + i * spacing + jitter;
+        var lenFactor = 0.82 + (Math.abs(Math.sin(i * 7.233)) * 0.4); // 0.82 - 1.22, organic irregularity
+        strands.push(makeStrand(x, lenFactor));
+      }
+    }
+
+    function resize() {
+      canvas.width = Math.round(window.innerWidth * dpr);
+      canvas.height = Math.round(window.innerHeight * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      buildStrands();
+    }
+    resize();
+    var resizeTimer = null;
+    window.addEventListener('resize', function() {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(resize, 220);
+    });
+
+    // ---- physics: a small verlet rope per strand ---------------------------
+    function step() {
+      for (var s = 0; s < strands.length; s++) {
+        var ps = strands[s].particles;
+        for (var i = 1; i < ps.length; i++) {
+          var p = ps[i];
+          if (p.grabbed) continue;
+          var vx = (p.x - p.ox) * DAMPING;
+          var vy = (p.y - p.oy) * DAMPING;
+          p.ox = p.x; p.oy = p.y;
+          p.x += vx;
+          p.y += vy + GRAVITY;
+        }
+      }
+      // wind: push nearby particles away from the pointer
+      if (pointerX !== null) {
+        for (var s2 = 0; s2 < strands.length; s2++) {
+          var ps2 = strands[s2].particles;
+          for (var j = 1; j < ps2.length; j++) {
+            var pt = ps2[j];
+            if (pt.grabbed) continue;
+            var dx = pt.x - pointerX, dy = pt.y - pointerY;
+            var d = Math.sqrt(dx * dx + dy * dy);
+            if (d < WIND_RADIUS && d > 0.001) {
+              var force = (1 - d / WIND_RADIUS) * WIND_STRENGTH;
+              pt.x += (dx / d) * force;
+              pt.y += (dy / d) * force * 0.35;
+            }
+          }
+        }
+      }
+      // constraint solve: keep each link close to its resting length
+      for (var it = 0; it < ITERATIONS; it++) {
+        for (var s3 = 0; s3 < strands.length; s3++) {
+          var strand = strands[s3];
+          var ps3 = strand.particles;
+          var restLen = SEG_LEN * strand.lenFactor;
+          for (var k = 0; k < ps3.length - 1; k++) {
+            var a = ps3[k], b = ps3[k + 1];
+            var ddx = b.x - a.x, ddy = b.y - a.y;
+            var dist = Math.sqrt(ddx * ddx + ddy * ddy) || 0.0001;
+            var diff = (dist - restLen) / dist;
+            var ax = ddx * 0.5 * diff, ay = ddy * 0.5 * diff;
+            if (!a.pinned && !a.grabbed) { a.x += ax; a.y += ay; }
+            if (!b.pinned && !b.grabbed) { b.x -= ax; b.y -= ay; }
+          }
+        }
+      }
+    }
+
+    // ---- render --------------------------------------------------------------
+    function render() {
+      var pal = palette();
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (var s = 0; s < strands.length; s++) {
+        var ps = strands[s].particles;
+
+        ctx.beginPath();
+        ctx.moveTo(ps[0].x, ps[0].y);
+        for (var i = 1; i < ps.length; i++) ctx.lineTo(ps[i].x, ps[i].y);
+        ctx.strokeStyle = pal.line;
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        for (var d = 2; d < ps.length; d += 3) {
+          var p = ps[d];
+          var r = 4.5 + (d % 5);
+          var grad = ctx.createRadialGradient(p.x - r * 0.3, p.y - r * 0.35, 0.4, p.x, p.y, r);
+          grad.addColorStop(0, pal.dropA);
+          grad.addColorStop(0.55, pal.dropB);
+          grad.addColorStop(1, 'rgba(0,0,0,0)');
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+          ctx.fillStyle = grad;
+          ctx.fill();
+          ctx.beginPath();
+          ctx.arc(p.x - r * 0.32, p.y - r * 0.38, r * 0.22, 0, Math.PI * 2);
+          ctx.fillStyle = pal.glint;
+          ctx.fill();
+        }
+      }
+    }
+
+    // ---- interaction: wind (passive) + grab-and-drag ------------------------
+    var pointerX = null, pointerY = null;
+    var grabbedParticle = null;
+
+    window.addEventListener('pointermove', function(e) {
+      pointerX = e.clientX; pointerY = e.clientY;
+      if (grabbedParticle) { grabbedParticle.x = e.clientX; grabbedParticle.y = e.clientY; }
+    });
+    window.addEventListener('pointerleave', function() { pointerX = null; pointerY = null; });
+
+    window.addEventListener('pointerdown', function(e) {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      if (e.target && e.target.closest && e.target.closest(INTERACTIVE_SEL)) return; // never hijack real controls
+
+      var best = null, bestDist = GRAB_RADIUS;
+      for (var s = 0; s < strands.length; s++) {
+        var ps = strands[s].particles;
+        for (var i = 1; i < ps.length; i++) {
+          var dx = ps[i].x - e.clientX, dy = ps[i].y - e.clientY;
+          var dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < bestDist) { best = ps[i]; bestDist = dist; }
+        }
+      }
+      if (best) {
+        grabbedParticle = best;
+        grabbedParticle.grabbed = true;
+        grabbedParticle.x = e.clientX; grabbedParticle.y = e.clientY;
+        e.preventDefault();
+      }
+    }, { passive: false });
+
+    function release() {
+      if (grabbedParticle) {
+        grabbedParticle.ox = grabbedParticle.x; grabbedParticle.oy = grabbedParticle.y;
+        grabbedParticle.grabbed = false;
+        grabbedParticle = null;
+      }
+    }
+    window.addEventListener('pointerup', release);
+    window.addEventListener('pointercancel', release);
+
+    function frame() {
+      step();
+      render();
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  })();
+
+  /* ==========================================================================
      Ripple press effect for buttons — the site's core interaction (sculpt the
      floor, tap for ripples) echoed in miniature on every primary control.
      ========================================================================== */

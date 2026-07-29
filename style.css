@@ -369,6 +369,10 @@ h2.section-title{
   display:block; pointer-events:none;
   background:radial-gradient(120% 90% at 50% 20%, var(--hero-glow) 0%, var(--bg) 68%);
 }
+.chime-curtain{
+  position:fixed; inset:0; width:100vw; height:100vh; z-index:40;
+  display:block; pointer-events:none;
+}
 .hero{ position:relative; padding:calc(var(--nav-h) + 40px) 0 0; min-height:100vh; display:flex; align-items:center; overflow:hidden; background:transparent; cursor:crosshair; touch-action:none; -webkit-touch-callout:none; user-select:none; }
 .hero-scrim{
   position:absolute; inset:0; z-index:1; pointer-events:none;
