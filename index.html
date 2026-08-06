@@ -239,9 +239,29 @@
     <div class="section-head">
       <div class="eyebrow"><span class="dot" aria-hidden="true"></span>Gallery</div>
       <h2 id="gallery-heading" class="section-title split-heading">Moments &amp; memories</h2>
-      <p class="section-lead">Snapshots from events, projects, and behind-the-scenes moments.</p>
+      <p class="section-lead">Snapshots from events, projects, and behind-the-scenes moments. Drag the shelf to browse, click a photo to pick it up.</p>
     </div>
-    <div class="gallery-grid reveal" id="galleryGrid" role="list"><!-- populated by content.js + script.js --></div>
+
+    <div class="shelf-wrap reveal">
+      <p class="shelf-loading mono" id="shelfLoading" aria-hidden="true">arranging photos…</p>
+      <div class="shelf-stage" id="shelfStage">
+        <div class="shelf-track" id="shelfTrack" role="list" aria-label="Photo shelf, drag to browse"></div>
+        <div class="shelf-surface" aria-hidden="true"></div>
+        <div class="shelf-shadow" aria-hidden="true"></div>
+      </div>
+      <p class="shelf-hint mono" aria-hidden="true">drag to orbit · click a photo to pick it up</p>
+    </div>
+
+    <div class="shelf-inspect" id="shelfInspect" aria-hidden="true">
+      <button class="shelf-back mono" id="shelfBack" type="button">&larr; Back to shelf</button>
+      <div class="shelf-inspect-stage" id="shelfInspectStage"></div>
+      <div class="shelf-detail">
+        <h3 id="shelfDetailTitle"></h3>
+        <p id="shelfDetailBody"></p>
+        <a id="shelfDetailLink" class="text-link" target="_blank" rel="noopener">View full size &#8599;</a>
+        <p class="shelf-detail-hint mono">drag to orbit · scroll to zoom · esc to close</p>
+      </div>
+    </div>
   </div>
 </section>
 

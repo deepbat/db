@@ -32,19 +32,43 @@
   })();
 
   /* ==========================================================================
-     Render gallery + skills from content.js (SITE_CONTENT)
+     Render gallery (as a 3D photo shelf) + skills from content.js (SITE_CONTENT)
      ========================================================================== */
+  var shelfPhotos = [];
   if (typeof SITE_CONTENT !== 'undefined') {
-    var galleryGrid = document.getElementById('galleryGrid');
-    if (galleryGrid && Array.isArray(SITE_CONTENT.gallery)) {
-      galleryGrid.innerHTML = SITE_CONTENT.gallery.map(function(item, i) {
-        return '<a class="g-item" href="' + item.src + '.jpg" data-full="' + item.src + '.jpg" ' +
-          'data-index="' + i + '" role="listitem" tabindex="0">' +
-          '<picture><source srcset="' + item.src + '.webp" type="image/webp">' +
-          '<img loading="lazy" src="' + item.src + '.jpg" alt="' + item.alt + '"></picture>' +
-          '<span class="g-cap mono">' + item.alt + '</span>' +
-          '</a>';
+    var shelfTrack = document.getElementById('shelfTrack');
+    var shelfLoading = document.getElementById('shelfLoading');
+    if (shelfTrack && Array.isArray(SITE_CONTENT.gallery) && SITE_CONTENT.gallery.length) {
+      shelfPhotos = SITE_CONTENT.gallery;
+      if (shelfLoading) {
+        shelfLoading.textContent = 'arranging ' + shelfPhotos.length + ' photos\u2026';
+        shelfLoading.classList.add('visible');
+      }
+
+      var count = shelfPhotos.length;
+      var angleStep = 360 / count;
+      // radius large enough that neighboring blocks (roughly --pb-w wide) don't
+      // overlap when spread evenly around the circle
+      var radius = Math.round((94 / Math.tan(Math.PI / count)) + 40);
+
+      shelfTrack.innerHTML = shelfPhotos.map(function(item, i) {
+        var angle = i * angleStep;
+        return '<div class="photo-block" data-index="' + i + '" data-angle="' + angle + '" ' +
+          'style="transform:rotateY(' + angle + 'deg) translateZ(' + radius + 'px)" ' +
+          'role="listitem" tabindex="0" aria-label="' + item.alt + '">' +
+          '<div class="pb-face pb-front"><picture><source srcset="' + item.src + '.webp" type="image/webp">' +
+          '<img loading="lazy" src="' + item.src + '.jpg" alt="' + item.alt + '"></picture></div>' +
+          '<div class="pb-face pb-back"></div>' +
+          '<div class="pb-face pb-right"></div>' +
+          '<div class="pb-face pb-left"></div>' +
+          '<div class="pb-face pb-top"></div>' +
+          '<div class="pb-face pb-bottom"></div>' +
+          '</div>';
       }).join('');
+
+      if (shelfLoading) {
+        setTimeout(function() { shelfLoading.classList.remove('visible'); }, reduceMotion ? 0 : 420);
+      }
     }
 
     var skillsList = document.getElementById('skillsList');
@@ -59,6 +83,143 @@
       }).join('');
     }
   }
+
+  /* ==========================================================================
+     Photo shelf interaction: drag the whole track to spin it (with a little
+     momentum on release), click a block to pick it up into an inspect view
+     (drag to orbit that single photo, scroll to zoom, Esc or the back link
+     to return to the shelf).
+     ========================================================================== */
+  (function initPhotoShelf() {
+    var stage = document.getElementById('shelfStage');
+    var track = document.getElementById('shelfTrack');
+    var inspect = document.getElementById('shelfInspect');
+    var inspectStage = document.getElementById('shelfInspectStage');
+    var inspectBack = document.getElementById('shelfBack');
+    var detailTitle = document.getElementById('shelfDetailTitle');
+    var detailBody = document.getElementById('shelfDetailBody');
+    var detailLink = document.getElementById('shelfDetailLink');
+    if (!stage || !track || !inspect || !shelfPhotos.length) return;
+
+    var TAP_MAX_MOVE = 8;
+
+    /* ---- drag-to-spin the shelf ------------------------------------------ */
+    var rotation = 0, velocity = 0;
+    var dragging = false, dragStartX = 0, dragStartRotation = 0, lastX = 0, lastMoveTime = 0;
+    var downX = 0, downY = 0, moved = 0;
+
+    function applyRotation() {
+      track.style.transform = 'translate(-50%,-50%) rotateY(' + rotation + 'deg)';
+    }
+    applyRotation();
+
+    track.addEventListener('pointerdown', function(e) {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      dragging = true; moved = 0;
+      dragStartX = e.clientX; downX = e.clientX; downY = e.clientY;
+      dragStartRotation = rotation; lastX = e.clientX; lastMoveTime = performance.now();
+      velocity = 0;
+      track.classList.add('dragging');
+      try { track.setPointerCapture(e.pointerId); } catch (err) {}
+    });
+    track.addEventListener('pointermove', function(e) {
+      if (!dragging) return;
+      moved = Math.max(moved, Math.hypot(e.clientX - downX, e.clientY - downY));
+      var dx = e.clientX - dragStartX;
+      rotation = dragStartRotation + dx * 0.34;
+      var now = performance.now();
+      var dt = Math.max(1, now - lastMoveTime);
+      velocity = ((e.clientX - lastX) * 0.34) / dt * 16; // approx deg per frame at release
+      lastX = e.clientX; lastMoveTime = now;
+      applyRotation();
+    });
+    function endDrag(e) {
+      if (!dragging) return;
+      dragging = false;
+      track.classList.remove('dragging');
+      if (moved <= TAP_MAX_MOVE) {
+        var block = e.target.closest ? e.target.closest('.photo-block') : null;
+        if (block) openInspect(parseInt(block.getAttribute('data-index'), 10));
+      }
+    }
+    track.addEventListener('pointerup', endDrag);
+    track.addEventListener('pointercancel', function() { dragging = false; track.classList.remove('dragging'); });
+
+    function momentumFrame() {
+      if (!dragging && Math.abs(velocity) > 0.01) {
+        rotation += velocity;
+        velocity *= 0.94;
+        applyRotation();
+      }
+      requestAnimationFrame(momentumFrame);
+    }
+    if (!reduceMotion) requestAnimationFrame(momentumFrame);
+
+    // keyboard: Enter/Space on a focused block opens inspect
+    track.addEventListener('keydown', function(e) {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      var block = e.target.closest ? e.target.closest('.photo-block') : null;
+      if (block) { e.preventDefault(); openInspect(parseInt(block.getAttribute('data-index'), 10)); }
+    });
+
+    /* ---- inspect mode: pick up one photo, orbit + zoom it ---------------- */
+    var inspectOpen = false;
+    var iRotY = 0, iRotX = 0, iScale = 1;
+    var iDragging = false, iLastX = 0, iLastY = 0;
+
+    function applyInspectTransform() {
+      var img = inspectStage.querySelector('.pb-inspect-img');
+      if (img) img.style.transform = 'rotateY(' + iRotY + 'deg) rotateX(' + iRotX + 'deg) scale(' + iScale + ')';
+    }
+
+    function openInspect(index) {
+      var item = shelfPhotos[index];
+      if (!item) return;
+      inspectStage.innerHTML = '<img class="pb-inspect-img" src="' + item.src + '.jpg" alt="' + item.alt + '">';
+      var titleText = item.alt.length > 60 ? item.alt.slice(0, 60) + '\u2026' : item.alt;
+      detailTitle.textContent = titleText;
+      detailBody.textContent = item.alt;
+      detailLink.href = item.src + '.jpg';
+      iRotY = 0; iRotX = 0; iScale = 1;
+      applyInspectTransform();
+      inspect.classList.add('open');
+      inspect.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      inspectOpen = true;
+      inspectBack.focus();
+    }
+    function closeInspect() {
+      inspect.classList.remove('open');
+      inspect.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+      inspectOpen = false;
+    }
+    inspectBack.addEventListener('click', closeInspect);
+    document.addEventListener('keydown', function(e) {
+      if (inspectOpen && e.key === 'Escape') closeInspect();
+    });
+
+    inspectStage.addEventListener('pointerdown', function(e) {
+      iDragging = true; iLastX = e.clientX; iLastY = e.clientY;
+      inspectStage.classList.add('dragging');
+      try { inspectStage.setPointerCapture(e.pointerId); } catch (err) {}
+    });
+    inspectStage.addEventListener('pointermove', function(e) {
+      if (!iDragging) return;
+      iRotY += (e.clientX - iLastX) * 0.35;
+      iRotX = Math.max(-25, Math.min(25, iRotX - (e.clientY - iLastY) * 0.25));
+      iLastX = e.clientX; iLastY = e.clientY;
+      applyInspectTransform();
+    });
+    function endInspectDrag() { iDragging = false; inspectStage.classList.remove('dragging'); }
+    inspectStage.addEventListener('pointerup', endInspectDrag);
+    inspectStage.addEventListener('pointercancel', endInspectDrag);
+    inspectStage.addEventListener('wheel', function(e) {
+      e.preventDefault();
+      iScale = Math.max(0.6, Math.min(2.4, iScale - e.deltaY * 0.0012));
+      applyInspectTransform();
+    }, { passive: false });
+  })();
 
   var footerYear = document.getElementById('footerYear');
   if (footerYear) footerYear.textContent = new Date().getFullYear();

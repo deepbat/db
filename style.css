@@ -575,6 +575,116 @@ h2.section-title{
 .g-item:hover .g-cap{ transform:translateY(0); }
 
 /* ==========================================================================
+   PHOTO SHELF — each photo is a real 3D block (front face + four edge
+   faces, like a thick print), arranged on a circle you spin by dragging.
+   Click a block to pick it up into a full inspect view. Standard CSS
+   cube-face technique: a WxH parent in preserve-3d, each face centered
+   then pushed out along its own local Z axis by half the box's size on
+   that axis. --pb-w/--pb-h/--pb-d are single source of truth so the JS
+   layout math and the CSS face offsets never drift apart.
+   ========================================================================== */
+.shelf-wrap{ --pb-w:188px; --pb-h:256px; --pb-d:15px; position:relative; }
+.shelf-loading{
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  font-size:12px; letter-spacing:.08em; color:var(--text-faint); opacity:0;
+  transition:opacity .3s var(--ease-out); pointer-events:none;
+}
+.shelf-loading.visible{ opacity:1; }
+
+.shelf-stage{
+  position:relative; height:400px; perspective:1500px; perspective-origin:50% 38%;
+  touch-action:pan-y;
+}
+.shelf-track{
+  position:absolute; left:50%; top:38%; width:0; height:0;
+  transform-style:preserve-3d; cursor:grab;
+}
+.shelf-track.dragging{ cursor:grabbing; }
+.photo-block{
+  position:absolute; left:0; top:0; width:var(--pb-w); height:var(--pb-h);
+  margin:calc(var(--pb-h) / -2) 0 0 calc(var(--pb-w) / -2);
+  transform-style:preserve-3d; will-change:transform;
+}
+.pb-face{ position:absolute; overflow:hidden; }
+.pb-front, .pb-back{ inset:0; border-radius:4px; }
+.pb-front{
+  transform:translateZ(calc(var(--pb-d) / 2));
+  background:var(--bg-elev); box-shadow:0 0 0 1px var(--line-soft);
+}
+.pb-front img{ width:100%; height:100%; object-fit:cover; display:block; }
+.pb-back{
+  transform:rotateY(180deg) translateZ(calc(var(--pb-d) / 2));
+  background:var(--bg-elev-2);
+  display:flex; align-items:center; justify-content:center;
+}
+.pb-back::before{
+  content:""; width:34%; height:34%; border-radius:50%;
+  border:1px solid var(--line); box-shadow:0 0 16px -4px rgba(var(--accent-rgb),.5);
+}
+.pb-right, .pb-left{
+  width:var(--pb-d); height:var(--pb-h); top:0; left:calc((var(--pb-w) - var(--pb-d)) / 2);
+  background:repeating-linear-gradient(90deg, #EDEBE3 0 2px, #DAD7CB 2px 3px);
+}
+.pb-right{ transform:rotateY(90deg) translateZ(calc(var(--pb-w) / 2)); }
+.pb-left{ transform:rotateY(-90deg) translateZ(calc(var(--pb-w) / 2)); }
+.pb-top, .pb-bottom{
+  width:var(--pb-w); height:var(--pb-d); left:0; top:calc((var(--pb-h) - var(--pb-d)) / 2);
+  background:repeating-linear-gradient(0deg, #EDEBE3 0 2px, #DAD7CB 2px 3px);
+}
+.pb-top{ transform:rotateX(90deg) translateZ(calc(var(--pb-h) / 2)); }
+.pb-bottom{ transform:rotateX(-90deg) translateZ(calc(var(--pb-h) / 2)); }
+
+.shelf-surface{
+  position:absolute; left:8%; right:8%; bottom:64px; height:2px;
+  background:linear-gradient(90deg, transparent, var(--line-bright) 15%, var(--accent) 50%, var(--line-bright) 85%, transparent);
+  opacity:.5; pointer-events:none;
+}
+.shelf-shadow{
+  position:absolute; left:50%; bottom:44px; width:70%; height:26px; transform:translateX(-50%);
+  background:radial-gradient(closest-side, rgba(0,0,0,.32), transparent 75%); pointer-events:none;
+}
+.shelf-hint{
+  text-align:center; font-size:11px; letter-spacing:.08em; color:var(--text-faint); margin-top:6px;
+}
+@media (max-width:760px){
+  .shelf-wrap{ --pb-w:132px; --pb-h:180px; --pb-d:11px; }
+  .shelf-stage{ height:300px; }
+}
+
+/* ---- inspect overlay ---- */
+.shelf-inspect{
+  position:fixed; inset:0; z-index:3000; display:grid; grid-template-columns:1.1fr .9fr;
+  background:rgba(3,7,13,.96); opacity:0; visibility:hidden; transition:opacity .3s var(--ease-out);
+}
+.shelf-inspect.open{ opacity:1; visibility:visible; }
+@media (max-width:860px){ .shelf-inspect{ grid-template-columns:1fr; grid-template-rows:1fr auto; } }
+.shelf-back{
+  position:absolute; top:22px; left:28px; z-index:2; color:#EAF3FC; font-size:12.5px; letter-spacing:.04em;
+  display:flex; align-items:center; gap:6px; opacity:.85; transition:opacity .2s;
+}
+.shelf-back:hover{ opacity:1; color:var(--accent); }
+.shelf-inspect-stage{
+  position:relative; display:flex; align-items:center; justify-content:center;
+  perspective:1600px; cursor:grab; touch-action:none;
+}
+.shelf-inspect-stage.dragging{ cursor:grabbing; }
+.pb-inspect-img{
+  max-width:70%; max-height:74vh; border-radius:6px;
+  box-shadow:0 40px 90px -30px rgba(0,0,0,.7), 0 0 0 1px rgba(255,255,255,.06);
+  transition:transform .05s linear; will-change:transform;
+}
+.shelf-detail{
+  padding:80px 48px 40px; color:#EAF3FC; display:flex; flex-direction:column; gap:14px;
+  border-left:1px solid rgba(255,255,255,.08); overflow-y:auto;
+}
+@media (max-width:860px){ .shelf-detail{ border-left:0; border-top:1px solid rgba(255,255,255,.08); padding:24px 28px 32px; } }
+.shelf-detail h3{ font-family:var(--font-display); font-size:26px; font-weight:700; letter-spacing:-.01em; }
+.shelf-detail p{ font-size:15px; line-height:1.7; color:rgba(234,243,251,.72); max-width:46ch; }
+.shelf-detail .text-link{ color:#EAF3FC; align-self:flex-start; }
+.shelf-detail .text-link::after{ background:var(--accent); }
+.shelf-detail-hint{ margin-top:auto; font-size:11px; letter-spacing:.06em; color:rgba(234,243,251,.4); }
+
+/* ==========================================================================
    ACHIEVEMENTS
    ========================================================================== */
 .awards{ display:grid; grid-template-columns:repeat(2,1fr); gap:16px; }
