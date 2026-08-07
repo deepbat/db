@@ -112,6 +112,7 @@
 html{ scroll-behavior:smooth; }
 @media (prefers-reduced-motion: reduce){ html{ scroll-behavior:auto; } }
 
+html, body{ height:100%; overflow:hidden; }
 body{
   margin:0;
   background:var(--bg);
@@ -120,7 +121,6 @@ body{
   font-size:16px;
   line-height:1.6;
   -webkit-font-smoothing:antialiased;
-  overflow-x:hidden;
   width:100%;
   max-width:100vw;
 }
@@ -315,17 +315,34 @@ h1,h2,h3,h4,p,figure{ margin:0; }
 /* ==========================================================================
    LAYOUT / SECTIONS — shimmering waterline dividers instead of hard rules
    ========================================================================== */
-main{ position:relative; z-index:2; }
-.section{ padding:120px 0; position:relative; background:var(--bg-veil); }
+main{
+  position:relative; z-index:2; display:flex; flex-direction:row;
+  width:100vw; height:100vh; overflow-x:auto; overflow-y:hidden;
+  scroll-behavior:smooth; scroll-snap-type:x proximity;
+  -webkit-overflow-scrolling:touch;
+}
+@media (prefers-reduced-motion: reduce){ main{ scroll-behavior:auto; } }
+main::-webkit-scrollbar{ height:6px; }
+main::-webkit-scrollbar-track{ background:var(--bg-elev); }
+main::-webkit-scrollbar-thumb{ background:var(--accent); border-radius:var(--r-pill); }
+main{ scrollbar-width:thin; scrollbar-color:var(--accent) var(--bg-elev); }
+
+.section{
+  flex:0 0 100vw; width:100vw; height:100vh; box-sizing:border-box;
+  padding:112px 0 40px; position:relative; background:var(--bg-veil);
+  overflow-y:auto; overflow-x:hidden; scroll-snap-align:start;
+  display:flex; flex-direction:column;
+}
+.section > .wrap{ margin-top:auto; margin-bottom:auto; }
 .section:not(:last-of-type)::after{
-  content:""; position:absolute; left:0; right:0; bottom:0; height:1px;
-  background:linear-gradient(90deg, transparent, var(--line-bright) 22%, var(--accent) 50%, var(--line-bright) 78%, transparent);
-  background-size:220% 100%; opacity:.42;
+  content:""; position:absolute; top:0; bottom:0; right:0; width:1px;
+  background:linear-gradient(180deg, transparent, var(--line-bright) 22%, var(--accent) 50%, var(--line-bright) 78%, transparent);
+  background-size:100% 220%; opacity:.42;
   animation:waterline 9s linear infinite;
 }
-@keyframes waterline{ 0%{ background-position:220% 0; } 100%{ background-position:-220% 0; } }
+@keyframes waterline{ 0%{ background-position:0 220%; } 100%{ background-position:0 -220%; } }
 @media (prefers-reduced-motion: reduce){ .section:not(:last-of-type)::after{ animation:none; background-position:0 0; } }
-@media (max-width:760px){ .section{ padding:76px 0; } }
+@media (max-width:760px){ .section{ padding:88px 0 32px; } }
 
 .section-head{ margin-bottom:52px; max-width:640px; }
 .eyebrow{
@@ -373,13 +390,13 @@ h2.section-title{
   position:fixed; inset:0; width:100vw; height:100vh; z-index:40;
   display:block; pointer-events:none;
 }
-.hero{ position:relative; padding:calc(var(--nav-h) + 40px) 0 0; min-height:100vh; display:flex; align-items:center; overflow:hidden; background:transparent; cursor:crosshair; touch-action:none; -webkit-touch-callout:none; user-select:none; }
+.hero{ position:relative; flex:0 0 100vw; width:100vw; height:100vh; box-sizing:border-box; padding:calc(var(--nav-h) + 40px) 0 0; display:flex; overflow-y:auto; overflow-x:hidden; scroll-snap-align:start; background:transparent; cursor:crosshair; -webkit-touch-callout:none; user-select:none; }
+.hero-content{ position:relative; z-index:2; width:100%; padding-bottom:64px; pointer-events:none; margin-top:auto; margin-bottom:auto; }
+.hero-content > *{ pointer-events:auto; }
 .hero-scrim{
   position:absolute; inset:0; z-index:1; pointer-events:none;
   background:linear-gradient(180deg, var(--bg) 0%, rgba(var(--bg-rgb),.42) 30%, rgba(var(--bg-rgb),.68) 72%, var(--bg-veil) 100%);
 }
-.hero-content{ position:relative; z-index:2; width:100%; padding-bottom:64px; pointer-events:none; }
-.hero-content > *{ pointer-events:auto; }
 
 .sim-hint{
   position:absolute; z-index:3; top:calc(var(--nav-h) + 22px); right:32px;
@@ -436,14 +453,14 @@ h2.section-title{
   padding:22px 0 30px; font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--text-faint);
   width:100%; justify-content:center; pointer-events:none;
 }
-.scroll-cue i{ display:block; width:1px; height:34px; background:var(--line); position:relative; overflow:hidden; }
+.scroll-cue i{ display:block; width:34px; height:1px; background:var(--line); position:relative; overflow:hidden; }
 .scroll-cue i::after{
-  content:""; position:absolute; left:0; top:-100%; width:100%; height:100%; background:var(--accent);
+  content:""; position:absolute; top:0; left:-100%; height:100%; width:100%; background:var(--accent);
   box-shadow:0 0 8px rgba(var(--accent-rgb),.9);
   animation:cue-drip 2.2s ease-in-out infinite;
 }
-@keyframes cue-drip{ 0%{ top:-100%; } 60%{ top:100%; } 100%{ top:100%; } }
-@media (prefers-reduced-motion: reduce){ .scroll-cue i::after{ animation:none; top:0; } }
+@keyframes cue-drip{ 0%{ left:-100%; } 60%{ left:100%; } 100%{ left:100%; } }
+@media (prefers-reduced-motion: reduce){ .scroll-cue i::after{ animation:none; left:0; } }
 @media (max-width:640px){ .scroll-cue{ display:none; } }
 
 /* ==========================================================================
@@ -753,7 +770,11 @@ h2.section-title{
 /* ==========================================================================
    FOOTER
    ========================================================================== */
-.site-footer{ padding:60px 0 32px; background:var(--bg-elev-2-veil); color:var(--text); }
+.site-footer{
+  flex:0 0 100vw; width:100vw; height:100vh; box-sizing:border-box;
+  padding:112px 0 32px; background:var(--bg-elev-2-veil); color:var(--text);
+  overflow-y:auto; overflow-x:hidden; scroll-snap-align:start;
+}
 .footer-grid{ display:grid; grid-template-columns:1.4fr 1fr 1fr 1fr; gap:32px; padding-bottom:36px; border-bottom:1px solid var(--line-soft); }
 @media (max-width:700px){ .footer-grid{ grid-template-columns:1fr 1fr; } }
 .foot-brand .brand-name{ font-size:18px; margin-bottom:8px; }

@@ -108,6 +108,8 @@
     var dragging = false, dragStartX = 0, dragStartRotation = 0, lastX = 0, lastMoveTime = 0;
     var downX = 0, downY = 0, moved = 0;
 
+    var pressedBlock = null;
+
     function applyRotation() {
       track.style.transform = 'translate(-50%,-50%) rotateY(' + rotation + 'deg)';
     }
@@ -119,6 +121,11 @@
       dragStartX = e.clientX; downX = e.clientX; downY = e.clientY;
       dragStartRotation = rotation; lastX = e.clientX; lastMoveTime = performance.now();
       velocity = 0;
+      // record the actual pressed block now — once setPointerCapture below fires,
+      // e.target on the eventual pointerup becomes the capturing element (track)
+      // itself, not whatever was visually under the pointer, so this can't be
+      // re-derived later from the pointerup event.
+      pressedBlock = (e.target && e.target.closest) ? e.target.closest('.photo-block') : null;
       track.classList.add('dragging');
       try { track.setPointerCapture(e.pointerId); } catch (err) {}
     });
@@ -133,17 +140,17 @@
       lastX = e.clientX; lastMoveTime = now;
       applyRotation();
     });
-    function endDrag(e) {
+    function endDrag() {
       if (!dragging) return;
       dragging = false;
       track.classList.remove('dragging');
-      if (moved <= TAP_MAX_MOVE) {
-        var block = e.target.closest ? e.target.closest('.photo-block') : null;
-        if (block) openInspect(parseInt(block.getAttribute('data-index'), 10));
+      if (moved <= TAP_MAX_MOVE && pressedBlock) {
+        openInspect(parseInt(pressedBlock.getAttribute('data-index'), 10));
       }
+      pressedBlock = null;
     }
     track.addEventListener('pointerup', endDrag);
-    track.addEventListener('pointercancel', function() { dragging = false; track.classList.remove('dragging'); });
+    track.addEventListener('pointercancel', function() { dragging = false; pressedBlock = null; track.classList.remove('dragging'); });
 
     function momentumFrame() {
       if (!dragging && Math.abs(velocity) > 0.01) {
@@ -255,15 +262,19 @@
     });
   }
 
+  var mainTrack = document.getElementById('main');
+
   var toTop = document.getElementById('toTop');
   if (toTop) {
     toTop.addEventListener('click', function() {
-      window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+      if (mainTrack) mainTrack.scrollTo({ left: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
     });
   }
 
   /* ==========================================================================
-     Smooth scroll for anchor links
+     Smooth scroll for anchor links — panels are arranged left to right now,
+     so this scrolls the target panel's left edge into view horizontally
+     (inline:'start') instead of the old top-of-page vertical jump.
      ========================================================================== */
   document.querySelectorAll('a[href^="#"]').forEach(function(a) {
     a.addEventListener('click', function(e) {
@@ -272,11 +283,39 @@
         var el = document.querySelector(id);
         if (el) {
           e.preventDefault();
-          el.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+          el.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', inline: 'start', block: 'nearest' });
+          history.pushState(null, '', id);
         }
       }
     });
   });
+
+  /* ==========================================================================
+     Vertical mouse-wheel input pans the horizontal panel track instead —
+     unless the wheel is over a panel whose own content is taller than the
+     screen and hasn't reached its scroll limit yet, in which case that
+     panel's internal vertical scroll takes priority as usual.
+     ========================================================================== */
+  if (mainTrack) {
+    mainTrack.addEventListener('wheel', function(e) {
+      var el = e.target;
+      while (el && el !== mainTrack) {
+        var style = window.getComputedStyle(el);
+        var canScrollY = (style.overflowY === 'auto' || style.overflowY === 'scroll') && el.scrollHeight > el.clientHeight;
+        if (canScrollY) {
+          var atTop = el.scrollTop <= 0;
+          var atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 1;
+          if ((e.deltaY < 0 && !atTop) || (e.deltaY > 0 && !atBottom)) return; // let the panel's own vertical scroll run
+          break; // panel is maxed out in this direction — fall through to panning
+        }
+        el = el.parentElement;
+      }
+      if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+        e.preventDefault();
+        mainTrack.scrollLeft += e.deltaY;
+      }
+    }, { passive: false });
+  }
 
   /* ==========================================================================
      Project card expand/collapse
@@ -373,7 +412,7 @@
           io.unobserve(entry.target);
         }
       });
-    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+    }, { threshold: 0.12, rootMargin: '0px -40px 0px 0px' });
     revealEls.forEach(function(el) { io.observe(el); });
   } else {
     revealEls.forEach(function(el) { el.classList.add('visible', 'split-in'); });
@@ -456,7 +495,7 @@
           match.link.classList.add('is-active');
         }
       });
-    }, { threshold: 0, rootMargin: '-45% 0px -50% 0px' });
+    }, { threshold: 0, rootMargin: '0px -45% 0px -45%' });
     spySections.forEach(function(s) { spy.observe(s.el); });
   }
 
@@ -675,14 +714,14 @@
       ctx.putImageData(img, 0, 0);
     }
 
-    // ---- interaction: long-press to sculpt, tap to ripple — anywhere on
-    // the page. Real controls (links, buttons, form fields) are left alone
-    // so nothing here ever competes with normal site navigation. Touch
-    // scrolling is precious everywhere except the hero (which already
-    // trades it away via touch-action:none), so on touch, sculpting is
-    // only enabled inside the hero; elsewhere a touch always resolves to
-    // a single ripple on release, never a drag-scroll-eating hold.
-    var heroEl = document.querySelector('.hero');
+    // ---- interaction: press-and-hold to sculpt, tap to ripple — anywhere
+    // on the page. Real controls (links, buttons, form fields) are left
+    // alone so nothing here ever competes with normal site navigation.
+    // Every panel (including the hero) now needs an unobstructed swipe to
+    // move to the next/previous panel, so touch never sculpts — only
+    // mouse/pen can, since a mouse hold never competes with anything. A
+    // touch always resolves to a single ripple on release and never calls
+    // preventDefault, so horizontal swipe-scrolling is untouched everywhere.
     var INTERACTIVE_SEL = 'a, button, input, textarea, select, label, [role="button"], [contenteditable]';
 
     var pointerActive = false, sculpting = false, allowSculpt = false;
@@ -700,17 +739,14 @@
       if (e.pointerType === 'mouse' && e.button !== 0) return;
       if (e.target && e.target.closest && e.target.closest(INTERACTIVE_SEL)) return; // never hijack real controls
 
-      var isHero = !!(e.target && e.target.closest && e.target.closest('.hero'));
-      allowSculpt = e.pointerType !== 'touch' || isHero;
+      allowSculpt = e.pointerType !== 'touch';
 
       pointerActive = true; sculpting = false;
       downTime = performance.now();
       downClientX = e.clientX; downClientY = e.clientY;
       lastGrid = toGrid(e);
       lastInteraction = downTime;
-
-      if (e.pointerType === 'touch' && isHero) e.preventDefault(); // matches the hero's existing touch-action:none trade-off
-    }, { passive: false });
+    });
 
     window.addEventListener('pointermove', function(e) {
       if (!pointerActive) return;
@@ -725,7 +761,7 @@
       if (pointerActive) {
         var held = performance.now() - downTime;
         var moved = Math.hypot(e.clientX - downClientX, e.clientY - downClientY);
-        var withinTapTime = allowSculpt ? held <= TAP_MAX_MS : true; // outside the hero on touch, any non-drag release ripples
+        var withinTapTime = allowSculpt ? held <= TAP_MAX_MS : true; // on touch, any non-drag release ripples
         if (!sculpting && moved <= TAP_MAX_MOVE && withinTapTime) {
           var p = toGrid(e);
           addRipple(p.x, p.y);
@@ -736,7 +772,6 @@
     }
     window.addEventListener('pointerup', finishPointer);
     window.addEventListener('pointercancel', finishPointer);
-    if (heroEl) heroEl.addEventListener('contextmenu', function(e) { e.preventDefault(); });
 
     // ---- main loop -----------------------------------------------------------
     function frame(now) {
