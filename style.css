@@ -386,7 +386,7 @@ h2.section-title{
   background:radial-gradient(120% 90% at 50% 20%, var(--hero-glow) 0%, var(--bg) 68%);
 }
 .chime-curtain{
-  position:fixed; inset:0; width:100vw; height:100vh; z-index:40;
+  position:absolute; inset:0; z-index:1;
   display:block; pointer-events:none;
 }
 .hero{ position:relative; flex:0 0 100vw; width:100vw; height:100vh; box-sizing:border-box; padding:calc(var(--nav-h) + 40px) 0 0; display:flex; overflow-y:auto; overflow-x:hidden; scroll-snap-align:start; background:transparent; cursor:crosshair; -webkit-touch-callout:none; user-select:none; }

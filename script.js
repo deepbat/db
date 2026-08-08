@@ -800,11 +800,13 @@
 
   /* ==========================================================================
      CHIMES — strands of water droplets hanging from just under the nav,
-     fixed in place across the whole site (they stay put as you scroll,
-     like a curtain in a doorway you keep walking back through). Each
-     strand is a small verlet rope: gravity pulls it down, your cursor
-     passing nearby pushes it aside like wind, and you can grab any
-     droplet and drag it — it swings back and settles once released.
+     scoped to the hero only: a moment you meet once at the top of the
+     site rather than a layer that follows you everywhere. They occupy the
+     right side of the hero and sit behind the headline in stacking order,
+     so they never compete with or cross over the text. Each strand is a
+     small verlet rope: gravity pulls it down, your cursor passing nearby
+     pushes it aside like wind, and you can grab any droplet and drag it —
+     it swings back and settles once released.
 
      Same non-invasive interaction pattern as the ocean sim: the canvas is
      pointer-events:none, so every click always reaches the real page
@@ -852,8 +854,12 @@
     function buildStrands() {
       var vw = window.innerWidth;
       var spacing = 62;
-      var count = Math.max(10, Math.round(vw / spacing));
-      var margin = (vw - (count - 1) * spacing) / 2;
+      // keep clear of the headline: strands only occupy the right ~42% of
+      // the hero instead of the full width, so they never cross the text
+      var zoneStart = vw * 0.58;
+      var zoneWidth = vw - zoneStart;
+      var count = Math.max(5, Math.round(zoneWidth / spacing));
+      var margin = zoneStart + (zoneWidth - (count - 1) * spacing) / 2;
       strands = [];
       for (var i = 0; i < count; i++) {
         var jitter = (Math.sin(i * 12.9898) * 43758.5453 % 1) * 14 - 7; // deterministic pseudo-random offset
@@ -960,35 +966,41 @@
     }
 
     // ---- interaction: wind (passive) + grab-and-drag ------------------------
+    // Scoped to the hero element itself now that the curtain lives only
+    // there — it should only react while the cursor is actually over the
+    // hero panel, not the whole page.
+    var heroEl = canvas.closest('.hero') || document.querySelector('.hero');
     var pointerX = null, pointerY = null;
     var grabbedParticle = null;
 
-    window.addEventListener('pointermove', function(e) {
-      pointerX = e.clientX; pointerY = e.clientY;
-      if (grabbedParticle) { grabbedParticle.x = e.clientX; grabbedParticle.y = e.clientY; }
-    });
-    window.addEventListener('pointerleave', function() { pointerX = null; pointerY = null; });
+    if (heroEl) {
+      heroEl.addEventListener('pointermove', function(e) {
+        pointerX = e.clientX; pointerY = e.clientY;
+        if (grabbedParticle) { grabbedParticle.x = e.clientX; grabbedParticle.y = e.clientY; }
+      });
+      heroEl.addEventListener('pointerleave', function() { pointerX = null; pointerY = null; });
 
-    window.addEventListener('pointerdown', function(e) {
-      if (e.pointerType === 'mouse' && e.button !== 0) return;
-      if (e.target && e.target.closest && e.target.closest(INTERACTIVE_SEL)) return; // never hijack real controls
+      heroEl.addEventListener('pointerdown', function(e) {
+        if (e.pointerType === 'mouse' && e.button !== 0) return;
+        if (e.target && e.target.closest && e.target.closest(INTERACTIVE_SEL)) return; // never hijack real controls
 
-      var best = null, bestDist = GRAB_RADIUS;
-      for (var s = 0; s < strands.length; s++) {
-        var ps = strands[s].particles;
-        for (var i = 1; i < ps.length; i++) {
-          var dx = ps[i].x - e.clientX, dy = ps[i].y - e.clientY;
-          var dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < bestDist) { best = ps[i]; bestDist = dist; }
+        var best = null, bestDist = GRAB_RADIUS;
+        for (var s = 0; s < strands.length; s++) {
+          var ps = strands[s].particles;
+          for (var i = 1; i < ps.length; i++) {
+            var dx = ps[i].x - e.clientX, dy = ps[i].y - e.clientY;
+            var dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < bestDist) { best = ps[i]; bestDist = dist; }
+          }
         }
-      }
-      if (best) {
-        grabbedParticle = best;
-        grabbedParticle.grabbed = true;
-        grabbedParticle.x = e.clientX; grabbedParticle.y = e.clientY;
-        e.preventDefault();
-      }
-    }, { passive: false });
+        if (best) {
+          grabbedParticle = best;
+          grabbedParticle.grabbed = true;
+          grabbedParticle.x = e.clientX; grabbedParticle.y = e.clientY;
+          e.preventDefault();
+        }
+      }, { passive: false });
+    }
 
     function release() {
       if (grabbedParticle) {
@@ -997,6 +1009,8 @@
         grabbedParticle = null;
       }
     }
+    // release stays on window: a drag that ends outside the hero (e.g. the
+    // cursor slipped past its edge mid-drag) should still let go cleanly
     window.addEventListener('pointerup', release);
     window.addEventListener('pointercancel', release);
 
