@@ -312,7 +312,7 @@
       }
       if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
         e.preventDefault();
-        mainTrack.scrollLeft += e.deltaY;
+        mainTrack.scrollBy({ left: e.deltaY, behavior: 'instant' });
       }
     }, { passive: false });
   }
@@ -486,15 +486,19 @@
     return el ? { link: a, el: el } : null;
   }).filter(Boolean);
   if (spySections.length && 'IntersectionObserver' in window) {
+    var intersectingMap = new Map();
     var spy = new IntersectionObserver(function(entries) {
       entries.forEach(function(entry) {
         var match = spySections.filter(function(s) { return s.el === entry.target; })[0];
         if (!match) return;
-        if (entry.isIntersecting) {
-          spySections.forEach(function(s) { s.link.classList.remove('is-active'); });
-          match.link.classList.add('is-active');
-        }
+        intersectingMap.set(match, entry.isIntersecting);
       });
+      // Determine the one currently-intersecting section (page order breaks
+      // ties if a batch briefly reports more than one at once, e.g. during
+      // a fast/instant jump) and set is-active on exactly that link — never
+      // relying on another entry's update to implicitly clear a stale one.
+      var current = spySections.filter(function(s) { return intersectingMap.get(s); })[0];
+      spySections.forEach(function(s) { s.link.classList.toggle('is-active', s === current); });
     }, { threshold: 0, rootMargin: '0px -45% 0px -45%' });
     spySections.forEach(function(s) { spy.observe(s.el); });
   }
