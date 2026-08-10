@@ -2,6 +2,19 @@
   'use strict';
 
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var isTouch = window.matchMedia('(pointer: coarse)').matches;
+
+  /* ==========================================================================
+     Device-aware hero hint — sculpting the ocean floor is desktop/mouse
+     only (a touch hold has to stay free for swiping between panels), so
+     don't promise it on touch devices. Ripples work everywhere.
+     ========================================================================== */
+  (function fixSimHint() {
+    var hint = document.querySelector('.sim-hint');
+    if (!hint || !isTouch) return;
+    var textNode = Array.prototype.filter.call(hint.childNodes, function(n) { return n.nodeType === 3; }).pop();
+    if (textNode) textNode.textContent = 'Tap anywhere for ripples · drag the droplets above';
+  })();
 
   /* ==========================================================================
      Dark / light theme toggle. The initial state is already applied by the
@@ -13,9 +26,11 @@
     if (!btn) return;
     var root = document.documentElement;
 
+    var themeColorMeta = document.querySelector('meta[name="theme-color"]');
     function reflect(theme) {
       btn.setAttribute('aria-label', theme === 'light' ? 'Switch to dark theme' : 'Switch to light theme');
       btn.setAttribute('aria-pressed', theme === 'light' ? 'true' : 'false');
+      if (themeColorMeta) themeColorMeta.setAttribute('content', theme === 'light' ? '#F3FAF9' : '#060911');
     }
     function apply(theme) {
       if (theme === 'light') root.setAttribute('data-theme', 'light');
@@ -183,8 +198,7 @@
       var item = shelfPhotos[index];
       if (!item) return;
       inspectStage.innerHTML = '<img class="pb-inspect-img" src="' + item.src + '.jpg" alt="' + item.alt + '">';
-      var titleText = item.alt.length > 60 ? item.alt.slice(0, 60) + '\u2026' : item.alt;
-      detailTitle.textContent = titleText;
+      detailTitle.textContent = 'Photo ' + (index + 1) + ' of ' + shelfPhotos.length;
       detailBody.textContent = item.alt;
       detailLink.href = item.src + '.jpg';
       iRotY = 0; iRotX = 0; iScale = 1;
@@ -272,23 +286,66 @@
   }
 
   /* ==========================================================================
+     Arrow-key panel navigation — Left/Right is the natural input for a
+     horizontal layout. Skipped while a form field has focus so it never
+     hijacks normal text-cursor movement or a native select/slider.
+     ========================================================================== */
+  if (mainTrack) {
+    var TYPING_SEL = 'input, textarea, select, [contenteditable="true"], [contenteditable=""]';
+    window.addEventListener('keydown', function(e) {
+      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+      var ae = document.activeElement;
+      if (ae && ae.closest && ae.closest(TYPING_SEL)) return;
+      var panels = Array.prototype.slice.call(mainTrack.children);
+      if (!panels.length) return;
+      var vw = window.innerWidth;
+      var current = Math.round(mainTrack.scrollLeft / vw);
+      var next = current + (e.key === 'ArrowRight' ? 1 : -1);
+      next = Math.max(0, Math.min(panels.length - 1, next));
+      if (next === current) return;
+      e.preventDefault();
+      panels[next].scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', inline: 'start', block: 'nearest' });
+      var id = panels[next].id;
+      if (id) { try { history.pushState(null, '', '#' + id); } catch (err) {} }
+    });
+  }
+
+  /* ==========================================================================
      Smooth scroll for anchor links — panels are arranged left to right now,
      so this scrolls the target panel's left edge into view horizontally
-     (inline:'start') instead of the old top-of-page vertical jump.
+     (inline:'start') instead of the old top-of-page vertical jump. Shared
+     by clicks, browser Back/Forward (popstate), and a bookmarked/shared
+     link with a hash already in the URL on first load.
      ========================================================================== */
+  function goToPanel(id, behavior) {
+    var el = document.querySelector(id);
+    if (!el) return;
+    el.scrollIntoView({ behavior: behavior || (reduceMotion ? 'auto' : 'smooth'), inline: 'start', block: 'nearest' });
+  }
+
   document.querySelectorAll('a[href^="#"]').forEach(function(a) {
     a.addEventListener('click', function(e) {
       var id = a.getAttribute('href');
-      if (id.length > 1) {
-        var el = document.querySelector(id);
-        if (el) {
-          e.preventDefault();
-          el.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', inline: 'start', block: 'nearest' });
-          history.pushState(null, '', id);
-        }
+      if (id.length > 1 && document.querySelector(id)) {
+        e.preventDefault();
+        goToPanel(id);
+        // pushState throws a SecurityError on file:// origins (e.g. testing
+        // a local checkout by double-clicking index.html) — harmless to
+        // skip there, the scroll itself already happened above.
+        try { history.pushState(null, '', id); } catch (err) {}
       }
     });
   });
+
+  window.addEventListener('popstate', function() {
+    if (location.hash) goToPanel(location.hash, reduceMotion ? 'auto' : 'smooth');
+    else goToPanel('#top', reduceMotion ? 'auto' : 'smooth');
+  });
+
+  if (location.hash && document.querySelector(location.hash)) {
+    // land directly on the linked panel instead of always opening on the hero
+    window.addEventListener('load', function() { goToPanel(location.hash, 'auto'); });
+  }
 
   /* ==========================================================================
      Vertical mouse-wheel input pans the horizontal panel track instead —
@@ -417,63 +474,6 @@
   } else {
     revealEls.forEach(function(el) { el.classList.add('visible', 'split-in'); });
     document.querySelectorAll('.skill-fill').forEach(function(fill) { fill.style.width = fill.getAttribute('data-pct') + '%'; });
-  }
-
-  /* ==========================================================================
-     Lightbox
-     ========================================================================== */
-  var lb = document.getElementById('lightbox');
-  var lbImg = document.getElementById('lbImg');
-  var lbClose = document.getElementById('lbClose');
-  var lbPrev = document.getElementById('lbPrev');
-  var lbNext = document.getElementById('lbNext');
-  var lbCounter = document.getElementById('lbCounter');
-  var gItems = Array.prototype.slice.call(document.querySelectorAll('.g-item'));
-  var current = 0;
-  var lbOpen = false;
-
-  if (lb && lbImg && gItems.length > 0) {
-    function openLightbox(i) {
-      if (i < 0 || i >= gItems.length) return;
-      current = i;
-      var img = gItems[i].querySelector('img');
-      var fullSrc = gItems[i].dataset.full || gItems[i].href;
-      lbImg.src = fullSrc;
-      lbImg.alt = img ? img.alt : 'Gallery image ' + (i + 1);
-      lb.classList.add('open');
-      lbOpen = true;
-      document.body.style.overflow = 'hidden';
-      if (lbCounter) lbCounter.textContent = (i + 1) + ' / ' + gItems.length;
-      lbClose.focus();
-    }
-    function closeLightbox() {
-      lb.classList.remove('open');
-      lbOpen = false;
-      document.body.style.overflow = '';
-      if (gItems[current]) gItems[current].focus();
-    }
-    function step(d) {
-      var next = (current + d + gItems.length) % gItems.length;
-      lbImg.style.opacity = '0';
-      setTimeout(function() { openLightbox(next); lbImg.style.opacity = '1'; }, 150);
-    }
-    gItems.forEach(function(it, i) {
-      it.addEventListener('click', function(e) { e.preventDefault(); openLightbox(i); });
-      it.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openLightbox(i); }
-      });
-    });
-    if (lbClose) lbClose.addEventListener('click', closeLightbox);
-    if (lbPrev) lbPrev.addEventListener('click', function() { step(-1); });
-    if (lbNext) lbNext.addEventListener('click', function() { step(1); });
-    if (lb) lb.addEventListener('click', function(e) { if (e.target === lb) closeLightbox(); });
-    document.addEventListener('keydown', function(e) {
-      if (!lbOpen) return;
-      if (e.key === 'Escape') closeLightbox();
-      if (e.key === 'ArrowLeft') step(-1);
-      if (e.key === 'ArrowRight') step(1);
-    });
-    lbImg.style.transition = 'opacity .15s ease';
   }
 
   /* ==========================================================================
@@ -778,6 +778,7 @@
     window.addEventListener('pointercancel', finishPointer);
 
     // ---- main loop -----------------------------------------------------------
+    var oceanRafId = null;
     function frame(now) {
       if (pointerActive) {
         if (sculpting) { sculptAt(lastGrid.x, lastGrid.y, 1); }
@@ -789,9 +790,17 @@
       }
       for (var s = 0; s < SUBSTEPS; s++) stepWave();
       render(now);
-      requestAnimationFrame(frame);
+      oceanRafId = requestAnimationFrame(frame);
     }
-    requestAnimationFrame(frame);
+    oceanRafId = requestAnimationFrame(frame);
+    document.addEventListener('visibilitychange', function() {
+      if (document.hidden) {
+        if (oceanRafId) cancelAnimationFrame(oceanRafId);
+        oceanRafId = null;
+      } else if (!oceanRafId) {
+        oceanRafId = requestAnimationFrame(frame);
+      }
+    });
 
     // a couple of opening ripples so the surface isn't perfectly flat on load
     addRipple(simW * 0.42, simH * 0.46, 0.7, 4);
@@ -896,8 +905,11 @@
           p.y += vy + GRAVITY;
         }
       }
-      // wind: push nearby particles away from the pointer
-      if (pointerX !== null) {
+      // wind: push nearby particles away from the pointer — this is ambient
+      // motion triggered just by the cursor being nearby, not a deliberate
+      // action, so it's skipped for reduced-motion users. Grabbing a
+      // droplet still works either way, since that's user-initiated.
+      if (pointerX !== null && !reduceMotion) {
         for (var s2 = 0; s2 < strands.length; s2++) {
           var ps2 = strands[s2].particles;
           for (var j = 1; j < ps2.length; j++) {
@@ -1014,12 +1026,42 @@
     window.addEventListener('pointerup', release);
     window.addEventListener('pointercancel', release);
 
+    var running = true;
+    var rafId = null;
+
     function frame() {
       step();
       render();
-      requestAnimationFrame(frame);
+      rafId = requestAnimationFrame(frame);
     }
-    requestAnimationFrame(frame);
+
+    function start() {
+      if (running || document.hidden) return;
+      running = true;
+      rafId = requestAnimationFrame(frame);
+    }
+    function stop() {
+      running = false;
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = null;
+    }
+
+    if (heroEl && 'IntersectionObserver' in window) {
+      var heroVisible = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) start(); else stop();
+        });
+      }, { threshold: 0.01 });
+      heroVisible.observe(heroEl);
+    } else {
+      start();
+    }
+    document.addEventListener('visibilitychange', function() {
+      if (document.hidden) stop(); else if (heroEl) {
+        var r = heroEl.getBoundingClientRect();
+        if (r.left < window.innerWidth && r.right > 0) start();
+      } else start();
+    });
   })();
 
   /* ==========================================================================

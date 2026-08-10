@@ -45,7 +45,9 @@
       <a href="#experience">Experience</a>
       <a href="#skills">Skills</a>
       <a href="#projects">Work</a>
+      <a href="#showreel">Showreel</a>
       <a href="#gallery">Gallery</a>
+      <a href="#achievements">Recognition</a>
       <a href="#contact">Contact</a>
     </nav>
     <a href="#contact" class="nav-cta">Say hi</a>
@@ -294,8 +296,8 @@
       <form class="contact-form reveal" id="contactForm" action="https://formsubmit.co/deepak.batra@outlook.com" method="POST">
         <input type="hidden" name="_subject" value="New message from portfolio site">
         <input type="hidden" name="_template" value="table">
-        <input type="hidden" name="_captcha" value="false">
-        <input type="text" name="_honey" class="hp-field" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <label for="cf-honey" class="sr-only">Leave this field blank</label>
+        <input type="text" id="cf-honey" name="_honey" class="hp-field" tabindex="-1" autocomplete="off">
         <div class="form-row">
           <div class="form-field">
             <label for="cf-name">Name</label>
@@ -363,15 +365,6 @@
 </footer>
 
 </main>
-
-<!-- ============ LIGHTBOX ============ -->
-<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Image viewer">
-  <button class="lb-close" id="lbClose" aria-label="Close image viewer">&times;</button>
-  <button class="lb-nav lb-prev" id="lbPrev" aria-label="Previous image">&#x2039;</button>
-  <img id="lbImg" src="" alt="">
-  <button class="lb-nav lb-next" id="lbNext" aria-label="Next image">&#x203a;</button>
-  <p class="lb-counter" id="lbCounter"></p>
-</div>
 
 <script src="content.js"></script>
 <script defer src="script.js"></script>

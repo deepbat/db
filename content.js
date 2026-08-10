@@ -31,8 +31,8 @@ const SITE_CONTENT = {
     { src: "images/gallery-08", alt: "Training workshop on productivity tools" },
     { src: "images/gallery-09", alt: "Professional development conference" },
     { src: "images/gallery-10", alt: "Team building and office culture event" },
-    { src: "images/gallery-12", alt: "Certification and achievement recognition" },
-    { src: "images/gallery-13", alt: "Behind the scenes of a project launch" },
+    { src: "images/gallery-11", alt: "Certification and achievement recognition" },
+    { src: "images/gallery-12", alt: "Behind the scenes of a project launch" },
     { src: "images/hero", alt: "Professional portrait and workspace" }
   ],
 

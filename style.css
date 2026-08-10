@@ -242,7 +242,7 @@ h1,h2,h3,h4,p,figure{ margin:0; }
 @media (prefers-reduced-motion: reduce){ .brand-mark::before{ animation:none; display:none; } }
 .brand-name{ font-family:var(--font-display); font-weight:700; font-size:15px; letter-spacing:-.01em; }
 
-.nav-links{ display:flex; align-items:center; gap:30px; }
+.nav-links{ display:flex; align-items:center; gap:22px; }
 .nav-links a{
   font-family:var(--font-mono); font-size:12.5px; letter-spacing:.04em; text-transform:uppercase;
   color:var(--text-soft); position:relative; padding:4px 0;
@@ -317,7 +317,7 @@ h1,h2,h3,h4,p,figure{ margin:0; }
    ========================================================================== */
 main{
   position:relative; z-index:2; display:flex; flex-direction:row;
-  width:100vw; height:100vh; overflow-x:auto; overflow-y:hidden;
+  width:100vw; height:100vh; height:100dvh; overflow-x:auto; overflow-y:hidden;
   scroll-snap-type:x proximity;
   -webkit-overflow-scrolling:touch;
 }
@@ -327,7 +327,7 @@ main::-webkit-scrollbar-thumb{ background:var(--accent); border-radius:var(--r-p
 main{ scrollbar-width:thin; scrollbar-color:var(--accent) var(--bg-elev); }
 
 .section{
-  flex:0 0 100vw; width:100vw; height:100vh; box-sizing:border-box;
+  flex:0 0 100vw; width:100vw; height:100vh; height:100dvh; box-sizing:border-box;
   padding:112px 0 40px; position:relative; background:var(--bg-veil);
   overflow-y:auto; overflow-x:hidden; scroll-snap-align:start;
   display:flex; flex-direction:column;
@@ -381,7 +381,7 @@ h2.section-title{
    text stays legible while the water still shows through underneath.
    ========================================================================== */
 .ocean-bg{
-  position:fixed; inset:0; width:100vw; height:100vh; z-index:0;
+  position:fixed; inset:0; width:100vw; height:100vh; height:100dvh; z-index:0;
   display:block; pointer-events:none;
   background:radial-gradient(120% 90% at 50% 20%, var(--hero-glow) 0%, var(--bg) 68%);
 }
@@ -389,7 +389,7 @@ h2.section-title{
   position:absolute; inset:0; z-index:1;
   display:block; pointer-events:none;
 }
-.hero{ position:relative; flex:0 0 100vw; width:100vw; height:100vh; box-sizing:border-box; padding:calc(var(--nav-h) + 40px) 0 0; display:flex; overflow-y:auto; overflow-x:hidden; scroll-snap-align:start; background:transparent; cursor:crosshair; -webkit-touch-callout:none; user-select:none; }
+.hero{ position:relative; flex:0 0 100vw; width:100vw; height:100vh; height:100dvh; box-sizing:border-box; padding:calc(var(--nav-h) + 40px) 0 0; display:flex; overflow-y:auto; overflow-x:hidden; scroll-snap-align:start; background:transparent; cursor:crosshair; -webkit-touch-callout:none; user-select:none; }
 .hero-content{ position:relative; z-index:2; width:100%; padding-bottom:64px; pointer-events:none; margin-top:auto; margin-bottom:auto; }
 .hero-content > *{ pointer-events:auto; }
 .hero-scrim{
@@ -575,22 +575,6 @@ h2.section-title{
 .showreel-cap{ display:flex; justify-content:space-between; margin-top:14px; font-size:11.5px; color:var(--text-faint); letter-spacing:.05em; }
 
 /* ==========================================================================
-   GALLERY
-   ========================================================================== */
-.gallery-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:16px; }
-@media (max-width:860px){ .gallery-grid{ grid-template-columns:repeat(2,1fr); } }
-.g-item{ overflow:hidden; aspect-ratio:1/1; display:block; background:var(--bg-elev); border:1px solid var(--line-soft); }
-.g-item img{ width:100%; height:100%; object-fit:cover; transition:transform .55s var(--ease-out), filter .4s var(--ease-out); filter:saturate(.82) contrast(1.05) brightness(.9); }
-.g-item:hover img{ transform:scale(1.08); filter:saturate(1.1) contrast(1.1) brightness(1) hue-rotate(-4deg); }
-.g-item .g-cap{
-  position:absolute; left:0; right:0; bottom:0; padding:12px 14px; z-index:3;
-  font-family:var(--font-mono); font-size:10.5px; color:#EAF3FC;
-  background:linear-gradient(0deg, rgba(5,11,20,.92), transparent 70%);
-  transform:translateY(100%); transition:transform .35s var(--ease-out);
-}
-.g-item:hover .g-cap{ transform:translateY(0); }
-
-/* ==========================================================================
    PHOTO SHELF — each photo is a real 3D block (front face + four edge
    faces, like a thick print), arranged on a circle you spin by dragging.
    Click a block to pick it up into a full inspect view. Standard CSS
@@ -743,6 +727,10 @@ h2.section-title{
 }
 .form-field input:focus, .form-field textarea:focus{ outline:none; border-color:var(--accent); box-shadow:0 0 0 1px var(--accent), 0 0 16px -4px rgba(var(--accent-rgb),.7); }
 .hp-field{ position:absolute; left:-9999px; }
+.sr-only{
+  position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+  overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
+}
 .form-submit{
   position:relative; overflow:hidden; align-self:flex-start; border-radius:var(--r-pill);
   background:var(--accent); color:var(--bg); border:1px solid var(--accent);
@@ -770,7 +758,7 @@ h2.section-title{
    FOOTER
    ========================================================================== */
 .site-footer{
-  flex:0 0 100vw; width:100vw; height:100vh; box-sizing:border-box;
+  flex:0 0 100vw; width:100vw; height:100vh; height:100dvh; box-sizing:border-box;
   padding:112px 0 32px; background:var(--bg-elev-2-veil); color:var(--text);
   overflow-y:auto; overflow-x:hidden; scroll-snap-align:start;
 }
@@ -788,26 +776,6 @@ h2.section-title{
 #toTop:hover{ color:var(--accent); }
 
 /* ==========================================================================
-   LIGHTBOX
-   ========================================================================== */
-.lightbox{
-  position:fixed; inset:0; z-index:3000; background:rgba(3,7,13,.96);
-  display:flex; align-items:center; justify-content:center;
-  opacity:0; visibility:hidden; transition:opacity .3s var(--ease-out);
-}
-.lightbox.open{ opacity:1; visibility:visible; }
-.lightbox img{ max-width:88vw; max-height:82vh; border-radius:var(--r-md); box-shadow:var(--shadow-lg), 0 0 60px -20px rgba(var(--accent-rgb),.35); }
-.lb-close, .lb-nav{
-  position:absolute; color:#F2F8FB; font-size:28px; width:48px; height:48px;
-  display:flex; align-items:center; justify-content:center; transition:opacity .2s, color .2s;
-}
-.lb-close:hover, .lb-nav:hover{ opacity:.85; color:var(--accent); }
-.lb-close{ top:18px; right:18px; }
-.lb-prev{ left:12px; top:50%; transform:translateY(-50%); }
-.lb-next{ right:12px; top:50%; transform:translateY(-50%); }
-.lb-counter{ position:absolute; bottom:20px; left:50%; transform:translateX(-50%); color:rgba(242,248,251,.75); font-family:var(--font-mono); font-size:12.5px; }
-
-/* ==========================================================================
    CUSTOM CURSOR
    ========================================================================== */
 .cursor-dot{
@@ -819,4 +787,4 @@ h2.section-title{
 .cursor-dot.hover{ width:36px; height:36px; background:transparent; border:1.5px solid var(--accent); box-shadow:0 0 18px -2px rgba(var(--accent-rgb),.7); }
 @media (max-width:900px), (pointer:coarse){ .cursor-dot{ display:none; } }
 
-@media print{ .site-nav,.mobile-menu,.cursor-dot,.grain,.caustic-field,.lightbox{ display:none !important; } }
+@media print{ .site-nav,.mobile-menu,.cursor-dot,.grain,.caustic-field{ display:none !important; } }
