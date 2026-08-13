@@ -4,6 +4,8 @@ This is the **self-contained static version** of the redesigned portfolio. It is
 
 The site does not require React, a bundler, an API key, or Manus storage. Its main interaction layer is implemented in plain JavaScript. Tapping the page creates water ripples, holding and dragging with a mouse sculpts the surface, the hanging droplets respond to the pointer, and grabbing a droplet produces a short harmonic chime through the browser’s Web Audio API. Browsers require a user gesture before audio can play; the first intentional tap arms it.
 
+The navigation includes a **Dark / Light** theme switcher. The preference is stored in `localStorage`, and the first visit follows the visitor’s operating-system color preference when no saved choice exists.
+
 ## Run locally
 
 You can open `index.html` directly, but a local server is recommended because browsers handle media and form requests more consistently over HTTP.
