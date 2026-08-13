@@ -1,1101 +1,149 @@
-(function(){
-  'use strict';
+/* Standalone interaction engine. No framework or build step is required. */
+(function () {
+  "use strict";
 
-  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var isTouch = window.matchMedia('(pointer: coarse)').matches;
+  var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var content = window.SITE_CONTENT || { skills: [], gallery: [] };
+  var audioContext = null;
+  var audioArmed = false;
+  var lastTone = 0;
+  var surfaceStatus = document.getElementById("surfaceStatus");
+  var audioStatus = document.getElementById("audioStatus");
+  var audioDot = document.getElementById("audioDot");
 
-  /* ==========================================================================
-     Device-aware hero hint — sculpting the ocean floor is desktop/mouse
-     only (a touch hold has to stay free for swiping between panels), so
-     don't promise it on touch devices. Ripples work everywhere.
-     ========================================================================== */
-  (function fixSimHint() {
-    var hint = document.querySelector('.sim-hint');
-    if (!hint || !isTouch) return;
-    var textNode = Array.prototype.filter.call(hint.childNodes, function(n) { return n.nodeType === 3; }).pop();
-    if (textNode) textNode.textContent = 'Tap anywhere for ripples · drag the droplets above';
-  })();
-
-  /* ==========================================================================
-     Dark / light theme toggle. The initial state is already applied by the
-     inline script in <head> (reads localStorage, falls back to the OS
-     preference) so there's no flash; this just wires up the button.
-     ========================================================================== */
-  (function initThemeToggle() {
-    var btn = document.getElementById('themeToggle');
-    if (!btn) return;
-    var root = document.documentElement;
-
-    var themeColorMeta = document.querySelector('meta[name="theme-color"]');
-    function reflect(theme) {
-      btn.setAttribute('aria-label', theme === 'light' ? 'Switch to dark theme' : 'Switch to light theme');
-      btn.setAttribute('aria-pressed', theme === 'light' ? 'true' : 'false');
-      if (themeColorMeta) themeColorMeta.setAttribute('content', theme === 'light' ? '#F3FAF9' : '#060911');
-    }
-    function apply(theme) {
-      if (theme === 'light') root.setAttribute('data-theme', 'light');
-      else root.removeAttribute('data-theme');
-      try { localStorage.setItem('db-theme', theme); } catch (e) {}
-      reflect(theme);
-    }
-
-    reflect(root.getAttribute('data-theme') === 'light' ? 'light' : 'dark');
-    btn.addEventListener('click', function() {
-      var current = root.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
-      apply(current === 'light' ? 'dark' : 'light');
-    });
-  })();
-
-  /* ==========================================================================
-     Render gallery (as a 3D photo shelf) + skills from content.js (SITE_CONTENT)
-     ========================================================================== */
-  var shelfPhotos = [];
-  if (typeof SITE_CONTENT !== 'undefined') {
-    var shelfTrack = document.getElementById('shelfTrack');
-    var shelfLoading = document.getElementById('shelfLoading');
-    if (shelfTrack && Array.isArray(SITE_CONTENT.gallery) && SITE_CONTENT.gallery.length) {
-      shelfPhotos = SITE_CONTENT.gallery;
-      if (shelfLoading) {
-        shelfLoading.textContent = 'arranging ' + shelfPhotos.length + ' photos\u2026';
-        shelfLoading.classList.add('visible');
-      }
-
-      var count = shelfPhotos.length;
-      var angleStep = 360 / count;
-      // radius large enough that neighboring blocks (roughly --pb-w wide) don't
-      // overlap when spread evenly around the circle
-      var radius = Math.round((94 / Math.tan(Math.PI / count)) + 40);
-
-      shelfTrack.innerHTML = shelfPhotos.map(function(item, i) {
-        var angle = i * angleStep;
-        return '<div class="photo-block" data-index="' + i + '" data-angle="' + angle + '" ' +
-          'style="transform:rotateY(' + angle + 'deg) translateZ(' + radius + 'px)" ' +
-          'role="listitem" tabindex="0" aria-label="' + item.alt + '">' +
-          '<div class="pb-face pb-front"><picture><source srcset="' + item.src + '.webp" type="image/webp">' +
-          '<img loading="lazy" src="' + item.src + '.jpg" alt="' + item.alt + '"></picture></div>' +
-          '<div class="pb-face pb-back"></div>' +
-          '<div class="pb-face pb-right"></div>' +
-          '<div class="pb-face pb-left"></div>' +
-          '<div class="pb-face pb-top"></div>' +
-          '<div class="pb-face pb-bottom"></div>' +
-          '</div>';
-      }).join('');
-
-      if (shelfLoading) {
-        setTimeout(function() { shelfLoading.classList.remove('visible'); }, reduceMotion ? 0 : 420);
-      }
-    }
-
-    var skillsList = document.getElementById('skillsList');
-    if (skillsList && Array.isArray(SITE_CONTENT.skills)) {
-      skillsList.innerHTML = SITE_CONTENT.skills.map(function(skill) {
-        var pct = Math.max(0, Math.min(100, skill.value));
-        return '<div class="skill-row">' +
-          '<h3>' + skill.name + '</h3>' +
-          '<div class="skill-track"><div class="skill-fill" data-pct="' + pct + '"></div></div>' +
-          '<span class="pct mono">' + pct + '%</span>' +
-          '</div>';
-      }).join('');
-    }
+  function setSurfaceStatus(text) {
+    if (surfaceStatus) surfaceStatus.textContent = text;
   }
 
-  /* ==========================================================================
-     Photo shelf interaction: drag the whole track to spin it (with a little
-     momentum on release), click a block to pick it up into an inspect view
-     (drag to orbit that single photo, scroll to zoom, Esc or the back link
-     to return to the shelf).
-     ========================================================================== */
-  (function initPhotoShelf() {
-    var stage = document.getElementById('shelfStage');
-    var track = document.getElementById('shelfTrack');
-    var inspect = document.getElementById('shelfInspect');
-    var inspectStage = document.getElementById('shelfInspectStage');
-    var inspectBack = document.getElementById('shelfBack');
-    var detailTitle = document.getElementById('shelfDetailTitle');
-    var detailBody = document.getElementById('shelfDetailBody');
-    var detailLink = document.getElementById('shelfDetailLink');
-    if (!stage || !track || !inspect || !shelfPhotos.length) return;
-
-    var TAP_MAX_MOVE = 8;
-
-    /* ---- drag-to-spin the shelf ------------------------------------------ */
-    var rotation = 0, velocity = 0;
-    var dragging = false, dragStartX = 0, dragStartRotation = 0, lastX = 0, lastMoveTime = 0;
-    var downX = 0, downY = 0, moved = 0;
-
-    var pressedBlock = null;
-
-    function applyRotation() {
-      track.style.transform = 'translate(-50%,-50%) rotateY(' + rotation + 'deg)';
-    }
-    applyRotation();
-
-    track.addEventListener('pointerdown', function(e) {
-      if (e.pointerType === 'mouse' && e.button !== 0) return;
-      dragging = true; moved = 0;
-      dragStartX = e.clientX; downX = e.clientX; downY = e.clientY;
-      dragStartRotation = rotation; lastX = e.clientX; lastMoveTime = performance.now();
-      velocity = 0;
-      // record the actual pressed block now — once setPointerCapture below fires,
-      // e.target on the eventual pointerup becomes the capturing element (track)
-      // itself, not whatever was visually under the pointer, so this can't be
-      // re-derived later from the pointerup event.
-      pressedBlock = (e.target && e.target.closest) ? e.target.closest('.photo-block') : null;
-      track.classList.add('dragging');
-      try { track.setPointerCapture(e.pointerId); } catch (err) {}
-    });
-    track.addEventListener('pointermove', function(e) {
-      if (!dragging) return;
-      moved = Math.max(moved, Math.hypot(e.clientX - downX, e.clientY - downY));
-      var dx = e.clientX - dragStartX;
-      rotation = dragStartRotation + dx * 0.34;
-      var now = performance.now();
-      var dt = Math.max(1, now - lastMoveTime);
-      velocity = ((e.clientX - lastX) * 0.34) / dt * 16; // approx deg per frame at release
-      lastX = e.clientX; lastMoveTime = now;
-      applyRotation();
-    });
-    function endDrag() {
-      if (!dragging) return;
-      dragging = false;
-      track.classList.remove('dragging');
-      if (moved <= TAP_MAX_MOVE && pressedBlock) {
-        openInspect(parseInt(pressedBlock.getAttribute('data-index'), 10));
-      }
-      pressedBlock = null;
-    }
-    track.addEventListener('pointerup', endDrag);
-    track.addEventListener('pointercancel', function() { dragging = false; pressedBlock = null; track.classList.remove('dragging'); });
-
-    function momentumFrame() {
-      if (!dragging && Math.abs(velocity) > 0.01) {
-        rotation += velocity;
-        velocity *= 0.94;
-        applyRotation();
-      }
-      requestAnimationFrame(momentumFrame);
-    }
-    if (!reduceMotion) requestAnimationFrame(momentumFrame);
-
-    // keyboard: Enter/Space on a focused block opens inspect
-    track.addEventListener('keydown', function(e) {
-      if (e.key !== 'Enter' && e.key !== ' ') return;
-      var block = e.target.closest ? e.target.closest('.photo-block') : null;
-      if (block) { e.preventDefault(); openInspect(parseInt(block.getAttribute('data-index'), 10)); }
-    });
-
-    /* ---- inspect mode: pick up one photo, orbit + zoom it ---------------- */
-    var inspectOpen = false;
-    var iRotY = 0, iRotX = 0, iScale = 1;
-    var iDragging = false, iLastX = 0, iLastY = 0;
-
-    function applyInspectTransform() {
-      var img = inspectStage.querySelector('.pb-inspect-img');
-      if (img) img.style.transform = 'rotateY(' + iRotY + 'deg) rotateX(' + iRotX + 'deg) scale(' + iScale + ')';
-    }
-
-    function openInspect(index) {
-      var item = shelfPhotos[index];
-      if (!item) return;
-      inspectStage.innerHTML = '<img class="pb-inspect-img" src="' + item.src + '.jpg" alt="' + item.alt + '">';
-      detailTitle.textContent = 'Photo ' + (index + 1) + ' of ' + shelfPhotos.length;
-      detailBody.textContent = item.alt;
-      detailLink.href = item.src + '.jpg';
-      iRotY = 0; iRotX = 0; iScale = 1;
-      applyInspectTransform();
-      inspect.classList.add('open');
-      inspect.setAttribute('aria-hidden', 'false');
-      document.body.style.overflow = 'hidden';
-      inspectOpen = true;
-      inspectBack.focus();
-    }
-    function closeInspect() {
-      inspect.classList.remove('open');
-      inspect.setAttribute('aria-hidden', 'true');
-      document.body.style.overflow = '';
-      inspectOpen = false;
-    }
-    inspectBack.addEventListener('click', closeInspect);
-    document.addEventListener('keydown', function(e) {
-      if (inspectOpen && e.key === 'Escape') closeInspect();
-    });
-
-    inspectStage.addEventListener('pointerdown', function(e) {
-      iDragging = true; iLastX = e.clientX; iLastY = e.clientY;
-      inspectStage.classList.add('dragging');
-      try { inspectStage.setPointerCapture(e.pointerId); } catch (err) {}
-    });
-    inspectStage.addEventListener('pointermove', function(e) {
-      if (!iDragging) return;
-      iRotY += (e.clientX - iLastX) * 0.35;
-      iRotX = Math.max(-25, Math.min(25, iRotX - (e.clientY - iLastY) * 0.25));
-      iLastX = e.clientX; iLastY = e.clientY;
-      applyInspectTransform();
-    });
-    function endInspectDrag() { iDragging = false; inspectStage.classList.remove('dragging'); }
-    inspectStage.addEventListener('pointerup', endInspectDrag);
-    inspectStage.addEventListener('pointercancel', endInspectDrag);
-    inspectStage.addEventListener('wheel', function(e) {
-      e.preventDefault();
-      iScale = Math.max(0.6, Math.min(2.4, iScale - e.deltaY * 0.0012));
-      applyInspectTransform();
-    }, { passive: false });
-  })();
-
-  var footerYear = document.getElementById('footerYear');
-  if (footerYear) footerYear.textContent = new Date().getFullYear();
-
-  /* ==========================================================================
-     Mobile menu
-     ========================================================================== */
-  var menuToggle = document.getElementById('menuToggle');
-  var mobileMenu = document.getElementById('mobileMenu');
-  if (menuToggle && mobileMenu) {
-    menuToggle.addEventListener('click', function() {
-      var isOpen = mobileMenu.classList.toggle('open');
-      menuToggle.classList.toggle('active', isOpen);
-      menuToggle.setAttribute('aria-expanded', String(isOpen));
-      document.body.style.overflow = isOpen ? 'hidden' : '';
-    });
-    mobileMenu.querySelectorAll('a').forEach(function(a) {
-      a.addEventListener('click', function() {
-        mobileMenu.classList.remove('open');
-        menuToggle.classList.remove('active');
-        menuToggle.setAttribute('aria-expanded', 'false');
-        document.body.style.overflow = '';
-      });
-    });
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape' && mobileMenu.classList.contains('open')) {
-        mobileMenu.classList.remove('open');
-        menuToggle.classList.remove('active');
-        menuToggle.setAttribute('aria-expanded', 'false');
-        document.body.style.overflow = '';
-        menuToggle.focus();
-      }
-    });
+  function armAudio() {
+    var AudioClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioClass) return null;
+    if (!audioContext) audioContext = new AudioClass();
+    if (audioContext.state === "suspended") audioContext.resume();
+    audioArmed = true;
+    if (audioStatus) audioStatus.textContent = "Chime / live";
+    if (audioDot) audioDot.classList.add("live");
+    return audioContext;
   }
 
-  var mainTrack = document.getElementById('main');
-
-  var toTop = document.getElementById('toTop');
-  if (toTop) {
-    toTop.addEventListener('click', function() {
-      if (mainTrack) mainTrack.scrollTo({ left: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
-    });
-  }
-
-  /* ==========================================================================
-     Arrow-key panel navigation — Left/Right is the natural input for a
-     horizontal layout. Skipped while a form field has focus so it never
-     hijacks normal text-cursor movement or a native select/slider.
-     ========================================================================== */
-  if (mainTrack) {
-    var TYPING_SEL = 'input, textarea, select, [contenteditable="true"], [contenteditable=""]';
-    window.addEventListener('keydown', function(e) {
-      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
-      var ae = document.activeElement;
-      if (ae && ae.closest && ae.closest(TYPING_SEL)) return;
-      var panels = Array.prototype.slice.call(mainTrack.children);
-      if (!panels.length) return;
-      var vw = window.innerWidth;
-      var current = Math.round(mainTrack.scrollLeft / vw);
-      var next = current + (e.key === 'ArrowRight' ? 1 : -1);
-      next = Math.max(0, Math.min(panels.length - 1, next));
-      if (next === current) return;
-      e.preventDefault();
-      panels[next].scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', inline: 'start', block: 'nearest' });
-      var id = panels[next].id;
-      if (id) { try { history.pushState(null, '', '#' + id); } catch (err) {} }
-    });
-  }
-
-  /* ==========================================================================
-     Smooth scroll for anchor links — panels are arranged left to right now,
-     so this scrolls the target panel's left edge into view horizontally
-     (inline:'start') instead of the old top-of-page vertical jump. Shared
-     by clicks, browser Back/Forward (popstate), and a bookmarked/shared
-     link with a hash already in the URL on first load.
-     ========================================================================== */
-  function goToPanel(id, behavior) {
-    var el = document.querySelector(id);
-    if (!el) return;
-    el.scrollIntoView({ behavior: behavior || (reduceMotion ? 'auto' : 'smooth'), inline: 'start', block: 'nearest' });
-  }
-
-  document.querySelectorAll('a[href^="#"]').forEach(function(a) {
-    a.addEventListener('click', function(e) {
-      var id = a.getAttribute('href');
-      if (id.length > 1 && document.querySelector(id)) {
-        e.preventDefault();
-        goToPanel(id);
-        // pushState throws a SecurityError on file:// origins (e.g. testing
-        // a local checkout by double-clicking index.html) — harmless to
-        // skip there, the scroll itself already happened above.
-        try { history.pushState(null, '', id); } catch (err) {}
-      }
-    });
-  });
-
-  window.addEventListener('popstate', function() {
-    if (location.hash) goToPanel(location.hash, reduceMotion ? 'auto' : 'smooth');
-    else goToPanel('#top', reduceMotion ? 'auto' : 'smooth');
-  });
-
-  if (location.hash && document.querySelector(location.hash)) {
-    // land directly on the linked panel instead of always opening on the hero
-    window.addEventListener('load', function() { goToPanel(location.hash, 'auto'); });
-  }
-
-  /* ==========================================================================
-     Vertical mouse-wheel input pans the horizontal panel track instead —
-     unless the wheel is over a panel whose own content is taller than the
-     screen and hasn't reached its scroll limit yet, in which case that
-     panel's internal vertical scroll takes priority as usual.
-     ========================================================================== */
-  if (mainTrack) {
-    mainTrack.addEventListener('wheel', function(e) {
-      var el = e.target;
-      while (el && el !== mainTrack) {
-        var style = window.getComputedStyle(el);
-        var canScrollY = (style.overflowY === 'auto' || style.overflowY === 'scroll') && el.scrollHeight > el.clientHeight;
-        if (canScrollY) {
-          var atTop = el.scrollTop <= 0;
-          var atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 1;
-          if ((e.deltaY < 0 && !atTop) || (e.deltaY > 0 && !atBottom)) return; // let the panel's own vertical scroll run
-          break; // panel is maxed out in this direction — fall through to panning
-        }
-        el = el.parentElement;
-      }
-      if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-        e.preventDefault();
-        mainTrack.scrollBy({ left: e.deltaY, behavior: 'instant' });
-      }
-    }, { passive: false });
-  }
-
-  /* ==========================================================================
-     Project card expand/collapse
-     ========================================================================== */
-  document.querySelectorAll('.proj-toggle').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      var more = btn.nextElementSibling;
-      if (!more || !more.classList.contains('proj-more')) return;
-      var isOpen = more.classList.toggle('open');
-      btn.setAttribute('aria-expanded', String(isOpen));
-      btn.innerHTML = isOpen ? 'Show less &larr;' : 'Learn more &rarr;';
-    });
-  });
-
-  /* ==========================================================================
-     Contact form (AJAX submit, stays on page)
-     ========================================================================== */
-  var contactForm = document.getElementById('contactForm');
-  var formStatus = document.getElementById('formStatus');
-  if (contactForm) {
-    contactForm.addEventListener('submit', function(e) {
-      e.preventDefault();
-      var submitBtn = contactForm.querySelector('.form-submit');
-      if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Sending...'; }
-      if (formStatus) { formStatus.textContent = ''; formStatus.className = 'form-status'; }
-
-      fetch(contactForm.action, {
-        method: 'POST',
-        body: new FormData(contactForm),
-        headers: { 'Accept': 'application/json' }
-      }).then(function(res) {
-        if (res.ok) {
-          if (formStatus) {
-            formStatus.textContent = 'Message sent \u2014 thank you! I\u2019ll get back to you soon.';
-            formStatus.className = 'form-status success';
-          }
-          contactForm.reset();
-        } else {
-          throw new Error('Request failed');
-        }
-      }).catch(function() {
-        if (formStatus) {
-          formStatus.textContent = 'Something went wrong. Please try emailing deepak.batra@outlook.com directly.';
-          formStatus.className = 'form-status error';
-        }
-      }).finally(function() {
-        if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Send message'; }
-      });
-    });
-  }
-
-  /* ==========================================================================
-     Split text into words for scroll-triggered typography reveal
-     ========================================================================== */
-  function splitIntoWords(el) {
-    var text = el.textContent;
-    var words = text.split(/\s+/).filter(Boolean);
-    el.innerHTML = '';
-    var wrap = document.createElement('span');
-    wrap.className = 'split-line';
-    words.forEach(function(w, i) {
-      var span = document.createElement('span');
-      span.className = 'split-word';
-      span.style.setProperty('--i', i);
-      span.textContent = w + (i < words.length - 1 ? '\u00A0' : '');
-      wrap.appendChild(span);
-    });
-    el.appendChild(wrap);
-  }
-  document.querySelectorAll('.split-heading').forEach(function(el){
-    // hero h1 contains inline markup (accent span) — split only plain-text headings
-    if (el.querySelector('.accent')) { el.classList.add('split-in'); return; }
-    splitIntoWords(el);
-  });
-
-  /* ==========================================================================
-     Scroll reveal + skill liquid-fill bars
-     ========================================================================== */
-  var revealEls = document.querySelectorAll('.reveal, .split-heading:not(.split-in)');
-  if ('IntersectionObserver' in window) {
-    var io = new IntersectionObserver(function(entries) {
-      entries.forEach(function(entry) {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-          if (entry.target.classList.contains('split-heading')) {
-            entry.target.classList.add('split-in');
-          }
-          if (entry.target.id === 'skillsList') {
-            entry.target.querySelectorAll('.skill-fill').forEach(function(fill) {
-              var pct = fill.getAttribute('data-pct');
-              requestAnimationFrame(function() { fill.style.width = pct + '%'; });
-            });
-          }
-          io.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.12, rootMargin: '0px -40px 0px 0px' });
-    revealEls.forEach(function(el) { io.observe(el); });
-  } else {
-    revealEls.forEach(function(el) { el.classList.add('visible', 'split-in'); });
-    document.querySelectorAll('.skill-fill').forEach(function(fill) { fill.style.width = fill.getAttribute('data-pct') + '%'; });
-  }
-
-  /* ==========================================================================
-     Nav scrollspy + glass bar strengthening on scroll
-     ========================================================================== */
-  var navAnchors = Array.prototype.slice.call(document.querySelectorAll('#navLinks a[href^="#"]'));
-  var spySections = navAnchors.map(function(a) {
-    var id = a.getAttribute('href').slice(1);
-    var el = document.getElementById(id);
-    return el ? { link: a, el: el } : null;
-  }).filter(Boolean);
-  if (spySections.length && 'IntersectionObserver' in window) {
-    var intersectingMap = new Map();
-    var spy = new IntersectionObserver(function(entries) {
-      entries.forEach(function(entry) {
-        var match = spySections.filter(function(s) { return s.el === entry.target; })[0];
-        if (!match) return;
-        intersectingMap.set(match, entry.isIntersecting);
-      });
-      // Determine the one currently-intersecting section (page order breaks
-      // ties if a batch briefly reports more than one at once, e.g. during
-      // a fast/instant jump) and set is-active on exactly that link — never
-      // relying on another entry's update to implicitly clear a stale one.
-      var current = spySections.filter(function(s) { return intersectingMap.get(s); })[0];
-      spySections.forEach(function(s) { s.link.classList.toggle('is-active', s === current); });
-    }, { threshold: 0, rootMargin: '0px -45% 0px -45%' });
-    spySections.forEach(function(s) { spy.observe(s.el); });
-  }
-
-  /* ==========================================================================
-     Custom cursor
-     ========================================================================== */
-  var cursorDot = document.getElementById('cursorDot');
-  if (cursorDot && !reduceMotion && window.matchMedia('(pointer: fine)').matches) {
-    window.addEventListener('mousemove', function(e) {
-      cursorDot.style.transform = 'translate(' + e.clientX + 'px,' + e.clientY + 'px) translate(-50%,-50%)';
-    });
-    document.querySelectorAll('a, button, .g-item').forEach(function(el) {
-      el.addEventListener('mouseenter', function() { cursorDot.classList.add('hover'); });
-      el.addEventListener('mouseleave', function() { cursorDot.classList.remove('hover'); });
-    });
-  } else if (cursorDot) {
-    cursorDot.style.display = 'none';
-  }
-
-  /* ==========================================================================
-     THE OCEAN — a live water simulation behind the entire page, not just
-     the hero. Long-press sculpts the sea floor: the center digs a pool,
-     the displaced material piles up as a ridge at the rim — one gesture,
-     both actions. A tap anywhere drops a ripple. Ripple speed is driven by
-     local floor height, so ripples travel faster over ridges and slower
-     through pools — wavefronts bend, focus, and throw bright caustic bands
-     exactly like light through a liquid lens.
-
-     Scope: on desktop, press-and-hold to sculpt works anywhere on the page
-     (a mouse hold never competes with scrolling). On touch, sculpting is
-     limited to the hero — the one place that already trades away
-     swipe-scroll for the gesture — while a tap anywhere else on the page
-     still drops a ripple without touching scroll behavior. Real controls
-     (links, buttons, form fields) are always left untouched.
-
-     Pure Canvas2D: physics run on a small grid, then the result is
-     upscaled by the browser (soft, no shaders, no WebGL dependency).
-     ========================================================================== */
-  (function initOceanSim() {
-    var canvas = document.getElementById('heroGrid');
-    if (!canvas) return;
-    var ctx = canvas.getContext('2d');
-    if (!ctx) return; // extremely old browser; canvas stays empty, rest of page unaffected
-
-    // ---- tunables ---------------------------------------------------------
-    var TARGET_LONG_AXIS = 132;   // sim-grid cells along the longer canvas side
-    var SPEED_MIN = 0.34, SPEED_MAX = 0.86; // wave speed over deep water vs. over a ridge
-    var DAMPING = 0.05;           // energy loss per step
-    var DT = 0.6;                 // integration step (Courant-safe: SPEED_MAX*DT < 1/sqrt(2))
-    var SUBSTEPS = 2;             // physics steps per animation frame
-    var EDGE_BAND = 9;            // cells over which the shoreline absorbs waves
-    var BRUSH_R = 10;             // sculpt brush radius in cells
-    var DIG_RATE = 1.15, RIDGE_RATE = 0.55; // sculpt strength (spoil piles up as a rim)
-    var TAP_MAX_MS = 220, TAP_MAX_MOVE = 9; // px thresholds separating a tap from a sculpt hold
-    var AMBIENT_MS = 5200;        // idle auto-ripple cadence (skipped for reduced motion)
-
-    var simW = 60, simH = 40;
-    var height, velocity, terrain, edgeDamp, img;
-
-    function clamp(v, lo, hi) { return v < lo ? lo : (v > hi ? hi : v); }
-    function smoothstep(e0, e1, x) {
-      var t = clamp((x - e0) / (e1 - e0), 0, 1);
-      return t * t * (3 - 2 * t);
-    }
-
-    function allocate(w, h) {
-      simW = w; simH = h;
-      height = new Float32Array(simW * simH);
-      velocity = new Float32Array(simW * simH);
-      terrain = new Float32Array(simW * simH);
-      edgeDamp = new Float32Array(simW * simH);
-      for (var j = 0; j < simH; j++) {
-        for (var i = 0; i < simW; i++) {
-          var d = Math.min(i, simW - 1 - i, j, simH - 1 - j);
-          edgeDamp[j * simW + i] = 0.15 + 0.85 * clamp(d / EDGE_BAND, 0, 1);
-        }
-      }
-      canvas.width = simW;
-      canvas.height = simH;
-      img = ctx.createImageData(simW, simH);
-      var a = img.data;
-      for (var p = 3; p < a.length; p += 4) a[p] = 255;
-    }
-
-    function sizeFromRect() {
-      var vw = window.innerWidth, vh = window.innerHeight;
-      var aspect = vw / Math.max(1, vh);
-      var w, h;
-      if (aspect >= 1) { w = TARGET_LONG_AXIS; h = Math.round(TARGET_LONG_AXIS / aspect); }
-      else { h = TARGET_LONG_AXIS; w = Math.round(TARGET_LONG_AXIS * aspect); }
-      w = clamp(w, 50, 220); h = clamp(h, 50, 220);
-      allocate(w, h);
-    }
-    sizeFromRect();
-
-    var resizeTimer = null;
-    window.addEventListener('resize', function() {
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(sizeFromRect, 220);
-    });
-
-    // ---- physics ------------------------------------------------------------
-    function sculptAt(gx, gy, rate) {
-      var minI = Math.max(0, Math.floor(gx - BRUSH_R - 1));
-      var maxI = Math.min(simW - 1, Math.ceil(gx + BRUSH_R + 1));
-      var minJ = Math.max(0, Math.floor(gy - BRUSH_R - 1));
-      var maxJ = Math.min(simH - 1, Math.ceil(gy + BRUSH_R + 1));
-      for (var j = minJ; j <= maxJ; j++) {
-        for (var i = minI; i <= maxI; i++) {
-          var dx = i - gx, dy = j - gy;
-          var d = Math.sqrt(dx * dx + dy * dy);
-          if (d > BRUSH_R) continue;
-          var core = smoothstep(BRUSH_R * 0.55, 0, d);          // 1 at center -> 0 by mid-radius
-          var rim = smoothstep(0, BRUSH_R * 0.55, d) * smoothstep(BRUSH_R, BRUSH_R * 0.55, d); // ring
-          var idx = j * simW + i;
-          var v = terrain[idx] + rate * (-DIG_RATE * core + RIDGE_RATE * rim);
-          terrain[idx] = clamp(v, -1.3, 1.3);
-        }
-      }
-    }
-
-    function addRipple(gx, gy, amp, sigma) {
-      amp = amp === undefined ? 1.0 : amp;
-      sigma = sigma === undefined ? 2.6 : sigma;
-      var r = Math.ceil(sigma * 3);
-      var minI = Math.max(0, Math.floor(gx - r)), maxI = Math.min(simW - 1, Math.ceil(gx + r));
-      var minJ = Math.max(0, Math.floor(gy - r)), maxJ = Math.min(simH - 1, Math.ceil(gy + r));
-      for (var j = minJ; j <= maxJ; j++) {
-        for (var i = minI; i <= maxI; i++) {
-          var dx = i - gx, dy = j - gy;
-          var d2 = dx * dx + dy * dy;
-          var g = Math.exp(-d2 / (2 * sigma * sigma));
-          var idx = j * simW + i;
-          height[idx] += amp * g;
-          velocity[idx] += amp * 0.6 * g;
-        }
-      }
-    }
-
-    function stepWave() {
-      var w = simW;
-      for (var j = 1; j < simH - 1; j++) {
-        var row = j * w;
-        for (var i = 1; i < w - 1; i++) {
-          var idx = row + i;
-          var h = height[idx];
-          var lap = height[idx - 1] + height[idx + 1] + height[idx - w] + height[idx + w] - 4 * h;
-          var tnorm = clamp((terrain[idx] + 1) * 0.5, 0, 1);
-          var speed = SPEED_MIN + (SPEED_MAX - SPEED_MIN) * tnorm;
-          var v = velocity[idx] + (speed * speed * lap - DAMPING * velocity[idx]) * DT;
-          velocity[idx] = v * edgeDamp[idx];
-        }
-      }
-      for (var k = 0; k < height.length; k++) height[k] += velocity[k] * DT;
-    }
-
-    // ---- render (low-res buffer, CSS-scaled up for a soft liquid look) ----
-    var PALETTES = {
-      dark:  { deep: [7, 13, 24],    shallow: [58, 168, 190],  causticCyan: [63, 224, 208],  causticViolet: [160, 122, 255] },
-      light: { deep: [122, 196, 192], shallow: [246, 251, 250], causticCyan: [10, 150, 140],  causticViolet: [106, 79, 224] }
-    };
-    function activePalette() {
-      return document.documentElement.getAttribute('data-theme') === 'light' ? PALETTES.light : PALETTES.dark;
-    }
-    var CAUSTIC_K = 5.2, RELIEF_K = 1.6;
-
-    function render(now) {
-      var pal = activePalette();
-      var DEEP = pal.deep, SHALLOW = pal.shallow, CAUSTIC_CYAN = pal.causticCyan, CAUSTIC_VIOLET = pal.causticViolet;
-      var w = simW, hgt = simH, data = img.data;
-      for (var j = 0; j < hgt; j++) {
-        var jU = j === 0 ? 0 : j - 1, jD = j === hgt - 1 ? hgt - 1 : j + 1;
-        for (var i = 0; i < w; i++) {
-          var iL = i === 0 ? 0 : i - 1, iR = i === w - 1 ? w - 1 : i + 1;
-          var idx = j * w + i;
-          var t = terrain[idx];
-
-          var tL = terrain[j * w + iL], tR = terrain[j * w + iR];
-          var tU = terrain[jU * w + i], tD = terrain[jD * w + i];
-          var hL = height[j * w + iL], hR = height[j * w + iR];
-          var hU = height[jU * w + i], hD = height[jD * w + i];
-
-          var tgx = tR - tL, tgy = tD - tU;
-          var hgx = hR - hL, hgy = hD - hU;
-
-          var gradMag = Math.sqrt(hgx * hgx + hgy * hgy);
-          var caustic = clamp(gradMag * CAUSTIC_K, 0, 1);
-
-          var relief = clamp(0.5 - (tgx + tgy) * RELIEF_K, 0, 1);
-          var reliefMul = 0.7 + relief * 0.55;
-
-          var depthNorm = clamp((t + 1) * 0.5, 0, 1);
-          var baseR = (DEEP[0] + (SHALLOW[0] - DEEP[0]) * depthNorm) * reliefMul;
-          var baseG = (DEEP[1] + (SHALLOW[1] - DEEP[1]) * depthNorm) * reliefMul;
-          var baseB = (DEEP[2] + (SHALLOW[2] - DEEP[2]) * depthNorm) * reliefMul;
-
-          var angle = Math.atan2(hgy, hgx);
-          var mixT = 0.5 + 0.5 * Math.sin(angle * 2.0 + now * 0.0012);
-          var causR = CAUSTIC_CYAN[0] + (CAUSTIC_VIOLET[0] - CAUSTIC_CYAN[0]) * mixT;
-          var causG = CAUSTIC_CYAN[1] + (CAUSTIC_VIOLET[1] - CAUSTIC_CYAN[1]) * mixT;
-          var causB = CAUSTIC_CYAN[2] + (CAUSTIC_VIOLET[2] - CAUSTIC_CYAN[2]) * mixT;
-
-          var r = baseR + (causR - baseR) * caustic * 0.85;
-          var g = baseG + (causG - baseG) * caustic * 0.85;
-          var b = baseB + (causB - baseB) * caustic * 0.85;
-
-          var core = caustic * caustic;
-          r += core * 42; g += core * 48; b += core * 54;
-
-          var p = idx * 4;
-          data[p] = r < 0 ? 0 : (r > 255 ? 255 : r);
-          data[p + 1] = g < 0 ? 0 : (g > 255 ? 255 : g);
-          data[p + 2] = b < 0 ? 0 : (b > 255 ? 255 : b);
-        }
-      }
-      ctx.putImageData(img, 0, 0);
-    }
-
-    // ---- interaction: press-and-hold to sculpt, tap to ripple — anywhere
-    // on the page. Real controls (links, buttons, form fields) are left
-    // alone so nothing here ever competes with normal site navigation.
-    // Every panel (including the hero) now needs an unobstructed swipe to
-    // move to the next/previous panel, so touch never sculpts — only
-    // mouse/pen can, since a mouse hold never competes with anything. A
-    // touch always resolves to a single ripple on release and never calls
-    // preventDefault, so horizontal swipe-scrolling is untouched everywhere.
-    var INTERACTIVE_SEL = 'a, button, input, textarea, select, label, [role="button"], [contenteditable]';
-
-    var pointerActive = false, sculpting = false, allowSculpt = false;
-    var downTime = 0, downClientX = 0, downClientY = 0;
-    var lastGrid = { x: simW / 2, y: simH / 2 };
-    var lastInteraction = performance.now(), lastAmbient = performance.now();
-
-    function toGrid(e) {
-      var relX = clamp(e.clientX / window.innerWidth, 0, 1);
-      var relY = clamp(e.clientY / window.innerHeight, 0, 1);
-      return { x: relX * simW, y: relY * simH };
-    }
-
-    window.addEventListener('pointerdown', function(e) {
-      if (e.pointerType === 'mouse' && e.button !== 0) return;
-      if (e.target && e.target.closest && e.target.closest(INTERACTIVE_SEL)) return; // never hijack real controls
-
-      allowSculpt = e.pointerType !== 'touch';
-
-      pointerActive = true; sculpting = false;
-      downTime = performance.now();
-      downClientX = e.clientX; downClientY = e.clientY;
-      lastGrid = toGrid(e);
-      lastInteraction = downTime;
-    });
-
-    window.addEventListener('pointermove', function(e) {
-      if (!pointerActive) return;
-      var moved = Math.hypot(e.clientX - downClientX, e.clientY - downClientY);
-      var held = performance.now() - downTime;
-      if (allowSculpt && !sculpting && (held > TAP_MAX_MS || moved > TAP_MAX_MOVE)) sculpting = true;
-      lastGrid = toGrid(e);
-      if (sculpting) { sculptAt(lastGrid.x, lastGrid.y, 1); lastInteraction = performance.now(); }
-    });
-
-    function finishPointer(e) {
-      if (pointerActive) {
-        var held = performance.now() - downTime;
-        var moved = Math.hypot(e.clientX - downClientX, e.clientY - downClientY);
-        var withinTapTime = allowSculpt ? held <= TAP_MAX_MS : true; // on touch, any non-drag release ripples
-        if (!sculpting && moved <= TAP_MAX_MOVE && withinTapTime) {
-          var p = toGrid(e);
-          addRipple(p.x, p.y);
-          lastInteraction = performance.now();
-        }
-      }
-      pointerActive = false; sculpting = false;
-    }
-    window.addEventListener('pointerup', finishPointer);
-    window.addEventListener('pointercancel', finishPointer);
-
-    // ---- main loop -----------------------------------------------------------
-    var oceanRafId = null;
-    function frame(now) {
-      if (pointerActive) {
-        if (sculpting) { sculptAt(lastGrid.x, lastGrid.y, 1); }
-        else if (allowSculpt && now - downTime > TAP_MAX_MS) { sculpting = true; }
-      }
-      if (!reduceMotion && now - lastInteraction > AMBIENT_MS && now - lastAmbient > AMBIENT_MS) {
-        addRipple(simW * (0.32 + Math.random() * 0.36), simH * (0.32 + Math.random() * 0.36), 0.5, 3);
-        lastAmbient = now;
-      }
-      for (var s = 0; s < SUBSTEPS; s++) stepWave();
-      render(now);
-      oceanRafId = requestAnimationFrame(frame);
-    }
-    oceanRafId = requestAnimationFrame(frame);
-    document.addEventListener('visibilitychange', function() {
-      if (document.hidden) {
-        if (oceanRafId) cancelAnimationFrame(oceanRafId);
-        oceanRafId = null;
-      } else if (!oceanRafId) {
-        oceanRafId = requestAnimationFrame(frame);
-      }
-    });
-
-    // a couple of opening ripples so the surface isn't perfectly flat on load
-    addRipple(simW * 0.42, simH * 0.46, 0.7, 4);
-    addRipple(simW * 0.63, simH * 0.58, 0.5, 3);
-  })();
-
-  /* ==========================================================================
-     CHIMES — strands of water droplets hanging from just under the nav,
-     scoped to the hero only: a moment you meet once at the top of the
-     site rather than a layer that follows you everywhere. They occupy the
-     right side of the hero and sit behind the headline in stacking order,
-     so they never compete with or cross over the text. Each strand is a
-     small verlet rope: gravity pulls it down, your cursor passing nearby
-     pushes it aside like wind, and you can grab any droplet and drag it —
-     it swings back and settles once released.
-
-     Same non-invasive interaction pattern as the ocean sim: the canvas is
-     pointer-events:none, so every click always reaches the real page
-     underneath. Grabbing only happens if a pointerdown starts within a
-     tight radius of an actual droplet, and never on top of a real
-     control (link, button, form field).
-     ========================================================================== */
-  (function initChimeCurtain() {
-    var canvas = document.getElementById('chimeCurtain');
-    if (!canvas) return;
-    var ctx = canvas.getContext('2d');
+  function playChime(semitones, intensity) {
+    var now = performance.now();
+    if (now - lastTone < 90) return;
+    lastTone = now;
+    var ctx = armAudio();
     if (!ctx) return;
-
-    var ANCHOR_Y = 78;            // hangs from just under the fixed nav
-    var SEGMENTS = 13;            // droplets per strand (including the pinned top one)
-    var SEG_LEN = 26;             // resting distance between droplets, px
-    var GRAVITY = 0.3;
-    var DAMPING = 0.986;
-    var ITERATIONS = 6;
-    var WIND_RADIUS = 95;
-    var WIND_STRENGTH = 5.5;
-    var GRAB_RADIUS = 22;
-    var INTERACTIVE_SEL = 'a, button, input, textarea, select, label, [role="button"], [contenteditable]';
-
-    var dpr = Math.min(window.devicePixelRatio || 1, 2);
-    var strands = [];
-
-    var PALETTES = {
-      dark:  { line: 'rgba(160,215,255,.28)', dropA: 'rgba(216,251,255,.95)', dropB: 'rgba(63,224,208,.55)', glint: 'rgba(255,255,255,.9)' },
-      light: { line: 'rgba(10,60,70,.22)',    dropA: 'rgba(255,255,255,.95)', dropB: 'rgba(11,166,156,.5)',  glint: 'rgba(255,255,255,.95)' }
-    };
-    function palette() {
-      return document.documentElement.getAttribute('data-theme') === 'light' ? PALETTES.light : PALETTES.dark;
-    }
-
-    function makeStrand(x, lenFactor) {
-      var particles = [];
-      for (var i = 0; i < SEGMENTS; i++) {
-        var y = ANCHOR_Y + i * SEG_LEN * lenFactor;
-        particles.push({ x: x, y: y, ox: x, oy: y, pinned: i === 0, grabbed: false });
-      }
-      return { baseX: x, lenFactor: lenFactor, particles: particles };
-    }
-
-    function buildStrands() {
-      var vw = window.innerWidth;
-      var spacing = 62;
-      // keep clear of the headline: strands only occupy the right ~42% of
-      // the hero instead of the full width, so they never cross the text
-      var zoneStart = vw * 0.58;
-      var zoneWidth = vw - zoneStart;
-      var count = Math.max(5, Math.round(zoneWidth / spacing));
-      var margin = zoneStart + (zoneWidth - (count - 1) * spacing) / 2;
-      strands = [];
-      for (var i = 0; i < count; i++) {
-        var jitter = (Math.sin(i * 12.9898) * 43758.5453 % 1) * 14 - 7; // deterministic pseudo-random offset
-        var x = margin + i * spacing + jitter;
-        var lenFactor = 1.0 + (Math.abs(Math.sin(i * 7.233)) * 0.55); // 1.0 - 1.55, organic irregularity
-        strands.push(makeStrand(x, lenFactor));
-      }
-    }
-
-    function resize() {
-      canvas.width = Math.round(window.innerWidth * dpr);
-      canvas.height = Math.round(window.innerHeight * dpr);
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      buildStrands();
-    }
-    resize();
-    var resizeTimer = null;
-    window.addEventListener('resize', function() {
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(resize, 220);
+    semitones = typeof semitones === "number" ? semitones : 0;
+    intensity = typeof intensity === "number" ? intensity : .5;
+    var start = ctx.currentTime;
+    var base = 220 * Math.pow(2, semitones / 12);
+    var master = ctx.createGain();
+    master.gain.setValueAtTime(.0001, start);
+    master.gain.exponentialRampToValueAtTime(.035 + intensity * .055, start + .016);
+    master.gain.exponentialRampToValueAtTime(.0001, start + 1.25);
+    master.connect(ctx.destination);
+    [1, 2.01, 3.02].forEach(function (ratio, index) {
+      var oscillator = ctx.createOscillator();
+      oscillator.type = index === 0 ? "sine" : "triangle";
+      oscillator.frequency.value = base * ratio;
+      oscillator.detune.value = index === 1 ? 4 : index === 2 ? -6 : 0;
+      oscillator.connect(master);
+      oscillator.start(start);
+      oscillator.stop(start + 1.35);
     });
-
-    // ---- physics: a small verlet rope per strand ---------------------------
-    function step() {
-      for (var s = 0; s < strands.length; s++) {
-        var ps = strands[s].particles;
-        for (var i = 1; i < ps.length; i++) {
-          var p = ps[i];
-          if (p.grabbed) continue;
-          var vx = (p.x - p.ox) * DAMPING;
-          var vy = (p.y - p.oy) * DAMPING;
-          p.ox = p.x; p.oy = p.y;
-          p.x += vx;
-          p.y += vy + GRAVITY;
-        }
-      }
-      // wind: push nearby particles away from the pointer — this is ambient
-      // motion triggered just by the cursor being nearby, not a deliberate
-      // action, so it's skipped for reduced-motion users. Grabbing a
-      // droplet still works either way, since that's user-initiated.
-      if (pointerX !== null && !reduceMotion) {
-        for (var s2 = 0; s2 < strands.length; s2++) {
-          var ps2 = strands[s2].particles;
-          for (var j = 1; j < ps2.length; j++) {
-            var pt = ps2[j];
-            if (pt.grabbed) continue;
-            var dx = pt.x - pointerX, dy = pt.y - pointerY;
-            var d = Math.sqrt(dx * dx + dy * dy);
-            if (d < WIND_RADIUS && d > 0.001) {
-              var force = (1 - d / WIND_RADIUS) * WIND_STRENGTH;
-              pt.x += (dx / d) * force;
-              pt.y += (dy / d) * force * 0.35;
-            }
-          }
-        }
-      }
-      // constraint solve: keep each link close to its resting length
-      for (var it = 0; it < ITERATIONS; it++) {
-        for (var s3 = 0; s3 < strands.length; s3++) {
-          var strand = strands[s3];
-          var ps3 = strand.particles;
-          var restLen = SEG_LEN * strand.lenFactor;
-          for (var k = 0; k < ps3.length - 1; k++) {
-            var a = ps3[k], b = ps3[k + 1];
-            var ddx = b.x - a.x, ddy = b.y - a.y;
-            var dist = Math.sqrt(ddx * ddx + ddy * ddy) || 0.0001;
-            var diff = (dist - restLen) / dist;
-            var ax = ddx * 0.5 * diff, ay = ddy * 0.5 * diff;
-            if (!a.pinned && !a.grabbed) { a.x += ax; a.y += ay; }
-            if (!b.pinned && !b.grabbed) { b.x -= ax; b.y -= ay; }
-          }
-        }
-      }
-    }
-
-    // ---- render --------------------------------------------------------------
-    function render() {
-      var pal = palette();
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      for (var s = 0; s < strands.length; s++) {
-        var ps = strands[s].particles;
-
-        ctx.beginPath();
-        ctx.moveTo(ps[0].x, ps[0].y);
-        for (var i = 1; i < ps.length; i++) ctx.lineTo(ps[i].x, ps[i].y);
-        ctx.strokeStyle = pal.line;
-        ctx.lineWidth = 1;
-        ctx.stroke();
-
-        for (var d = 2; d < ps.length; d += 3) {
-          var p = ps[d];
-          var r = 4.5 + (d % 5);
-          var grad = ctx.createRadialGradient(p.x - r * 0.3, p.y - r * 0.35, 0.4, p.x, p.y, r);
-          grad.addColorStop(0, pal.dropA);
-          grad.addColorStop(0.55, pal.dropB);
-          grad.addColorStop(1, 'rgba(0,0,0,0)');
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
-          ctx.fillStyle = grad;
-          ctx.fill();
-          ctx.beginPath();
-          ctx.arc(p.x - r * 0.32, p.y - r * 0.38, r * 0.22, 0, Math.PI * 2);
-          ctx.fillStyle = pal.glint;
-          ctx.fill();
-        }
-      }
-    }
-
-    // ---- interaction: wind (passive) + grab-and-drag ------------------------
-    // Scoped to the hero element itself now that the curtain lives only
-    // there — it should only react while the cursor is actually over the
-    // hero panel, not the whole page.
-    var heroEl = canvas.closest('.hero') || document.querySelector('.hero');
-    var pointerX = null, pointerY = null;
-    var grabbedParticle = null;
-
-    if (heroEl) {
-      heroEl.addEventListener('pointermove', function(e) {
-        pointerX = e.clientX; pointerY = e.clientY;
-        if (grabbedParticle) { grabbedParticle.x = e.clientX; grabbedParticle.y = e.clientY; }
-      });
-      heroEl.addEventListener('pointerleave', function() { pointerX = null; pointerY = null; });
-
-      heroEl.addEventListener('pointerdown', function(e) {
-        if (e.pointerType === 'mouse' && e.button !== 0) return;
-        if (e.target && e.target.closest && e.target.closest(INTERACTIVE_SEL)) return; // never hijack real controls
-
-        var best = null, bestDist = GRAB_RADIUS;
-        for (var s = 0; s < strands.length; s++) {
-          var ps = strands[s].particles;
-          for (var i = 1; i < ps.length; i++) {
-            var dx = ps[i].x - e.clientX, dy = ps[i].y - e.clientY;
-            var dist = Math.sqrt(dx * dx + dy * dy);
-            if (dist < bestDist) { best = ps[i]; bestDist = dist; }
-          }
-        }
-        if (best) {
-          grabbedParticle = best;
-          grabbedParticle.grabbed = true;
-          grabbedParticle.x = e.clientX; grabbedParticle.y = e.clientY;
-          e.preventDefault();
-        }
-      }, { passive: false });
-    }
-
-    function release() {
-      if (grabbedParticle) {
-        grabbedParticle.ox = grabbedParticle.x; grabbedParticle.oy = grabbedParticle.y;
-        grabbedParticle.grabbed = false;
-        grabbedParticle = null;
-      }
-    }
-    // release stays on window: a drag that ends outside the hero (e.g. the
-    // cursor slipped past its edge mid-drag) should still let go cleanly
-    window.addEventListener('pointerup', release);
-    window.addEventListener('pointercancel', release);
-
-    var running = true;
-    var rafId = null;
-
-    function frame() {
-      step();
-      render();
-      rafId = requestAnimationFrame(frame);
-    }
-
-    function start() {
-      if (running || document.hidden) return;
-      running = true;
-      rafId = requestAnimationFrame(frame);
-    }
-    function stop() {
-      running = false;
-      if (rafId) cancelAnimationFrame(rafId);
-      rafId = null;
-    }
-
-    if (heroEl && 'IntersectionObserver' in window) {
-      var heroVisible = new IntersectionObserver(function(entries) {
-        entries.forEach(function(entry) {
-          if (entry.isIntersecting) start(); else stop();
-        });
-      }, { threshold: 0.01 });
-      heroVisible.observe(heroEl);
-    } else {
-      start();
-    }
-    document.addEventListener('visibilitychange', function() {
-      if (document.hidden) stop(); else if (heroEl) {
-        var r = heroEl.getBoundingClientRect();
-        if (r.left < window.innerWidth && r.right > 0) start();
-      } else start();
-    });
-  })();
-
-  /* ==========================================================================
-     Ripple press effect for buttons — the site's core interaction (sculpt the
-     floor, tap for ripples) echoed in miniature on every primary control.
-     ========================================================================== */
-  (function initButtonRipples() {
-    var targets = document.querySelectorAll('.btn, .nav-cta, .form-submit');
-    targets.forEach(function(el) {
-      el.style.position = el.style.position || 'relative';
-      el.style.overflow = 'hidden';
-      el.addEventListener('pointerdown', function(e) {
-        var rect = el.getBoundingClientRect();
-        var size = Math.max(rect.width, rect.height) * 1.6;
-        var span = document.createElement('span');
-        span.className = 'ripple-fx';
-        span.style.width = size + 'px';
-        span.style.height = size + 'px';
-        span.style.left = (e.clientX - rect.left) + 'px';
-        span.style.top = (e.clientY - rect.top) + 'px';
-        el.appendChild(span);
-        span.addEventListener('animationend', function() { span.remove(); });
-      });
-    });
-  })();
-
-  /* ==========================================================================
-     Video fade-in once ready
-     ========================================================================== */
-  var video = document.getElementById('showreelVideo');
-  if (video) {
-    video.style.opacity = '0';
-    video.style.transition = 'opacity .5s ease';
-    video.addEventListener('loadeddata', function() { video.style.opacity = '1'; });
   }
 
+  /* Water surface: a low-res responsive field keeps the page alive without hijacking controls. */
+  function initWater() {
+    var canvas = document.getElementById("oceanCanvas");
+    if (!canvas) return;
+    var ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    var width = 0, height = 0, dpr = 1, raf = 0, lastTime = performance.now();
+    var pointerDown = false, sculpting = false, downAt = 0, downX = 0, downY = 0;
+    var lastInteraction = performance.now(), ripples = [], grid = new Float32Array(32 * 22);
+    function resize() {
+      width = window.innerWidth; height = window.innerHeight; dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = Math.round(width * dpr); canvas.height = Math.round(height * dpr);
+      canvas.style.width = width + "px"; canvas.style.height = height + "px"; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    function interactive(target) { return target && target.closest && target.closest("a,button,input,textarea,select,label,video,[role='button'],[contenteditable='true']"); }
+    function addRipple(x, y, speed, hue) {
+      ripples.push({ x: x, y: y, radius: 0, speed: 1.6 + (speed || .5) * 1.5, alpha: .74, hue: hue || "cyan" });
+      if (ripples.length > 22) ripples.shift();
+    }
+    function displace(x, y, strength) {
+      var gx = Math.round((x / Math.max(1, width)) * 31), gy = Math.round((y / Math.max(1, height)) * 21);
+      for (var j = Math.max(0, gy - 3); j <= Math.min(21, gy + 3); j++) for (var i = Math.max(0, gx - 3); i <= Math.min(31, gx + 3); i++) {
+        var distance = Math.hypot(i - gx, j - gy); if (distance < 4) grid[j * 32 + i] += strength * (1 - distance / 4);
+      }
+    }
+    function point(event) { return { x: event.clientX, y: event.clientY }; }
+    function down(event) {
+      if ((event.pointerType === "mouse" && event.button !== 0) || interactive(event.target)) return;
+      var p = point(event); pointerDown = true; sculpting = false; downAt = performance.now(); downX = p.x; downY = p.y;
+      lastInteraction = performance.now(); addRipple(p.x, p.y, .45, "cyan"); setSurfaceStatus("ripple / chime");
+    }
+    function move(event) {
+      if (!pointerDown) return;
+      var p = point(event), moved = Math.hypot(p.x - downX, p.y - downY), held = performance.now() - downAt;
+      if (!sculpting && !reducedMotion && event.pointerType !== "touch" && (held > 220 || moved > 10)) sculpting = true;
+      if (sculpting) { displace(p.x, p.y, .016); addRipple(p.x, p.y, .16, "lime"); lastInteraction = performance.now(); setSurfaceStatus("sculpting the surface"); }
+    }
+    function up(event) {
+      if (!pointerDown) return;
+      var p = point(event), moved = Math.hypot(p.x - downX, p.y - downY);
+      if (!sculpting && moved < 11) { addRipple(p.x, p.y, .9, "lime"); playChime(Math.round((p.x / Math.max(1, width)) * 15) - 7, .72); lastInteraction = performance.now(); setSurfaceStatus("ripple / chime"); }
+      pointerDown = false; sculpting = false; setTimeout(function () { setSurfaceStatus("Tap for ripples · hold to sculpt"); }, 620);
+    }
+    function render(time) {
+      var delta = Math.min(32, time - lastTime); lastTime = time; ctx.clearRect(0, 0, width, height);
+      if (!pointerDown && !reducedMotion && time - lastInteraction > 5200) { addRipple(width * (.32 + Math.random() * .36), height * (.32 + Math.random() * .36), .46, Math.random() > .6 ? "lime" : "cyan"); lastInteraction = time; }
+      var wash = ctx.createRadialGradient(width * .6, height * .35, 0, width * .5, height * .55, Math.max(width, height) * .72);
+      wash.addColorStop(0, "rgba(25,68,72,.12)"); wash.addColorStop(.45, "rgba(8,20,24,.08)"); wash.addColorStop(1, "rgba(3,8,11,.02)"); ctx.fillStyle = wash; ctx.fillRect(0, 0, width, height);
+      for (var r = ripples.length - 1; r >= 0; r--) {
+        var ripple = ripples[r]; ripple.radius += ripple.speed * (delta / 16); ripple.alpha *= .992;
+        if (ripple.alpha < .028 || ripple.radius > Math.max(width, height) * .74) { ripples.splice(r, 1); continue; }
+        var fade = ripple.alpha * Math.max(0, 1 - ripple.radius / (Math.max(width, height) * .8));
+        ctx.save(); ctx.translate(ripple.x, ripple.y); ctx.scale(1, .32 + Math.sin(ripple.radius * .015) * .03); ctx.lineWidth = 1.3; ctx.shadowBlur = 12;
+        ctx.strokeStyle = ripple.hue === "lime" ? "rgba(215,255,63," + fade + ")" : "rgba(111,231,255," + fade + ")"; ctx.shadowColor = ctx.strokeStyle;
+        ctx.beginPath(); ctx.ellipse(0, 0, ripple.radius, ripple.radius, 0, 0, Math.PI * 2); ctx.stroke(); ctx.lineWidth = .5; ctx.globalAlpha = fade * .55;
+        ctx.beginPath(); ctx.ellipse(0, 0, ripple.radius * 1.34, ripple.radius * 1.34, 0, 0, Math.PI * 2); ctx.stroke(); ctx.restore();
+      }
+      ctx.save(); ctx.globalCompositeOperation = "screen";
+      for (var row = 0; row < 22; row++) { ctx.beginPath(); for (var col = 0; col < 32; col++) { var x = col / 31 * width, y = row / 21 * height, wave = Math.sin(time * .00022 + col * .33 + row * .17) * 3, shift = grid[row * 32 + col] * 16; if (col === 0) ctx.moveTo(x, y + wave + shift); else ctx.lineTo(x, y + wave + shift); } ctx.strokeStyle = "rgba(111,231,255," + (.018 + (row % 4) * .006) + ")"; ctx.stroke(); }
+      for (var g = 0; g < grid.length; g++) grid[g] *= .968; ctx.restore(); raf = requestAnimationFrame(render);
+    }
+    resize(); addRipple(width * .42, height * .45, .65, "cyan"); addRipple(width * .68, height * .58, .42, "lime");
+    window.addEventListener("resize", resize); window.addEventListener("pointerdown", down, { passive: true }); window.addEventListener("pointermove", move, { passive: true }); window.addEventListener("pointerup", up, { passive: true }); window.addEventListener("pointercancel", up, { passive: true }); raf = requestAnimationFrame(render);
+    document.addEventListener("visibilitychange", function () { if (document.hidden) cancelAnimationFrame(raf); else raf = requestAnimationFrame(render); });
+  }
+
+  /* Hanging droplets: verlet strands follow the pointer and can be plucked. */
+  function initChimes() {
+    var canvas = document.getElementById("chimeCanvas"), hero = document.querySelector(".hero");
+    if (!canvas || !hero) return; var ctx = canvas.getContext("2d"); if (!ctx) return;
+    var width = 0, height = 0, dpr = 1, raf = 0, pointerX = null, pointerY = null, grabbed = null, strands = [];
+    function resize() { width = hero.clientWidth; height = hero.clientHeight; dpr = Math.min(window.devicePixelRatio || 1, 2); canvas.width = Math.round(width * dpr); canvas.height = Math.round(height * dpr); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); var start = width * .6, zone = width - start, count = Math.max(5, Math.round(zone / 61)), margin = start + (zone - (count - 1) * 61) / 2; strands = []; for (var s = 0; s < count; s++) { var factor = 1 + Math.abs(Math.sin(s * 7.233)) * .48, x = margin + s * 61 + (Math.sin(s * 12.9898) * 43758.5453 % 1) * 12 - 6, particles = []; for (var p = 0; p < 13; p++) particles.push({ x: x, y: 72 + p * 25 * factor, ox: x, oy: 72 + p * 25 * factor, pinned: p === 0 }); strands.push({ rest: 25 * factor, particles: particles }); } }
+    function interactive(target) { return target && target.closest && target.closest("a,button,input,textarea,select,label,video,[role='button']"); }
+    function move(event) { var rect = hero.getBoundingClientRect(); pointerX = event.clientX - rect.left; pointerY = event.clientY - rect.top; if (grabbed) { grabbed.x = pointerX; grabbed.y = pointerY; } }
+    function leave() { pointerX = null; pointerY = null; }
+    function down(event) { if ((event.pointerType === "mouse" && event.button !== 0) || interactive(event.target)) return; var rect = hero.getBoundingClientRect(), x = event.clientX - rect.left, y = event.clientY - rect.top, nearest = null, best = 24; strands.forEach(function (strand) { strand.particles.slice(1).forEach(function (p) { var d = Math.hypot(p.x - x, p.y - y); if (d < best) { nearest = p; best = d; } }); }); if (nearest) { grabbed = nearest; grabbed.grabbed = true; grabbed.x = x; grabbed.y = y; playChime(Math.round((x / Math.max(1, width)) * 10) - 5, .6); event.preventDefault(); } }
+    function up() { if (!grabbed) return; grabbed.ox = grabbed.x; grabbed.oy = grabbed.y; grabbed.grabbed = false; grabbed = null; }
+    function step() { strands.forEach(function (strand) { strand.particles.forEach(function (p, index) { if (index === 0 || p.grabbed) return; var vx = (p.x - p.ox) * .986, vy = (p.y - p.oy) * .986; p.ox = p.x; p.oy = p.y; p.x += vx; p.y += vy + .28; if (pointerX !== null && pointerY !== null) { var dx = p.x - pointerX, dy = p.y - pointerY, d = Math.hypot(dx, dy); if (d < 100 && d > .001) { var force = (1 - d / 100) * 4.8; p.x += dx / d * force; p.y += dy / d * force * .35; } } }); for (var iteration = 0; iteration < 5; iteration++) strand.particles.forEach(function (a, index) { if (index === strand.particles.length - 1) return; var b = strand.particles[index + 1], dx = b.x - a.x, dy = b.y - a.y, d = Math.hypot(dx, dy) || .001, diff = (d - strand.rest) / d, ox = dx * .5 * diff, oy = dy * .5 * diff; if (!a.pinned && !a.grabbed) { a.x += ox; a.y += oy; } if (!b.grabbed) { b.x -= ox; b.y -= oy; } }); }); }
+    function render() { ctx.clearRect(0, 0, width, height); strands.forEach(function (strand) { var ps = strand.particles; ctx.beginPath(); ctx.moveTo(ps[0].x, ps[0].y); ps.slice(1).forEach(function (p) { ctx.lineTo(p.x, p.y); }); ctx.strokeStyle = "rgba(111,231,255,.28)"; ctx.lineWidth = 1; ctx.stroke(); ps.forEach(function (p, index) { if (index % 3 !== 2) return; var r = 4 + index % 4, grad = ctx.createRadialGradient(p.x - r * .35, p.y - r * .4, .5, p.x, p.y, r); grad.addColorStop(0, "rgba(244,255,255,.98)"); grad.addColorStop(.45, "rgba(111,231,255,.84)"); grad.addColorStop(1, "rgba(215,255,63,0)"); ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI * 2); ctx.fillStyle = grad; ctx.fill(); ctx.beginPath(); ctx.arc(p.x - r * .3, p.y - r * .38, r * .2, 0, Math.PI * 2); ctx.fillStyle = "rgba(255,255,255,.92)"; ctx.fill(); }); }); step(); raf = requestAnimationFrame(render); }
+    resize(); window.addEventListener("resize", resize); hero.addEventListener("pointermove", move); hero.addEventListener("pointerleave", leave); hero.addEventListener("pointerdown", down, { passive: false }); window.addEventListener("pointerup", up); window.addEventListener("pointercancel", up); raf = requestAnimationFrame(render);
+  }
+
+  function renderSkills() { var list = document.getElementById("skillList"); if (!list) return; content.skills.forEach(function (skill, index) { var row = document.createElement("div"); row.className = "skill-row"; row.innerHTML = '<div class="skill-meta"><span class="num mono">0' + (index + 1) + '</span><h3>' + skill.name + '</h3><span class="value mono">' + skill.value + '%</span></div><div class="skill-track"><i style="width:' + skill.value + '%"></i></div>'; list.appendChild(row); }); }
+  function renderGallery() { var grid = document.getElementById("galleryGrid"); if (!grid) return; content.gallery.forEach(function (item, index) { var button = document.createElement("button"); button.type = "button"; button.className = "gallery-item"; button.setAttribute("aria-label", "Open " + item.alt); button.innerHTML = '<picture><source srcset="' + item.src + '.webp" type="image/webp"><img src="' + item.src + '.jpg" alt="' + item.alt + '" loading="lazy"></picture><span class="mono">' + String(index + 1).padStart(2, "0") + ' / ' + item.alt + '</span>'; button.addEventListener("click", function () { openGallery(index); }); grid.appendChild(button); }); }
+  var modal = document.getElementById("galleryModal"), modalImage = document.getElementById("modalImage"), modalTitle = document.getElementById("modalTitle"), modalCount = document.getElementById("modalCount"), currentPhoto = 0;
+  function openGallery(index) { currentPhoto = (index + content.gallery.length) % content.gallery.length; var item = content.gallery[currentPhoto]; modalImage.src = item.src + ".jpg"; modalImage.alt = item.alt; modalTitle.textContent = item.alt; modalCount.textContent = String(currentPhoto + 1).padStart(2, "0") + " / " + String(content.gallery.length).padStart(2, "0"); modal.setAttribute("aria-hidden", "false"); }
+  function closeGallery() { modal.setAttribute("aria-hidden", "true"); }
+  function stepGallery(amount) { openGallery(currentPhoto + amount); }
+
+  function initProjects() { document.querySelectorAll(".case-toggle").forEach(function (button) { button.addEventListener("click", function () { var card = button.closest(".project-card"), open = card.classList.toggle("open"); button.setAttribute("aria-expanded", String(open)); button.textContent = open ? "− Show less" : "+ Open the case"; }); }); }
+  function initNavigation() { var nav = document.querySelector(".site-nav"), menu = document.getElementById("mobileMenu"), toggle = document.querySelector(".menu-toggle"), close = document.querySelector(".mobile-close"); window.addEventListener("scroll", function () { nav.classList.toggle("scrolled", window.scrollY > 20); }, { passive: true }); function closeMenu() { menu.classList.remove("open"); menu.setAttribute("aria-hidden", "true"); toggle.setAttribute("aria-expanded", "false"); } toggle.addEventListener("click", function () { var open = menu.classList.toggle("open"); menu.setAttribute("aria-hidden", String(!open)); toggle.setAttribute("aria-expanded", String(open)); }); close.addEventListener("click", closeMenu); menu.querySelectorAll("a").forEach(function (a) { a.addEventListener("click", closeMenu); }); }
+  function initContact() { var form = document.getElementById("contactForm"), status = document.getElementById("formStatus"); if (!form) return; form.addEventListener("submit", function (event) { event.preventDefault(); var submit = form.querySelector("button[type='submit']"); submit.disabled = true; submit.textContent = "Sending…"; fetch(form.action, { method: "POST", body: new FormData(form), headers: { Accept: "application/json" } }).then(function (response) { if (!response.ok) throw new Error("Request failed"); form.reset(); status.textContent = "Message sent — I’ll get back to you soon."; status.className = "form-status success"; }).catch(function () { status.textContent = "Something went wrong. Please email deepak.batra@outlook.com directly."; status.className = "form-status error"; }).finally(function () { submit.disabled = false; submit.textContent = "Send message ↗"; }); }); }
+  function initModal() { document.querySelector(".modal-close").addEventListener("click", closeGallery); document.querySelector(".modal-prev").addEventListener("click", function () { stepGallery(-1); }); document.querySelector(".modal-next").addEventListener("click", function () { stepGallery(1); }); modal.addEventListener("click", function (event) { if (event.target === modal) closeGallery(); }); document.addEventListener("keydown", function (event) { if (modal.getAttribute("aria-hidden") === "false") { if (event.key === "Escape") closeGallery(); if (event.key === "ArrowLeft") stepGallery(-1); if (event.key === "ArrowRight") stepGallery(1); } }); }
+  document.addEventListener("DOMContentLoaded", function () { var year = document.getElementById("year"); if (year) year.textContent = new Date().getFullYear(); renderSkills(); renderGallery(); initProjects(); initNavigation(); initContact(); initModal(); initWater(); initChimes(); });
 })();
