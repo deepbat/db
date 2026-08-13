@@ -1,0 +1,9 @@
+/* Light-theme water correction: preserve the paper palette but make the instrument read clearly. */
+html[data-theme="light"] .ocean-canvas{opacity:.68;mix-blend-mode:multiply;filter:contrast(1.25) saturate(1.55)}
+html[data-theme="light"] .chime-canvas{opacity:1;mix-blend-mode:multiply;filter:contrast(1.22) saturate(1.6)}
+html[data-theme="light"] .hero{background:rgba(243,241,233,.3)}
+html[data-theme="light"] .hero-bg{opacity:.46;filter:saturate(.82) contrast(1.02)}
+html[data-theme="light"] .hero-scrim{background:linear-gradient(90deg,rgba(243,241,233,.97) 0%,rgba(243,241,233,.78) 34%,rgba(243,241,233,.08) 78%,rgba(243,241,233,.34)),linear-gradient(0deg,rgba(243,241,233,.55),transparent 42%,rgba(243,241,233,.04))}
+html[data-theme="light"] .hero-grid{opacity:.3;background-image:linear-gradient(rgba(0,94,111,.26) 1px,transparent 1px),linear-gradient(90deg,rgba(0,94,111,.26) 1px,transparent 1px)}
+html[data-theme="light"] .audio-status span:first-child{border-color:#006b7d}html[data-theme="light"] .instruction-dot{border-color:#536900}
+@media (prefers-reduced-motion:reduce){html[data-theme="light"] .ocean-canvas{opacity:.5}html[data-theme="light"] .chime-canvas{opacity:.82}}
