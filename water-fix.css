@@ -1,0 +1,9 @@
+/* Water regression fix: the canvas must sit above translucent panels, not behind them. */
+.panel{z-index:auto}
+.hero{isolation:auto;z-index:auto}
+.hero-bg{z-index:0}.hero-scrim{z-index:1}.hero-grid{z-index:2}.chime-canvas{z-index:3;pointer-events:none}
+.ocean-canvas{z-index:6;opacity:.54;mix-blend-mode:screen;filter:contrast(1.18) saturate(1.35)}
+.hero-content,.hero-instruction,.audio-status,.hero-bottom,.section>.wrap,.footer>.wrap{position:relative;z-index:10}
+.hero-instruction,.audio-status,.hero-bottom{position:absolute}
+html[data-theme="light"] .ocean-canvas{z-index:6;opacity:.76;mix-blend-mode:multiply;filter:contrast(1.45) saturate(1.85)}
+html[data-theme="light"] .chime-canvas{z-index:3;opacity:1;mix-blend-mode:multiply;filter:contrast(1.3) saturate(1.75)}
