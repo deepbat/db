@@ -6,6 +6,8 @@ The site does not require React, a bundler, an API key, or Manus storage. Its ma
 
 The navigation includes a **Dark / Light** theme switcher. The preference is stored in `localStorage`, and the first visit follows the visitor’s operating-system color preference when no saved choice exists.
 
+The water instrument now has a reliable DOM/CSS visual layer in addition to its canvas texture. This keeps the droplets and surface rings visibly present in both themes even when a browser delays or suppresses a canvas frame. The gallery also uses pointer-driven 3D tilt, image parallax, highlight depth, and a reduced-motion fallback across all twelve photos.
+
 ## Run locally
 
 You can open `index.html` directly, but a local server is recommended because browsers handle media and form requests more consistently over HTTP.

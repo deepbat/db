@@ -52,6 +52,15 @@
     });
   }
 
+  function spawnVisualRipple(x, y, hue) {
+    var ripple = document.createElement("span");
+    ripple.className = "water-ripple" + (hue === "lime" ? " is-lime" : "");
+    ripple.style.left = x + "px";
+    ripple.style.top = y + "px";
+    document.body.appendChild(ripple);
+    window.setTimeout(function () { ripple.remove(); }, 1750);
+  }
+
   /* Water surface: a low-res responsive field keeps the page alive without hijacking controls. */
   function initWater() {
     var canvas = document.getElementById("oceanCanvas");
@@ -81,7 +90,7 @@
     function down(event) {
       if ((event.pointerType === "mouse" && event.button !== 0) || interactive(event.target)) return;
       var p = point(event); pointerDown = true; sculpting = false; downAt = performance.now(); downX = p.x; downY = p.y;
-      lastInteraction = performance.now(); addRipple(p.x, p.y, .45, "cyan"); setSurfaceStatus("ripple / chime");
+      lastInteraction = performance.now(); addRipple(p.x, p.y, .45, "cyan"); spawnVisualRipple(p.x, p.y, "cyan"); setSurfaceStatus("ripple / chime");
     }
     function move(event) {
       if (!pointerDown) return;
@@ -92,7 +101,7 @@
     function up(event) {
       if (!pointerDown) return;
       var p = point(event), moved = Math.hypot(p.x - downX, p.y - downY);
-      if (!sculpting && moved < 11) { addRipple(p.x, p.y, .9, "lime"); playChime(Math.round((p.x / Math.max(1, width)) * 15) - 7, .72); lastInteraction = performance.now(); setSurfaceStatus("ripple / chime"); }
+      if (!sculpting && moved < 11) { addRipple(p.x, p.y, .9, "lime"); spawnVisualRipple(p.x, p.y, "lime"); playChime(Math.round((p.x / Math.max(1, width)) * 15) - 7, .72); lastInteraction = performance.now(); setSurfaceStatus("ripple / chime"); }
       pointerDown = false; sculpting = false; setTimeout(function () { setSurfaceStatus("Tap for ripples · hold to sculpt"); }, 620);
     }
     function render(time) {
@@ -134,6 +143,48 @@
     resize(); window.addEventListener("resize", resize); hero.addEventListener("pointermove", move); hero.addEventListener("pointerleave", leave); hero.addEventListener("pointerdown", down, { passive: false }); window.addEventListener("pointerup", up); window.addEventListener("pointercancel", up); raf = requestAnimationFrame(render);
   }
 
+  function initDropField() {
+    var field = document.getElementById("dropField");
+    var hero = document.querySelector(".hero");
+    if (!field || !hero) return;
+    var count = Math.max(6, Math.floor(hero.clientWidth / 88));
+    for (var i = 0; i < count; i++) {
+      var strand = document.createElement("span");
+      strand.className = "drop-string";
+      strand.style.left = (62 + (i / Math.max(1, count - 1)) * 35) + "%";
+      strand.style.height = (44 + (i % 4) * 8) + "%";
+      strand.style.transform = "rotate(" + ((i % 3) - 1) * 1.7 + "deg)";
+      var bead = document.createElement("i");
+      bead.className = "drop-bead" + (i % 4 === 2 ? " lime" : "");
+      bead.style.top = (16 + (i % 6) * 12) + "%";
+      bead.style.animationDelay = (i * -.32) + "s";
+      strand.appendChild(bead);
+      field.appendChild(strand);
+    }
+    hero.addEventListener("pointermove", function (event) {
+      var rect = hero.getBoundingClientRect();
+      field.style.transform = "translate3d(" + (((event.clientX - rect.left) / Math.max(1, rect.width) - .5) * 16).toFixed(2) + "px," + (((event.clientY - rect.top) / Math.max(1, rect.height) - .5) * 10).toFixed(2) + "px,0)";
+    }, { passive: true });
+  }
+
+  function init3dGallery() {
+    document.querySelectorAll(".gallery-item").forEach(function (card) {
+      card.addEventListener("pointermove", function (event) {
+        var rect = card.getBoundingClientRect();
+        var x = (event.clientX - rect.left) / Math.max(1, rect.width) - .5;
+        var y = (event.clientY - rect.top) / Math.max(1, rect.height) - .5;
+        card.style.setProperty("--tilt-x", (-y * 10).toFixed(2) + "deg");
+        card.style.setProperty("--tilt-y", (x * 12).toFixed(2) + "deg");
+        card.style.setProperty("--photo-x", (x * 10).toFixed(1) + "px");
+        card.style.setProperty("--photo-y", (y * 10).toFixed(1) + "px");
+        card.style.setProperty("--depth-shadow", (x * -10).toFixed(0) + "px " + (y * -10).toFixed(0) + "px 25px rgba(0,0,0,.3)");
+      });
+      card.addEventListener("pointerleave", function () {
+        card.style.setProperty("--tilt-x", "0deg"); card.style.setProperty("--tilt-y", "0deg"); card.style.setProperty("--photo-x", "0px"); card.style.setProperty("--photo-y", "0px"); card.style.setProperty("--depth-shadow", "0 0 0 rgba(0,0,0,0)");
+      });
+    });
+  }
+
   function renderSkills() { var list = document.getElementById("skillList"); if (!list) return; content.skills.forEach(function (skill, index) { var row = document.createElement("div"); row.className = "skill-row"; row.innerHTML = '<div class="skill-meta"><span class="num mono">0' + (index + 1) + '</span><h3>' + skill.name + '</h3><span class="value mono">' + skill.value + '%</span></div><div class="skill-track"><i style="width:' + skill.value + '%"></i></div>'; list.appendChild(row); }); }
   function renderGallery() { var grid = document.getElementById("galleryGrid"); if (!grid) return; content.gallery.forEach(function (item, index) { var button = document.createElement("button"); button.type = "button"; button.className = "gallery-item"; button.setAttribute("aria-label", "Open " + item.alt); button.innerHTML = '<picture><source srcset="' + item.src + '.webp" type="image/webp"><img src="' + item.src + '.jpg" alt="' + item.alt + '" loading="lazy"></picture><span class="mono">' + String(index + 1).padStart(2, "0") + ' / ' + item.alt + '</span>'; button.addEventListener("click", function () { openGallery(index); }); grid.appendChild(button); }); }
   var modal = document.getElementById("galleryModal"), modalImage = document.getElementById("modalImage"), modalTitle = document.getElementById("modalTitle"), modalCount = document.getElementById("modalCount"), currentPhoto = 0;
@@ -145,5 +196,5 @@
   function initNavigation() { var nav = document.querySelector(".site-nav"), menu = document.getElementById("mobileMenu"), toggle = document.querySelector(".menu-toggle"), close = document.querySelector(".mobile-close"); window.addEventListener("scroll", function () { nav.classList.toggle("scrolled", window.scrollY > 20); }, { passive: true }); function closeMenu() { menu.classList.remove("open"); menu.setAttribute("aria-hidden", "true"); toggle.setAttribute("aria-expanded", "false"); } toggle.addEventListener("click", function () { var open = menu.classList.toggle("open"); menu.setAttribute("aria-hidden", String(!open)); toggle.setAttribute("aria-expanded", String(open)); }); close.addEventListener("click", closeMenu); menu.querySelectorAll("a").forEach(function (a) { a.addEventListener("click", closeMenu); }); }
   function initContact() { var form = document.getElementById("contactForm"), status = document.getElementById("formStatus"); if (!form) return; form.addEventListener("submit", function (event) { event.preventDefault(); var submit = form.querySelector("button[type='submit']"); submit.disabled = true; submit.textContent = "Sending…"; fetch(form.action, { method: "POST", body: new FormData(form), headers: { Accept: "application/json" } }).then(function (response) { if (!response.ok) throw new Error("Request failed"); form.reset(); status.textContent = "Message sent — I’ll get back to you soon."; status.className = "form-status success"; }).catch(function () { status.textContent = "Something went wrong. Please email deepak.batra@outlook.com directly."; status.className = "form-status error"; }).finally(function () { submit.disabled = false; submit.textContent = "Send message ↗"; }); }); }
   function initModal() { document.querySelector(".modal-close").addEventListener("click", closeGallery); document.querySelector(".modal-prev").addEventListener("click", function () { stepGallery(-1); }); document.querySelector(".modal-next").addEventListener("click", function () { stepGallery(1); }); modal.addEventListener("click", function (event) { if (event.target === modal) closeGallery(); }); document.addEventListener("keydown", function (event) { if (modal.getAttribute("aria-hidden") === "false") { if (event.key === "Escape") closeGallery(); if (event.key === "ArrowLeft") stepGallery(-1); if (event.key === "ArrowRight") stepGallery(1); } }); }
-  document.addEventListener("DOMContentLoaded", function () { var year = document.getElementById("year"); if (year) year.textContent = new Date().getFullYear(); renderSkills(); renderGallery(); initProjects(); initNavigation(); initContact(); initModal(); initWater(); initChimes(); });
+  document.addEventListener("DOMContentLoaded", function () { var year = document.getElementById("year"); if (year) year.textContent = new Date().getFullYear(); renderSkills(); renderGallery(); initProjects(); initNavigation(); initContact(); initModal(); initWater(); initChimes(); initDropField(); init3dGallery(); });
 })();
