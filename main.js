@@ -1,3 +1,28 @@
+/* Portfolio data. Keep this file simple so content can be edited without touching the interaction engine. */
+window.SITE_CONTENT = {
+  skills: [
+    { name: "Microsoft Office", value: 95 },
+    { name: "Email Writing", value: 90 },
+    { name: "Documentation", value: 92 },
+    { name: "Google Workspace", value: 88 },
+    { name: "AI Tools", value: 85 },
+    { name: "Problem Solving", value: 90 }
+  ],
+  gallery: [
+    { src: "images/gallery-01", alt: "Team collaboration session at the office" },
+    { src: "images/gallery-02", alt: "Project planning whiteboard session" },
+    { src: "images/gallery-03", alt: "Document management system setup" },
+    { src: "images/gallery-04", alt: "Workspace organization and setup" },
+    { src: "images/gallery-05", alt: "AI tools demonstration presentation" },
+    { src: "images/gallery-06", alt: "Office equipment and technology setup" },
+    { src: "images/gallery-07", alt: "Stakeholder meeting and coordination" },
+    { src: "images/gallery-08", alt: "Training workshop on productivity tools" },
+    { src: "images/gallery-09", alt: "Professional development conference" },
+    { src: "images/gallery-10", alt: "Team building and office culture event" },
+    { src: "images/gallery-11", alt: "Certification and achievement recognition" },
+    { src: "images/gallery-12", alt: "Behind the scenes of a project launch" }
+  ]
+};
 /* Standalone interaction engine. No framework or build step is required. */
 (function () {
   "use strict";
@@ -102,16 +127,16 @@
       if (!pointerDown) return;
       var p = point(event), moved = Math.hypot(p.x - downX, p.y - downY);
       if (!sculpting && moved < 11) { addRipple(p.x, p.y, .9, "lime"); spawnVisualRipple(p.x, p.y, "lime"); playChime(Math.round((p.x / Math.max(1, width)) * 15) - 7, .72); lastInteraction = performance.now(); setSurfaceStatus("ripple / chime"); }
-      pointerDown = false; sculpting = false; setTimeout(function () { setSurfaceStatus("Tap for ripples · hold to sculpt"); }, 620);
+      pointerDown = false; sculpting = false; setTimeout(function () { setSurfaceStatus("Move to sway the jungle · step into the portal"); }, 620);
     }
     function render(time) {
-      var delta = Math.min(32, time - lastTime); lastTime = time; ctx.clearRect(0, 0, width, height);
+      var delta = Math.min(32, Math.max(0, time - lastTime)); lastTime = time; ctx.clearRect(0, 0, width, height);
       if (!pointerDown && !reducedMotion && time - lastInteraction > 5200) { addRipple(width * (.32 + Math.random() * .36), height * (.32 + Math.random() * .36), .46, Math.random() > .6 ? "lime" : "cyan"); lastInteraction = time; }
       var wash = ctx.createRadialGradient(width * .6, height * .35, 0, width * .5, height * .55, Math.max(width, height) * .72);
       wash.addColorStop(0, "rgba(25,68,72,.12)"); wash.addColorStop(.45, "rgba(8,20,24,.08)"); wash.addColorStop(1, "rgba(3,8,11,.02)"); ctx.fillStyle = wash; ctx.fillRect(0, 0, width, height);
       for (var r = ripples.length - 1; r >= 0; r--) {
         var ripple = ripples[r]; ripple.radius += ripple.speed * (delta / 16); ripple.alpha *= .992;
-        if (ripple.alpha < .028 || ripple.radius > Math.max(width, height) * .74) { ripples.splice(r, 1); continue; }
+        if (ripple.alpha < .028 || ripple.radius < 0 || ripple.radius > Math.max(width, height) * .74) { ripples.splice(r, 1); continue; }
         var fade = ripple.alpha * Math.max(0, 1 - ripple.radius / (Math.max(width, height) * .8));
         ctx.save(); ctx.translate(ripple.x, ripple.y); ctx.scale(1, .32 + Math.sin(ripple.radius * .015) * .03); ctx.lineWidth = 1.3; ctx.shadowBlur = 12;
         ctx.strokeStyle = ripple.hue === "lime" ? "rgba(215,255,63," + fade + ")" : "rgba(111,231,255," + fade + ")"; ctx.shadowColor = ctx.strokeStyle;
@@ -198,3 +223,355 @@
   function initModal() { document.querySelector(".modal-close").addEventListener("click", closeGallery); document.querySelector(".modal-prev").addEventListener("click", function () { stepGallery(-1); }); document.querySelector(".modal-next").addEventListener("click", function () { stepGallery(1); }); modal.addEventListener("click", function (event) { if (event.target === modal) closeGallery(); }); document.addEventListener("keydown", function (event) { if (modal.getAttribute("aria-hidden") === "false") { if (event.key === "Escape") closeGallery(); if (event.key === "ArrowLeft") stepGallery(-1); if (event.key === "ArrowRight") stepGallery(1); } }); }
   document.addEventListener("DOMContentLoaded", function () { var year = document.getElementById("year"); if (year) year.textContent = new Date().getFullYear(); renderSkills(); renderGallery(); initProjects(); initNavigation(); initContact(); initModal(); initWater(); initChimes(); initDropField(); init3dGallery(); });
 })();
+/* Persisted dark/light theme preference with a system fallback. */
+(function () {
+  "use strict";
+  var root = document.documentElement;
+  var button = document.getElementById("themeToggle");
+  var stored = localStorage.getItem("deepak-theme");
+  var systemLight = window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches;
+  var theme = stored || (systemLight ? "light" : "dark");
+
+  function apply(next) {
+    theme = next === "light" ? "light" : "dark";
+    root.setAttribute("data-theme", theme);
+    root.style.colorScheme = theme;
+    if (!button) return;
+    var light = theme === "light";
+    button.setAttribute("aria-pressed", String(light));
+    button.setAttribute("aria-label", light ? "Switch to dark theme" : "Switch to light theme");
+    button.querySelector(".theme-toggle-icon").textContent = light ? "☾" : "☼";
+    button.querySelector(".theme-toggle-label").textContent = light ? "Dark" : "Light";
+  }
+
+  apply(theme);
+  if (button) button.addEventListener("click", function () {
+    var next = theme === "light" ? "dark" : "light";
+    localStorage.setItem("deepak-theme", next);
+    apply(next);
+  });
+})();
+
+/* Jungle portal scene: generated foliage, fireflies, cursor parallax and a
+   "step into the jungle" portal response. Plain JS, no build step. */
+(function () {
+  "use strict";
+
+  var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var scene = document.querySelector(".jungle-scene");
+  if (!scene) return;
+  var stage = scene.querySelector(".jungle-stage");
+  var backLayer = scene.querySelector(".jungle-layer.back");
+  var frontLayer = scene.querySelector(".jungle-layer.front");
+  var portalWrap = scene.querySelector(".jungle-portal-wrap");
+  var portal = scene.querySelector(".jungle-portal");
+  var hero = document.querySelector(".hero");
+  if (!stage || !backLayer || !frontLayer || !portalWrap || !portal || !hero) return;
+
+  /* Shared SVG defs (one instance, referenced by every generated leaf). */
+  var defs = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  defs.setAttribute("class", "jungle-defs");
+  defs.setAttribute("width", "0");
+  defs.setAttribute("height", "0");
+  defs.style.position = "absolute";
+  defs.innerHTML =
+    '<defs>' +
+    '<linearGradient id="jg-grad" x1="0" y1="0" x2="0" y2="1">' +
+    '<stop offset="0" stop-color="#0f3320"/><stop offset=".55" stop-color="#1d5c39"/><stop offset="1" stop-color="#2f7d4b"/>' +
+    '</linearGradient>' +
+    '<linearGradient id="jg-grad-soft" x1="0" y1="0" x2="0" y2="1">' +
+    '<stop offset="0" stop-color="#0a2417"/><stop offset="1" stop-color="#123a25"/>' +
+    '</linearGradient>' +
+    '<path id="jg-leaf" d="M60 4 C86 22 100 58 84 92 C74 112 46 112 36 92 C20 58 34 22 60 4 Z"/>' +
+    '<path id="jg-vein" d="M60 16 C57 46 57 74 61 98" fill="none"/>' +
+    '</defs>';
+  scene.appendChild(defs);
+
+  var SVG_NS = "http://www.w3.org/2000/svg";
+
+  function leafSVG(size, opts) {
+    opts = opts || {};
+    var svg = document.createElementNS(SVG_NS, "svg");
+    svg.setAttribute("viewBox", "0 0 120 120");
+    svg.style.width = size + "px";
+    svg.style.height = size + "px";
+    var body = document.createElementNS(SVG_NS, "use");
+    body.setAttribute("href", "#jg-leaf");
+    body.setAttribute("fill", opts.soft ? "url(#jg-grad-soft)" : "url(#jg-grad)");
+    svg.appendChild(body);
+    var vein = document.createElementNS(SVG_NS, "use");
+    vein.setAttribute("href", "#jg-vein");
+    vein.setAttribute("stroke", opts.soft ? "rgba(111,231,255,.18)" : "rgba(215,255,63,.4)");
+    vein.setAttribute("stroke-width", "2.2");
+    svg.appendChild(vein);
+    return svg;
+  }
+
+  function frondSVG(size, opts) {
+    opts = opts || {};
+    var svg = document.createElementNS(SVG_NS, "svg");
+    svg.setAttribute("viewBox", "0 0 120 120");
+    svg.style.width = size + "px";
+    svg.style.height = size + "px";
+    var g = document.createElementNS(SVG_NS, "g");
+    var spine = document.createElementNS(SVG_NS, "path");
+    spine.setAttribute("d", "M14 106 C 36 76 58 48 104 12");
+    spine.setAttribute("stroke", opts.soft ? "rgba(80,140,66,.5)" : "rgba(96,168,74,.6)");
+    spine.setAttribute("stroke-width", "2.4");
+    spine.setAttribute("fill", "none");
+    g.appendChild(spine);
+    for (var t = .12; t <= .92; t += .1) {
+      var p = bezier(t);
+      var dx = bezierDX(t), dy = bezierDY(t);
+      var ang = Math.atan2(dy, dx) * 180 / Math.PI;
+      var len = 8 + t * 26;
+      [-1, 1].forEach(function (side) {
+        var leaf = document.createElementNS(SVG_NS, "ellipse");
+        leaf.setAttribute("cx", String(p.x));
+        leaf.setAttribute("cy", String(p.y));
+        leaf.setAttribute("rx", String(len));
+        leaf.setAttribute("ry", String(3.2 + t * 3));
+        leaf.setAttribute("fill", opts.soft ? "url(#jg-grad-soft)" : "url(#jg-grad)");
+        leaf.setAttribute("transform", "rotate(" + (ang + 90 * side) + " " + p.x + " " + p.y + ")");
+        g.appendChild(leaf);
+      });
+    }
+    svg.appendChild(g);
+    return svg;
+    function bezier(t) {
+      var u = 1 - t;
+      return { x: u * u * 14 + 2 * u * t * 36 + t * t * 104, y: u * u * 106 + 2 * u * t * 76 + t * t * 12 };
+    }
+    function bezierDX(t) { return 2 * (1 - t) * (36 - 14) + 2 * t * (104 - 36); }
+    function bezierDY(t) { return 2 * (1 - t) * (76 - 106) + 2 * t * (12 - 76); }
+  }
+
+  function place(container, el, x, y, rot, scale, z) {
+    el.classList.add("jungle-leaf");
+    if (z) el.style.zIndex = z;
+    el.style.left = x + "px";
+    el.style.top = y + "px";
+    el.style.transform = "translate(-50%,-50%) rotate(" + rot + "deg) scale(" + scale + ")";
+    container.appendChild(el);
+    return el;
+  }
+
+  var rimLeaves = [], cornerLeaves = [];
+
+  function layoutLeaves() {
+    rimLeaves.forEach(function (l) { if (l.el.parentNode) l.el.parentNode.removeChild(l.el); });
+    rimLeaves = [];
+    var sceneRect = scene.getBoundingClientRect();
+    var pRect = portalWrap.getBoundingClientRect();
+    var cx = pRect.left - sceneRect.left + pRect.width / 2;
+    var cy = pRect.top - sceneRect.top + pRect.height / 2;
+    var radius = pRect.width * .55;
+    var count = 16;
+    for (var i = 0; i < count; i++) {
+      var angle = (i / count) * Math.PI * 2 + (i % 2 ? .14 : -.09);
+      var x = cx + Math.cos(angle) * radius;
+      var y = cy + Math.sin(angle) * radius;
+      var size = 34 + ((i * 37) % 34);
+      var frond = i % 3 === 0;
+      var el = frond ? frondSVG(size) : leafSVG(size);
+      el.classList.add(frond ? "frond" : "leaf");
+      var rot = angle * 180 / Math.PI + 90 + ((i % 4) - 2) * 16;
+      place(frontLayer, el, x, y, rot, .9 + ((i * 53) % 30) / 100);
+      rimLeaves.push({ el: el });
+    }
+  }
+
+
+  function buildCornerFoliage() {
+    cornerLeaves.forEach(function (l) { if (l.parentNode) l.parentNode.removeChild(l); });
+    cornerLeaves = [];
+    var W = window.innerWidth, H = window.innerHeight;
+    var clusters = [
+      /* bottom-left corner cluster */
+      { x: W * .045, y: H * .93, rot: -28, size: 175, scale: 1 },
+      { x: W * .105, y: H * .985, rot: 14, size: 150, scale: 1.1, z: 1 },
+      { x: W * .015, y: H * .86, rot: -58, size: 120, scale: 1.05, z: 1 },
+      /* bottom-right foreground */
+      { x: W * .985, y: H * .965, rot: 38, size: 170, scale: 1, z: 2 },
+      { x: W * .925, y: H * 1.0, rot: 78, size: 135, scale: 1.05, z: 2 },
+      /* top corners */
+      { x: W * .015, y: H * .075, rot: -118, size: 130, scale: .95 },
+      { x: W * .975, y: H * .05, rot: 128, size: 105, scale: .9 },
+      /* mid-left accents */
+      { x: W * .03, y: H * .42, rot: -84, size: 90, scale: .85 },
+      { x: W * .165, y: H * .16, rot: -152, size: 70, scale: .8 }
+    ];
+    clusters.forEach(function (c, idx) {
+      var el = idx % 2 ? frondSVG(c.size) : leafSVG(c.size);
+      place(frontLayer, el, c.x, c.y, c.rot, c.scale, c.z || 0);
+      cornerLeaves.push(el);
+    });
+    /* faint distant foliage in the back layer */
+    var back = [
+      { x: W * .8, y: H * .2, rot: -40, size: 110, scale: 1 },
+      { x: W * .88, y: H * .84, rot: 66, size: 140, scale: 1 },
+      { x: W * .72, y: H * .9, rot: 100, size: 90, scale: .9 }
+    ];
+    back.forEach(function (c) {
+      var el = leafSVG(c.size, { soft: true });
+      el.classList.add("back");
+      place(backLayer, el, c.x, c.y, c.rot, c.scale);
+      cornerLeaves.push(el);
+    });
+  }
+
+  function buildVines() {
+    var W = window.innerWidth, H = window.innerHeight;
+    var spots = [
+      { x: W * .585, len: .46, delay: 0 },
+      { x: W * .645, len: .38, delay: -2.2 },
+      { x: W * .705, len: .5, delay: -4.1 }
+    ];
+    spots.forEach(function (s) {
+      var vine = document.createElement("span");
+      vine.className = "jungle-vine";
+      vine.style.left = s.x + "px";
+      vine.style.height = (s.len * H) + "px";
+      vine.style.animationDelay = s.delay + "s";
+      var beads = 4 + Math.floor(Math.random() * 3);
+      for (var i = 0; i < beads; i++) {
+        var bead = document.createElement("i");
+        bead.className = "vine-bead";
+        bead.style.top = (14 + i * 16 + Math.random() * 6) + "%";
+        bead.style.animationDelay = (Math.random() * 2 - 1) + "s";
+        vine.appendChild(bead);
+      }
+      frontLayer.appendChild(vine);
+    });
+  }
+
+  function buildSparks() {
+    var colors = ["lime", "cyan", "pink", "lime", "cyan"];
+    for (var i = 0; i < 16; i++) {
+      var spark = document.createElement("i");
+      spark.className = "jungle-spark " + colors[i % colors.length];
+      spark.style.left = (26 + Math.random() * 70) + "%";
+      spark.style.top = (14 + Math.random() * 74) + "%";
+      spark.style.setProperty("--dur", (9 + Math.random() * 9).toFixed(1) + "s");
+      spark.style.setProperty("--delay", (-Math.random() * 18).toFixed(1) + "s");
+      spark.style.setProperty("--sway", ((Math.random() * 60) - 30).toFixed(0) + "px");
+      spark.style.animationDelay = spark.style.getPropertyValue("--delay");
+      scene.appendChild(spark);
+    }
+  }
+
+
+  /* --- cursor parallax (mouse only) ----------------------------------------- */
+  var target = { x: 0, y: 0 }, current = { x: 0, y: 0 }, raf = null;
+
+  function applyParallax() {
+    var x = current.x, y = current.y;
+    stage.style.transform = "translate3d(" + (x * 12).toFixed(2) + "px," + (y * 8).toFixed(2) + "px,0) rotate(" + (x * .6).toFixed(2) + "deg)";
+    portalWrap.style.transform = "translate3d(" + (x * 24).toFixed(2) + "px," + (y * 15).toFixed(2) + "px,0)";
+    backLayer.style.transform = "translate3d(" + (x * 7).toFixed(2) + "px," + (y * 5).toFixed(2) + "px,0)";
+    frontLayer.style.transform = "translate3d(" + (x * 36).toFixed(2) + "px," + (y * 23).toFixed(2) + "px,0)";
+  }
+
+  function parallaxLoop() {
+    current.x += (target.x - current.x) * .07;
+    current.y += (target.y - current.y) * .07;
+    var settled = Math.abs(target.x - current.x) < .002 && Math.abs(target.y - current.y) < .002;
+    if (settled) { current.x = target.x; current.y = target.y; }
+    applyParallax();
+    if (!settled) raf = requestAnimationFrame(parallaxLoop); else raf = null;
+  }
+
+  function onMove(event) {
+    if (event.pointerType === "touch") return;
+    var rect = hero.getBoundingClientRect();
+    target.x = (event.clientX - rect.left) / Math.max(1, rect.width) - .5;
+    target.y = (event.clientY - rect.top) / Math.max(1, rect.height) - .5;
+    if (!raf && !reducedMotion) raf = requestAnimationFrame(parallaxLoop);
+    var pRect = portal.getBoundingClientRect();
+    var px = event.clientX - (pRect.left + pRect.width / 2);
+    var py = event.clientY - (pRect.top + pRect.height / 2);
+    var d = Math.sqrt(px * px + py * py), r = pRect.width / 2;
+    if (d < r * 1.12) scene.classList.add("in");
+    else if (d > r * 1.3) scene.classList.remove("in");
+  }
+
+  function onLeave() {
+    target.x = 0; target.y = 0;
+    if (!raf && !reducedMotion) raf = requestAnimationFrame(parallaxLoop);
+    scene.classList.remove("in");
+  }
+
+  function onDown(event) {
+    if (event.pointerType === "touch") return;
+    if (event.target && event.target.closest && event.target.closest("a,button,input,textarea,select,label,video,[role='button']")) return;
+    var pRect = portal.getBoundingClientRect();
+    var px = event.clientX - (pRect.left + pRect.width / 2);
+    var py = event.clientY - (pRect.top + pRect.height / 2);
+    if (Math.sqrt(px * px + py * py) < pRect.width / 2 * 1.15) {
+      scene.classList.add("pulse");
+      window.setTimeout(function () { scene.classList.remove("pulse"); }, 540);
+    }
+  }
+
+
+  /* Foliage accents across the rest of the page: a swaying frond on every
+     section divider, corner foliage on the about photo frame, a frond on each
+     project visual, and tiny leaves on the gallery tiles. */
+  function buildSectionAccents() {
+    document.querySelectorAll(".section-line").forEach(function (line) {
+      var frond = frondSVG(26);
+      frond.classList.add("jungle-accent", "sway");
+      var note = line.querySelector(".section-note");
+      if (note) line.insertBefore(frond, note); else line.appendChild(frond);
+    });
+    var frame = document.querySelector(".media-frame");
+    if (frame) {
+      var top = document.createElement("span");
+      top.className = "jungle-frame-accent";
+      top.style.top = "-15px"; top.style.right = "-11px";
+      top.style.transform = "rotate(162deg)";
+      var tl = leafSVG(46); tl.classList.add("jungle-accent", "sway");
+      top.appendChild(tl); frame.appendChild(top);
+      var bottom = document.createElement("span");
+      bottom.className = "jungle-frame-accent";
+      bottom.style.left = "-15px"; bottom.style.bottom = "-13px";
+      bottom.style.transform = "rotate(-30deg)";
+      var bl = leafSVG(62); bl.classList.add("jungle-accent", "sway");
+      bottom.appendChild(bl); frame.appendChild(bottom);
+    }
+    document.querySelectorAll(".project-visual").forEach(function (visual) {
+      var el = frondSVG(36);
+      el.classList.add("jungle-leaf");
+      el.style.right = "12px"; el.style.top = "10px";
+      el.style.transform = "rotate(118deg)";
+      el.style.opacity = ".92";
+      visual.appendChild(el);
+    });
+    document.querySelectorAll(".gallery-item").forEach(function (item, index) {
+      var el = leafSVG(20);
+      el.classList.add("jungle-leaf");
+      el.style.right = "8px"; el.style.top = "8px";
+      el.style.transform = "translate(-50%,-50%) rotate(" + (120 + (index % 3) * 25) + "deg)";
+      el.style.opacity = ".85";
+      item.appendChild(el);
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    buildCornerFoliage();
+    buildVines();
+    buildSparks();
+    layoutLeaves();
+    buildSectionAccents();
+    buildCornerFoliage();
+    buildVines();
+    buildSparks();
+    layoutLeaves();
+    hero.addEventListener("pointermove", onMove, { passive: true });
+    hero.addEventListener("pointerleave", onLeave);
+    hero.addEventListener("pointerdown", onDown, { passive: true });
+    window.addEventListener("resize", layoutLeaves);
+    window.addEventListener("resize", buildCornerFoliage);
+  });
+})();
+

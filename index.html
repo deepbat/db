@@ -9,11 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="theme.css">
-  <link rel="stylesheet" href="water-contrast.css">
-  <link rel="stylesheet" href="water-fix.css">
-  <link rel="stylesheet" href="interaction-fix.css">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -48,6 +44,23 @@
       <div id="dropField" class="drop-field" aria-hidden="true"></div>
       <div class="hero-scrim" aria-hidden="true"></div>
       <div class="hero-grid" aria-hidden="true"></div>
+      <div class="jungle-scene" aria-hidden="true">
+        <div class="jungle-stage">
+          <div class="jungle-layer back"></div>
+          <div class="jungle-halo"></div>
+          <div class="jungle-portal-wrap">
+            <div class="portal-glow"></div>
+            <div class="jungle-portal">
+              <span class="portal-sun"></span>
+              <span class="portal-mist a"></span>
+              <span class="portal-mist b"></span>
+              <span class="portal-cloud a"></span>
+              <span class="portal-cloud b"></span>
+            </div>
+          </div>
+          <div class="jungle-layer front"></div>
+        </div>
+      </div>
       <div class="wrap hero-content">
         <div class="eyebrow"><span class="live-dot"></span> Office professional / documentation specialist / technology enthusiast</div>
         <div class="hero-index mono">01 — INTRODUCTION</div>
@@ -58,7 +71,7 @@
         </div>
         <div class="hero-stats"><div><strong>5<span>+</span></strong><small class="mono">YEARS EXP.</small></div><div><strong>200<span>+</span></strong><small class="mono">PROJECTS</small></div><div><strong>99<span>%</span></strong><small class="mono">ON-TIME</small></div></div>
       </div>
-      <div class="hero-instruction mono"><span class="instruction-dot"></span><span id="surfaceStatus">Tap for ripples · hold to sculpt</span></div>
+      <div class="hero-instruction mono"><span class="instruction-dot"></span><span id="surfaceStatus">Move to sway the jungle · step into the portal</span></div>
       <div class="audio-status mono"><span id="audioDot"></span><span id="audioStatus">Audio / tap to arm</span></div>
       <div class="wrap hero-bottom"><span class="mono">Based in India / working everywhere</span><a href="#about">Scroll to explore ↓</a></div>
     </section>
@@ -97,9 +110,7 @@
 
   <div class="gallery-modal" id="galleryModal" aria-hidden="true"><button class="modal-close" type="button" aria-label="Close gallery">×</button><div class="modal-image"><img id="modalImage" src="" alt=""></div><div class="modal-caption"><span id="modalCount" class="mono"></span><p id="modalTitle"></p><small class="mono">← / → browse · esc close</small></div><button class="modal-prev" type="button" aria-label="Previous image">←</button><button class="modal-next" type="button" aria-label="Next image">→</button></div>
 
-  <script src="content.js"></script>
-  <script src="script.js"></script>
-  <script src="theme.js"></script>
+  <script src="main.js"></script>
   <script>document.getElementById("chimeCanvas").style.pointerEvents = "none";</script>
 </body>
 </html>
