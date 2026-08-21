@@ -255,3 +255,17 @@ html[data-theme="light"] .jungle-portal::before{
       rgba(44,32,20,.68) 73% 100%),
     radial-gradient(circle, transparent 0 55.5%, rgba(160,130,96,.2) 56% 56.5%, transparent 57%);
 }
+
+/* ==========================================================================
+   BUG FIXES — appended cleanly so they override only what they need to.
+   ========================================================================== */
+
+/* Fix 3: Modal keyboard trap — visibility:hidden when closed means
+   Tab can never reach the modal's buttons while it's off-screen.
+   The JS sets visibility:visible on open and visibility:hidden on close. */
+.gallery-modal{
+  visibility: hidden;
+}
+.gallery-modal[aria-hidden="false"]{
+  visibility: visible;
+}

@@ -212,15 +212,44 @@ window.SITE_CONTENT = {
 
   function renderSkills() { var list = document.getElementById("skillList"); if (!list) return; content.skills.forEach(function (skill, index) { var row = document.createElement("div"); row.className = "skill-row"; row.innerHTML = '<div class="skill-meta"><span class="num mono">0' + (index + 1) + '</span><h3>' + skill.name + '</h3><span class="value mono">' + skill.value + '%</span></div><div class="skill-track"><i style="width:' + skill.value + '%"></i></div>'; list.appendChild(row); }); }
   function renderGallery() { var grid = document.getElementById("galleryGrid"); if (!grid) return; content.gallery.forEach(function (item, index) { var button = document.createElement("button"); button.type = "button"; button.className = "gallery-item"; button.setAttribute("aria-label", "Open " + item.alt); button.innerHTML = '<picture><source srcset="' + item.src + '.webp" type="image/webp"><img src="' + item.src + '.jpg" alt="' + item.alt + '" loading="lazy"></picture><span class="mono">' + String(index + 1).padStart(2, "0") + ' / ' + item.alt + '</span>'; button.addEventListener("click", function () { openGallery(index); }); grid.appendChild(button); }); }
-  var modal = document.getElementById("galleryModal"), modalImage = document.getElementById("modalImage"), modalTitle = document.getElementById("modalTitle"), modalCount = document.getElementById("modalCount"), currentPhoto = 0;
-  function openGallery(index) { currentPhoto = (index + content.gallery.length) % content.gallery.length; var item = content.gallery[currentPhoto]; modalImage.src = item.src + ".jpg"; modalImage.alt = item.alt; modalTitle.textContent = item.alt; modalCount.textContent = String(currentPhoto + 1).padStart(2, "0") + " / " + String(content.gallery.length).padStart(2, "0"); modal.setAttribute("aria-hidden", "false"); }
-  function closeGallery() { modal.setAttribute("aria-hidden", "true"); }
+  var modal = document.getElementById("galleryModal"), modalImage = document.getElementById("modalImage"), modalTitle = document.getElementById("modalTitle"), modalCount = document.getElementById("modalCount"), currentPhoto = 0, _lastFocused = null;
+  function openGallery(index) {
+    currentPhoto = (index + content.gallery.length) % content.gallery.length;
+    var item = content.gallery[currentPhoto];
+    modalImage.src = item.src + ".jpg";
+    modalImage.alt = item.alt;
+    modalTitle.textContent = item.alt;
+    modalCount.textContent = String(currentPhoto + 1).padStart(2, "0") + " / " + String(content.gallery.length).padStart(2, "0");
+    _lastFocused = document.activeElement;
+    modal.setAttribute("aria-hidden", "false");
+    modal.style.visibility = "visible";
+    // move focus into the modal so screen readers announce it
+    var closeBtn = modal.querySelector(".modal-close");
+    if (closeBtn) closeBtn.focus();
+  }
+  function closeGallery() {
+    modal.setAttribute("aria-hidden", "true");
+    modal.style.visibility = "hidden";
+    // return focus to the element that opened the modal
+    if (_lastFocused && _lastFocused.focus) _lastFocused.focus();
+    _lastFocused = null;
+  }
   function stepGallery(amount) { openGallery(currentPhoto + amount); }
+  function _trapFocus(e) {
+    if (modal.getAttribute("aria-hidden") !== "false") return;
+    var focusable = Array.prototype.slice.call(modal.querySelectorAll("button, [href], input, [tabindex]:not([tabindex=\"-1\"])"));
+    if (!focusable.length) return;
+    var first = focusable[0], last = focusable[focusable.length - 1];
+    if (e.key === "Tab") {
+      if (e.shiftKey) { if (document.activeElement === first) { e.preventDefault(); last.focus(); } }
+      else { if (document.activeElement === last) { e.preventDefault(); first.focus(); } }
+    }
+  }
 
   function initProjects() { document.querySelectorAll(".case-toggle").forEach(function (button) { button.addEventListener("click", function () { var card = button.closest(".project-card"), open = card.classList.toggle("open"); button.setAttribute("aria-expanded", String(open)); button.textContent = open ? "− Show less" : "+ Open the case"; }); }); }
   function initNavigation() { var nav = document.querySelector(".site-nav"), menu = document.getElementById("mobileMenu"), toggle = document.querySelector(".menu-toggle"), close = document.querySelector(".mobile-close"); window.addEventListener("scroll", function () { nav.classList.toggle("scrolled", window.scrollY > 20); }, { passive: true }); function closeMenu() { menu.classList.remove("open"); menu.setAttribute("aria-hidden", "true"); toggle.setAttribute("aria-expanded", "false"); } toggle.addEventListener("click", function () { var open = menu.classList.toggle("open"); menu.setAttribute("aria-hidden", String(!open)); toggle.setAttribute("aria-expanded", String(open)); }); close.addEventListener("click", closeMenu); menu.querySelectorAll("a").forEach(function (a) { a.addEventListener("click", closeMenu); }); }
   function initContact() { var form = document.getElementById("contactForm"), status = document.getElementById("formStatus"); if (!form) return; form.addEventListener("submit", function (event) { event.preventDefault(); var submit = form.querySelector("button[type='submit']"); submit.disabled = true; submit.textContent = "Sending…"; fetch(form.action, { method: "POST", body: new FormData(form), headers: { Accept: "application/json" } }).then(function (response) { if (!response.ok) throw new Error("Request failed"); form.reset(); status.textContent = "Message sent — I’ll get back to you soon."; status.className = "form-status success"; }).catch(function () { status.textContent = "Something went wrong. Please email deepak.batra@outlook.com directly."; status.className = "form-status error"; }).finally(function () { submit.disabled = false; submit.textContent = "Send message ↗"; }); }); }
-  function initModal() { document.querySelector(".modal-close").addEventListener("click", closeGallery); document.querySelector(".modal-prev").addEventListener("click", function () { stepGallery(-1); }); document.querySelector(".modal-next").addEventListener("click", function () { stepGallery(1); }); modal.addEventListener("click", function (event) { if (event.target === modal) closeGallery(); }); document.addEventListener("keydown", function (event) { if (modal.getAttribute("aria-hidden") === "false") { if (event.key === "Escape") closeGallery(); if (event.key === "ArrowLeft") stepGallery(-1); if (event.key === "ArrowRight") stepGallery(1); } }); }
+  function initModal() { document.querySelector(".modal-close").addEventListener("click", closeGallery); document.querySelector(".modal-prev").addEventListener("click", function () { stepGallery(-1); }); document.querySelector(".modal-next").addEventListener("click", function () { stepGallery(1); }); modal.addEventListener("click", function (event) { if (event.target === modal) closeGallery(); }); document.addEventListener("keydown", function (event) { _trapFocus(event); if (modal.getAttribute("aria-hidden") === "false") { if (event.key === "Escape") closeGallery(); if (event.key === "ArrowLeft") stepGallery(-1); if (event.key === "ArrowRight") stepGallery(1); } }); }
   document.addEventListener("DOMContentLoaded", function () { var year = document.getElementById("year"); if (year) year.textContent = new Date().getFullYear(); renderSkills(); renderGallery(); initProjects(); initNavigation(); initContact(); initModal(); initWater(); initChimes(); initDropField(); init3dGallery(); });
 })();
 /* Persisted dark/light theme preference with a system fallback. */
@@ -563,10 +592,6 @@ window.SITE_CONTENT = {
     buildSparks();
     layoutLeaves();
     buildSectionAccents();
-    buildCornerFoliage();
-    buildVines();
-    buildSparks();
-    layoutLeaves();
     hero.addEventListener("pointermove", onMove, { passive: true });
     hero.addEventListener("pointerleave", onLeave);
     hero.addEventListener("pointerdown", onDown, { passive: true });
