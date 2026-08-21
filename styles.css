@@ -157,3 +157,101 @@ html[data-theme="light"] .jungle-scene{opacity:.9}
   .jungle-spark{width:4px;height:4px}
   html[data-theme="light"] .jungle-scene{opacity:.5}
 }
+
+/* ==========================================================================
+   JUNGLE PORTAL ENHANCEMENT — make the arch the hero of the hero section.
+   The portal was sized conservatively (min(58vw,620px)) and pushed to the
+   right edge. These overrides make it larger, more centered, give the stone
+   ring a lighter, more organic look, and deepen the scrim on the left so
+   the headline always reads clearly over the wider arch.
+   ========================================================================== */
+
+/* Bigger portal, shifted left so it fills more of the viewport */
+.jungle-portal-wrap{
+  width: min(78vw, 860px);
+  right: -14%;
+  top: 50%;
+}
+
+/* Lighter stone ring — the dark ::before was too heavy and opaque */
+.jungle-portal::before{
+  background:
+    radial-gradient(circle at 50% 50%,
+      transparent 0 53.5%,
+      rgba(70,54,38,.65) 54% 56%,
+      rgba(46,36,28,.82) 56.5% 74%,
+      rgba(28,20,14,.88) 75% 100%),
+    radial-gradient(circle, transparent 0 55%, rgba(160,130,96,.3) 55.6% 56.2%, transparent 56.8%);
+}
+
+/* Larger, softer glow behind the portal */
+.portal-glow{
+  inset: -22%;
+  background: radial-gradient(circle, rgba(255,214,140,.3), rgba(216,154,224,.16) 46%, transparent 70%);
+  filter: blur(28px);
+}
+
+/* Adjust the left-side text scrim to stay readable with the wider portal */
+.hero-scrim{
+  background:
+    linear-gradient(90deg,
+      rgba(7,16,20,.98) 0%,
+      rgba(7,16,20,.88) 30%,
+      rgba(7,16,20,.38) 58%,
+      rgba(7,16,20,.12) 78%,
+      rgba(7,16,20,.52)),
+    linear-gradient(0deg, rgba(7,16,20,.9), transparent 38%, rgba(7,16,20,.36));
+}
+
+/* Responsive adjustments to maintain the larger sizing */
+@media (max-width:1200px){
+  .jungle-portal-wrap{ width:min(82vw,720px); right:-16%; }
+}
+@media (max-width:1050px){
+  .jungle-portal-wrap{ width:min(80vw,620px); right:-18%; }
+}
+@media (max-width:760px){
+  .jungle-portal-wrap{ width:min(180vw,680px); right:-44%; top:60%; }
+}
+
+/* ==========================================================================
+   PORTAL RING FIX — reduce the stone ring's opacity further and make
+   it feel more like mossy ancient stone rather than a dark rubber band.
+   Also fix the light theme flipping to dark: the ocean canvas multiply
+   blend was darkening the whole hero background in light mode.
+   ========================================================================== */
+
+/* Thinner, lighter, more organic stone ring */
+.jungle-portal::before{
+  background:
+    radial-gradient(circle at 50% 50%,
+      transparent 0 54%,
+      rgba(55,42,30,.5) 54.2% 55.4%,
+      rgba(38,28,18,.72) 55.8% 72%,
+      rgba(22,16,10,.82) 73% 100%),
+    radial-gradient(circle, transparent 0 55.5%, rgba(130,105,78,.25) 56% 56.5%, transparent 57%);
+}
+
+/* Light theme: keep the hero background actually light */
+html[data-theme="light"] .hero{
+  background: rgba(243,241,233,.55) !important;
+}
+html[data-theme="light"] .hero-scrim{
+  background:
+    linear-gradient(90deg,
+      rgba(243,241,233,.97) 0%,
+      rgba(243,241,233,.84) 28%,
+      rgba(243,241,233,.28) 58%,
+      rgba(243,241,233,.08) 80%,
+      rgba(243,241,233,.38)) !important,
+    linear-gradient(0deg, rgba(243,241,233,.62), transparent 42%, rgba(243,241,233,.12)) !important;
+}
+html[data-theme="light"] .jungle-portal::before{
+  background:
+    radial-gradient(circle at 50% 50%,
+      transparent 0 54%,
+      rgba(90,70,50,.38) 54.2% 55.4%,
+      rgba(68,50,34,.58) 55.8% 72%,
+      rgba(44,32,20,.68) 73% 100%),
+    radial-gradient(circle, transparent 0 55.5%, rgba(160,130,96,.2) 56% 56.5%, transparent 57%);
+}
