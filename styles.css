@@ -332,3 +332,26 @@ html[data-theme="light"] .jungle-portal::before{
   align-self:center;
 }
 
+/* ==========================================================================
+   WEBGL PORTAL — real 3D jungle arch (portal3d.js). The canvas lives inside
+   .jungle-portal-wrap so it inherits the existing parallax transforms. The
+   flat CSS portal fades out only after the WebGL scene renders successfully;
+   if the module or WebGL fails, the CSS portal stays as the fallback.
+   ========================================================================== */
+
+.portal-gl{
+  position:absolute;inset:-4%;width:108%;height:108%;
+  z-index:4;display:block;border:0;background:transparent;
+  opacity:0;transition:opacity .9s var(--ease);
+}
+.portal-gl.on{opacity:1;cursor:grab;touch-action:pan-y}
+.portal-gl.on.dragging{cursor:grabbing}
+body.gl3d .jungle-portal,
+body.gl3d .portal-glow{opacity:0!important;pointer-events:none;transition:opacity .7s var(--ease)}
+@media (max-width:760px){
+  .portal-gl{inset:-2%;width:104%;height:104%}
+}
+@media (prefers-reduced-motion:reduce){
+  .portal-gl.on{cursor:default}
+}
+
