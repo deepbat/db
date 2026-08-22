@@ -333,25 +333,48 @@ html[data-theme="light"] .jungle-portal::before{
 }
 
 /* ==========================================================================
-   WEBGL PORTAL — real 3D jungle arch (portal3d.js). The canvas lives inside
-   .jungle-portal-wrap so it inherits the existing parallax transforms. The
-   flat CSS portal fades out only after the WebGL scene renders successfully;
-   if the module or WebGL fails, the CSS portal stays as the fallback.
+   WEBGL ASSEMBLY FIELD — full-hero GPU particle organism (portal3d.js).
+   The canvas owns the hero backdrop once it renders; the DOM jungle, photo
+   bg and scrim fade out via body.gl3d. If WebGL or the CDN fails, none of
+   that happens and the original CSS portal remains as fallback.
    ========================================================================== */
 
 .portal-gl{
-  position:absolute;inset:-4%;width:108%;height:108%;
-  z-index:4;display:block;border:0;background:transparent;
-  opacity:0;transition:opacity .9s var(--ease);
+  position:absolute;inset:0;width:100%;height:100%;
+  z-index:3;display:block;border:0;background:transparent;
+  opacity:0;transition:opacity 1s var(--ease);
 }
-.portal-gl.on{opacity:1;cursor:grab;touch-action:pan-y}
-.portal-gl.on.dragging{cursor:grabbing}
-body.gl3d .jungle-portal,
-body.gl3d .portal-glow{opacity:0!important;pointer-events:none;transition:opacity .7s var(--ease)}
+.portal-gl.on{opacity:1}
+body.gl3d .jungle-scene,
+body.gl3d .hero-bg,
+body.gl3d .hero-scrim,
+body.gl3d .hero-grid{
+  opacity:0!important;pointer-events:none!important;
+  transition:opacity .9s var(--ease);
+}
+.hud{
+  position:absolute;z-index:11;right:24px;bottom:64px;
+  display:inline-flex;align-items:center;gap:14px;
+  padding:8px 12px;border:1px solid rgba(111,231,255,.28);
+  background:rgba(7,16,20,.4);color:var(--cyan);
+  font-size:max(10px,.625rem)!important;letter-spacing:.08em;
+  backdrop-filter:blur(6px);pointer-events:none;
+}
+.hud #hudCount{color:var(--muted)}
+html[data-theme="light"] .hud{background:rgba(243,241,233,.5);border-color:rgba(0,125,146,.35)}
+.hero h1 span{
+  background:linear-gradient(100deg,var(--lime) 25%,#f2ffbe 45%,var(--lime) 65%);
+  background-size:220% 100%;-webkit-background-clip:text;background-clip:text;
+  color:transparent;animation:h1-sheen 5.5s linear infinite;
+}
+@keyframes h1-sheen{to{background-position:-220% 0}}
+html[data-theme="light"] .hero h1 span{
+  background-image:linear-gradient(100deg,#607b00 25%,#a4c522 45%,#607b00 65%);
+}
 @media (max-width:760px){
-  .portal-gl{inset:-2%;width:104%;height:104%}
+  .hud{right:16px;bottom:56px;font-size:max(9px,.5625rem)!important;padding:6px 9px;gap:9px}
 }
 @media (prefers-reduced-motion:reduce){
-  .portal-gl.on{cursor:default}
+  .hero h1 span{animation:none}
 }
 
