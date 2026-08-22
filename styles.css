@@ -269,3 +269,66 @@ html[data-theme="light"] .jungle-portal::before{
 .gallery-modal[aria-hidden="false"]{
   visibility: visible;
 }
+
+/* ==========================================================================
+   FIXES 1-13 — appended cleanly, only overriding what needs to change.
+   ========================================================================== */
+
+/* Fix 1: Scrollspy — .active already styled in original CSS (lime underline),
+   JS IntersectionObserver now adds/removes it correctly. No new CSS needed. */
+
+/* Fix 2: Scroll progress bar */
+#scrollProgress{
+  position:fixed;z-index:50;top:0;left:0;right:0;height:2px;
+  background:var(--lime);transform-origin:left;transform:scaleX(0);
+  transition:transform .1s linear;pointer-events:none;
+}
+
+/* Fix 3: Back-to-top button */
+#backToTop{
+  position:fixed;z-index:40;right:24px;bottom:32px;
+  width:40px;height:40px;border:1px solid rgba(215,255,63,.45);
+  background:rgba(7,16,20,.82);color:var(--lime);
+  font:16px "IBM Plex Mono",monospace;
+  backdrop-filter:blur(8px);cursor:pointer;
+  opacity:0;pointer-events:none;
+  transition:opacity .2s ease,transform .2s ease,border-color .15s ease;
+  transform:translateY(8px);
+}
+#backToTop.visible{opacity:1;pointer-events:auto;transform:translateY(0);}
+#backToTop:hover{border-color:var(--lime);background:rgba(215,255,63,.1);}
+#backToTop:focus-visible{outline:2px solid var(--lime);outline-offset:3px;}
+
+/* Fix 4: Minimum readable text size — bump all sub-10px text to 10px */
+.footer-bottom,.gallery-item span,.modal-caption small,
+.evidence span,.video-meta,.audio-status,
+.hero-instruction,.hero-bottom,.section-note{
+  font-size:max(10px,0.625rem) !important;
+}
+
+/* Fix 5: Hero overload — hide drop-field and chime strands so water + jungle
+   are the two clear visual signatures without three systems competing */
+.drop-field{ display:none !important; }
+.chime-canvas{ opacity:0.45; }
+
+/* Fix 10: Global focus-visible ring for keyboard users */
+*:focus-visible{
+  outline:2px solid var(--lime);
+  outline-offset:3px;
+}
+/* inputs already show a bottom-border focus — don't double-outline them */
+.contact-grid input:focus-visible,
+.contact-grid textarea:focus-visible{
+  outline:none;
+}
+
+/* Fix 11: Timeline arrows — style <i>↗</i> as a decorative accent, not
+   a clickable affordance. Remove the pointer cursor, dim it, and shrink it
+   so it reads as "end of entry" not "click me" */
+.timeline i{
+  color:rgba(111,231,255,.38);
+  font-size:11px;
+  cursor:default;
+  align-self:center;
+}
+
