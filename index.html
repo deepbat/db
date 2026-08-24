@@ -1,169 +1,45 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="description" content="Deepak Batra — Office Professional, Documentation Specialist and Technology Enthusiast based in India. Turning operational chaos into clear, running systems.">
-  <meta name="theme-color" content="#071014">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Deepak Batra — personal space</title>
+    <meta
+      name="description"
+      content="Personal space for things I build, explore and find interesting. AI, local LLMs, automation, web experiments, photography — from Jalandhar, India."
+    />
+    <meta name="theme-color" content="#05070c" />
+    <link rel="canonical" href="https://deepbat.github.io/db/" />
 
-  <!-- Canonical -->
-  <link rel="canonical" href="https://deepbat.github.io/db/">
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2305070c'/%3E%3Cpath d='M20 44V20h9a8 8 0 0 1 0 16h-9' fill='none' stroke='%2369e4ff' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='45' cy='42' r='3.5' fill='%2369e4ff'/%3E%3C/svg%3E"
+    />
 
-  <!-- Favicon (inline SVG — no extra file needed) -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23071014'/%3E%3Crect x='18' y='18' width='64' height='64' rx='6' fill='none' stroke='%23D7FF3F' stroke-width='6'/%3E%3Ctext x='50' y='67' text-anchor='middle' font-family='monospace' font-size='38' fill='%23D7FF3F'%3EDB%3C/text%3E%3C/svg%3E">
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://deepbat.github.io/db/" />
+    <meta property="og:title" content="Deepak Batra — personal space" />
+    <meta
+      property="og:description"
+      content="Things I build, explore and find interesting. A personal corner of the internet."
+    />
+    <meta property="og:image" content="https://deepbat.github.io/db/images/hero.webp" />
 
-  <!-- Open Graph -->
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://deepbat.github.io/db/">
-  <meta property="og:title" content="Deepak Batra | Office Systems &amp; AI Productivity">
-  <meta property="og:description" content="Office Professional and Documentation Specialist turning operational chaos into clear, running systems. Based in India.">
-  <meta property="og:image" content="https://deepbat.github.io/db/images/hero.jpg">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-  <meta property="og:locale" content="en_IN">
-  <meta property="og:site_name" content="Deepak Batra">
-
-  <!-- Twitter / X Card -->
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Deepak Batra | Office Systems &amp; AI Productivity">
-  <meta name="twitter:description" content="Office Professional and Documentation Specialist turning operational chaos into clear, running systems.">
-  <meta name="twitter:image" content="https://deepbat.github.io/db/images/hero.jpg">
-
-  <!-- JSON-LD Person schema -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Person",
-    "name": "Deepak Batra",
-    "url": "https://deepbat.github.io/db/",
-    "image": "https://deepbat.github.io/db/images/hero.jpg",
-    "jobTitle": "Office Professional & Documentation Specialist",
-    "description": "Turning operational chaos into clear, running systems using documentation, scheduling, and AI productivity tools.",
-    "address": { "@type": "PostalAddress", "addressCountry": "IN" },
-    "sameAs": [
-      "https://linkedin.com/in/deepakbatra",
-      "https://instagram.com/deepakbatra",
-      "https://deepbat.github.io/db/"
-    ]
-  }
-  </script>
-
-  <title>Deepak Batra | Office Systems &amp; AI Productivity</title>
-
-  <!-- LCP preload: hero.jpg is the largest contentful paint on most viewports -->
-  <link rel="preload" as="image" href="images/hero.jpg">
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-  <a class="skip-link" href="#main">Skip to content</a>
-  <canvas id="oceanCanvas" class="ocean-canvas" aria-hidden="true"></canvas>
-  <div id="waterVisual" class="water-visual" aria-hidden="true"></div>
-  <div class="grain" aria-hidden="true"></div>
-
-  <header class="site-nav" id="top">
-    <div class="wrap nav-inner">
-      <a class="brand" href="#top" aria-label="Deepak Batra home">
-        <span class="brand-mark" aria-hidden="true"><i></i><b></b></span>
-        <span class="brand-name">DEEPAK BATRA</span>
-      </a>
-      <nav class="nav-links" aria-label="Primary navigation">
-        <a href="#about">About</a><a href="#experience">Experience</a><a href="#skills">Skills</a><a href="#projects">Work</a><a href="#showreel">Showreel</a><a href="#gallery">Gallery</a><a href="#recognition">Recognition</a><a href="#contact">Contact</a>
-      </nav>
-      <a class="nav-status" href="#contact"><span></span> Open to work</a>
-      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light theme" aria-pressed="false"><span class="theme-toggle-icon" aria-hidden="true">☼</span><span class="theme-toggle-label">Light</span></button>
-      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobileMenu" aria-label="Open navigation"><span></span><span></span></button>
-    </div>
-  </header>
-  <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
-    <div class="mobile-menu-top"><span class="mono">NAVIGATE / 08</span><button type="button" class="mobile-close" aria-label="Close navigation">×</button></div>
-    <a href="#about">01 <span>About</span> ↗</a><a href="#experience">02 <span>Experience</span> ↗</a><a href="#skills">03 <span>Skills</span> ↗</a><a href="#projects">04 <span>Work</span> ↗</a><a href="#showreel">05 <span>Showreel</span> ↗</a><a href="#gallery">06 <span>Gallery</span> ↗</a><a href="#recognition">07 <span>Recognition</span> ↗</a><a href="#contact">08 <span>Contact</span> ↗</a>
-    <p>Office professional / documentation specialist / technology enthusiast.</p>
-  </div>
-
-  <main id="main">
-    <section class="hero panel" aria-labelledby="heroTitle">
-      <div class="hero-bg" aria-hidden="true"></div>
-      <canvas id="chimeCanvas" class="chime-canvas" aria-hidden="true"></canvas>
-      <div id="dropField" class="drop-field" aria-hidden="true"></div>
-      <div class="hero-scrim" aria-hidden="true"></div>
-      <div class="hero-grid" aria-hidden="true"></div>
-      <canvas id="portalGL" class="portal-gl" aria-hidden="true"></canvas>
-      <div class="jungle-scene" aria-hidden="true">
-        <div class="jungle-stage">
-          <div class="jungle-layer back"></div>
-          <div class="jungle-halo"></div>
-          <div class="jungle-portal-wrap">
-            <div class="portal-glow"></div>
-            <div class="jungle-portal">
-              <span class="portal-sun"></span>
-              <span class="portal-mist a"></span>
-              <span class="portal-mist b"></span>
-              <span class="portal-cloud a"></span>
-              <span class="portal-cloud b"></span>
-            </div>
-          </div>
-          <div class="jungle-layer front"></div>
-        </div>
-      </div>
-      <div class="wrap hero-content">
-        <div class="eyebrow"><span class="live-dot"></span> Office professional / documentation specialist / technology enthusiast</div>
-        <div class="hero-index mono">01 — INTRODUCTION</div>
-        <h1 id="heroTitle">Hi, I’m Deepak.<br><em>I turn chaos</em><br>into <span>order.</span></h1>
-        <div class="hero-lower">
-          <p>I put AI tools to work on the busywork — so teams spend less time formatting and more time deciding.</p>
-          <div class="hero-actions"><a class="button button-primary" href="#projects">View my work ↗</a><a class="button button-ghost" href="#contact">Get in touch ↗</a></div>
-        </div>
-        <div class="hero-stats"><div><strong>5<span>+</span></strong><small class="mono">YEARS EXP.</small></div><div><strong>200<span>+</span></strong><small class="mono">PROJECTS</small></div><div><strong>99<span>%</span></strong><small class="mono">ON-TIME</small></div></div>
-      </div>
-      <div class="hero-instruction mono"><span class="instruction-dot"></span><span id="surfaceStatus">Drag the field · click to pulse · scroll to assemble</span></div>
-      <div class="audio-status mono"><span id="audioDot"></span><span id="audioStatus">Audio / tap to arm</span></div>
-      <div class="hud mono" aria-hidden="true"><span id="hudState">BOOT</span><span id="hudCount"></span></div>
-      <div class="wrap hero-bottom"><span class="mono">Based in India / working everywhere</span><a href="#about">Scroll to explore ↓</a></div>
-    </section>
-
-    <section class="section panel" id="about" aria-labelledby="aboutTitle"><div class="wrap">
-      <div class="section-line"><span class="section-label mono">02 / About</span><span class="section-note mono">A clear system is a quiet advantage.</span></div>
-      <div class="about-grid"><figure class="media-frame"><img src="images/hero.jpg" alt="Deepak Batra in a professional workspace" loading="lazy"><figcaption class="mono">DEEPAK / FIELD NOTE 01</figcaption></figure><div class="copy"><span class="kicker mono">THE WORK BEHIND THE WORK</span><h2 id="aboutTitle">The details matter.<br><em>The system matters more.</em></h2><p class="lede">I keep offices running smoothly — nothing missing, nothing out of order, and everything easy to find when it’s needed.</p><p>Five years in, that’s meant scheduling, vendor coordination, and being the person who actually knows where things stand. The last couple of years added a second thread — using AI tools to take the repetitive parts of documentation and reporting off everyone’s plate, so the humans in the room can spend their time on judgment calls instead of formatting.</p><div class="pills"><span>● Office Administration</span><span>● Documentation &amp; Comms</span><span>● AI Productivity</span></div><a class="text-link" href="#contact">Bring me the messy workflow ↗</a></div></div>
-    </div></section>
-
-    <section class="section panel darker" id="experience" aria-labelledby="experienceTitle"><div class="wrap">
-      <div class="section-line"><span class="section-label cyan mono">03 / Experience</span><span class="section-note mono">2018 → now</span></div>
-      <div class="heading-row"><h2 id="experienceTitle">Where I’ve worked<br><em>and what moved.</em></h2><p>A record of roles, responsibilities, and the systems built along the way.</p></div>
-      <div class="timeline"><article><span class="date mono">2023 — Present</span><b>01</b><div><h3>Documentation Specialist</h3><p>Owns the organization’s knowledge base and reporting pipeline, including the AI-assisted tooling that automates weekly reports.</p></div><i>↗</i></article><article><span class="date mono">2021 — 2023</span><b>02</b><div><h3>Office Administrator</h3><p>Managed day-to-day operations, vendor relationships, and cross-team scheduling for a 40-person office.</p></div><i>↗</i></article><article><span class="date mono">2019 — 2021</span><b>03</b><div><h3>Operations Coordinator</h3><p>Coordinated logistics and communication between departments, standardizing several recurring reporting workflows.</p></div><i>↗</i></article><article><span class="date mono">2018 — 2019</span><b>04</b><div><h3>Administrative Assistant</h3><p>Handled correspondence, filing, and scheduling while learning the systems that would become a specialty.</p></div><i>↗</i></article></div>
-    </div></section>
-
-    <section class="section panel" id="skills" aria-labelledby="skillsTitle"><div class="wrap two-col">
-      <div><div class="section-line"><span class="section-label mono">04 / Skills</span><span class="section-note mono">Inputs → outputs</span></div><h2 id="skillsTitle">Good tools are<br><em>quiet multipliers.</em></h2><p class="section-copy">The practical stack behind the work: dependable office systems, clean communication, and enough curiosity to keep learning what makes the next version faster.</p><div class="side-note"><b>↗</b><span class="mono">Every percentage is a working habit, not a badge.</span></div></div>
-      <div class="skill-list" id="skillList"></div>
-    </div></section>
-
-    <section class="section panel darker" id="projects" aria-labelledby="projectsTitle"><div class="wrap">
-      <div class="section-line"><span class="section-label cyan mono">05 / Work</span><span class="section-note mono">Proof over promises</span></div><div class="heading-row"><h2 id="projectsTitle">Selected work<br><em>with receipts.</em></h2><p>Key projects where organization, automation, and collaboration became measurable impact.</p></div>
-      <div class="project-list"><article class="project-card"><div class="project-visual"><img src="images/gallery-02.jpg" alt="Project planning whiteboard session" loading="lazy"><span class="tag mono">CASE 01 / ROUTING</span><strong>−40%<small>PROCESSING TIME</small></strong></div><div class="project-copy"><h3>Office Workflow Automation</h3><div class="evidence mono"><span>OUTCOME</span><span>SYSTEM</span><span>HANDOFF</span></div><p>Designed and implemented an automated document routing system that reduced processing time by 40% and eliminated manual data entry errors across departments.</p><button class="case-toggle" type="button" aria-expanded="false">+ Open the case</button><p class="case-detail">The system replaced a manual, email-based approval chain with a rules-based router that assigned documents to the right reviewer automatically, flagged missing fields before submission, and logged every step for audit purposes.</p></div></article><article class="project-card"><div class="project-visual"><img src="images/gallery-07.jpg" alt="Stakeholder meeting and coordination" loading="lazy"><span class="tag mono">CASE 02 / KNOWLEDGE</span><strong>01<small>SOURCE OF TRUTH</small></strong></div><div class="project-copy"><h3>Centralized Documentation System</h3><div class="evidence mono"><span>OUTCOME</span><span>TAXONOMY</span><span>ACCESS</span></div><p>Built a unified knowledge base consolidating SOPs, reports, and compliance documents into a searchable, version-controlled platform accessible to all team members.</p><button class="case-toggle" type="button" aria-expanded="false">+ Open the case</button><p class="case-detail">The new structure introduced consistent naming conventions, folder taxonomy, and access permissions, cutting the average time to find a document from minutes to seconds.</p></div></article><article class="project-card"><div class="project-visual"><img src="images/gallery-05.jpg" alt="AI tools demonstration presentation" loading="lazy"><span class="tag mono">CASE 03 / INTELLIGENCE</span><strong>30m<small>REPORT PREP</small></strong></div><div class="project-copy"><h3>AI-Powered Reporting Tool</h3><div class="evidence mono"><span>INPUT</span><span>AI ASSIST</span><span>REVIEW</span></div><p>Leveraged AI tools to automate weekly report generation, cutting preparation time from 6 hours to 30 minutes while improving data accuracy and visualization quality.</p><button class="case-toggle" type="button" aria-expanded="false">+ Open the case</button><p class="case-detail">An AI-assisted pipeline now cleans the data, generates summary visuals, and drafts narrative commentary for review, leaving the team more time for analysis instead of formatting.</p></div></article></div>
-    </div></section>
-
-    <section class="section panel" id="showreel" aria-labelledby="showreelTitle"><div class="wrap"><div class="section-line"><span class="section-label mono">06 / Showreel</span><span class="section-note mono">00:07 — showreel.mp4</span></div><div class="heading-row"><h2 id="showreelTitle">A cinematic overview<br><em>of the process.</em></h2><p>From the first question to the final handoff, the work is about finding the useful pattern hidden inside the noise.</p></div><div class="video-frame"><video controls preload="metadata" poster="images/gallery-02.jpg" playsinline width="1280" height="720"><source src="images/showreel.mp4" type="video/mp4">Your browser does not support video playback.</video><div class="video-meta mono"><span>PLAY / 00:07</span><span>PROCESS STUDY 001</span></div></div></div></section>
-
-    <section class="section panel darker" id="gallery" aria-labelledby="galleryTitle"><div class="wrap"><div class="section-line"><span class="section-label cyan mono">07 / Gallery</span><span class="section-note mono">12 moments / one practice</span></div><div class="gallery-intro"><div><h2 id="galleryTitle">Moments &amp;<br><em>memories.</em></h2><p>Snapshots from events, projects, and behind-the-scenes moments. Click a frame to pick it up.</p></div><img src="images/gallery-05.jpg" alt="AI tools demonstration presentation" loading="lazy"></div><div class="gallery-grid" id="galleryGrid"></div></div></section>
-
-    <section class="section panel" id="recognition" aria-labelledby="recognitionTitle"><div class="wrap"><div class="section-line"><span class="section-label mono">08 / Recognition</span><span class="section-note mono">Signals received</span></div><div class="recognition-grid"><div><h2 id="recognitionTitle">The work gets noticed<br><em>when it gets useful.</em></h2><p class="section-copy">Recognition is a by-product. The real win is a team that knows where to look, what to trust, and how to move.</p></div><div class="recognition-list"><div><b>✓</b><h3>Efficiency Excellence Award</h3><p>Recognized for implementing workflow automation that saved 20+ hours per week.</p></div><div><b>✓</b><h3>Documentation Mastery Certification</h3><p>Completed advanced certification in enterprise document management systems.</p></div><div><b>✓</b><h3>AI Productivity Badge</h3><p>Awarded for integrating AI tools into daily operational workflows.</p></div><div><b>✓</b><h3>Team Collaboration Leader</h3><p>Consistently rated highest for cross-functional coordination and stakeholder communication.</p></div></div></div></div></section>
-
-    <section class="section panel contact-panel" id="contact" aria-labelledby="contactTitle"><div class="wrap"><div class="section-line"><span class="section-label cyan mono">09 / Contact</span><span class="section-note mono">Signal is open</span></div><div class="contact-grid"><div><span class="kicker mono">A GOOD BRIEF STARTS HERE</span><h2 id="contactTitle">Have a messy workflow?<br><em>Let’s make it clear.</em></h2><p>Open to new opportunities, collaborations, and conversations about building calmer, smarter ways of working.</p><div class="contact-links"><a href="mailto:deepak.batra@outlook.com">EMAIL <span>deepak.batra@outlook.com</span> ↗</a><a href="tel:+919779777570">PHONE <span>+91-9779777570</span> ↗</a><a href="https://linkedin.com/in/deepakbatra" target="_blank" rel="noopener">LINKEDIN <span>/in/deepakbatra</span> ↗</a></div></div><form id="contactForm" action="https://formsubmit.co/deepak.batra@outlook.com" method="POST"><input type="hidden" name="_subject" value="New message from portfolio site"><input type="hidden" name="_template" value="table"><input class="hp" type="text" name="_honey" tabindex="-1" autocomplete="off"><label><span class="mono">01 / NAME</span><input name="name" required autocomplete="name" placeholder="Your name"></label><label><span class="mono">02 / EMAIL</span><input name="email" required type="email" autocomplete="email" placeholder="you@company.com"></label><label><span class="mono">03 / MESSAGE</span><textarea name="message" required rows="5" placeholder="Tell me what needs untangling…"></textarea></label><button class="button button-primary" type="submit">Send message ↗</button><p id="formStatus" class="form-status" role="status"></p></form></div></div></section>
-  </main>
-
-  <footer class="footer"><div class="wrap footer-grid"><div><a class="brand" href="#top"><span class="brand-mark" aria-hidden="true"><i></i><b></b></span><span class="brand-name">DEEPAK BATRA</span></a><p>Office Professional • Documentation Specialist • Technology Enthusiast.</p></div><div><span class="mono">EXPLORE</span><a href="#about">About</a><a href="#experience">Experience</a><a href="#projects">Work</a><a href="#gallery">Gallery</a></div><div><span class="mono">CONNECT</span><a href="mailto:deepak.batra@outlook.com">Email</a><a href="https://linkedin.com/in/deepakbatra">LinkedIn</a><a href="https://instagram.com/deepakbatra">Instagram</a></div><div><span class="mono">LOCATION</span><p>India</p><p>Available for remote<br>&amp; on-site opportunities.</p></div></div><div class="wrap footer-bottom"><span class="mono">© <span id="year"></span> DEEPAK BATRA / BUILT TO KEEP GROWING.</span><a href="#top">Back to start ↑</a></div></footer>
-
-  <div class="gallery-modal" id="galleryModal" aria-hidden="true"><button class="modal-close" type="button" aria-label="Close gallery">×</button><div class="modal-image"><img id="modalImage" src="" alt=""></div><div class="modal-caption"><span id="modalCount" class="mono"></span><p id="modalTitle"></p><small class="mono">← / → browse · esc close</small></div><button class="modal-prev" type="button" aria-label="Previous image">←</button><button class="modal-next" type="button" aria-label="Next image">→</button></div>
-
-  <script type="importmap">
-    {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
-  </script>
-  <script type="module" src="portal3d.js"></script>
-  <script src="main.js"></script>
-  <script>document.getElementById("chimeCanvas").style.pointerEvents = "none";</script>
-</body>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://api.fontshare.com" />
+    <link
+      href="https://api.fontshare.com/v2/css?f[]=clash-display@500,600,700&f[]=general-sans@400,500,600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
 </html>
