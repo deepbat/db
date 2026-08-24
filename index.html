@@ -9,6 +9,17 @@
       content="Personal space for things I build, explore and find interesting. AI, local LLMs, automation, web experiments, photography — from Jalandhar, India."
     />
     <meta name="theme-color" content="#05070c" />
+    <script>
+      try {
+        var t = localStorage.getItem("db-theme");
+        if (t !== "light" && t !== "dark") {
+          t = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+        }
+        document.documentElement.dataset.theme = t;
+      } catch (e) {
+        document.documentElement.dataset.theme = "dark";
+      }
+    </script>
     <link rel="canonical" href="https://deepbat.github.io/db/" />
 
     <link

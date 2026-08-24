@@ -40,4 +40,5 @@ npm run preview   # serves dist/ — check everything at /db/
 - `base: "/db/"` in `vite.config.js` must match the repo path.
 - 3D quality adapts to the device (particle count, resolution, antialiasing);
   reduced-motion users get a static, calm version; no WebGL → CSS backdrop.
-- `verify.mjs` is a local-only screenshot/console-error checker (not deployed).
+- Theme: dark/light toggle, persisted in localStorage, defaults to the OS
+  preference on first visit. The 3D scene adapts too.

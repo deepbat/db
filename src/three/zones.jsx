@@ -67,17 +67,49 @@ function Glow({ scale = 8, opacity = 0.5, color = "#69e4ff" }) {
   );
 }
 
-const metal = (extra = {}) => ({
-  color: "#a7b0c2",
+/* Theme palettes */
+
+const PAL = (light) =>
+  light
+    ? {
+        metal: "#4d5563",
+        wire: "#0b7f9e",
+        wireOp: 0.3,
+        edge: "#0b7f9e",
+        edgeOp: 0.5,
+        fill: "#ffffff",
+        fillOp: 0.55,
+        glow: 0.15,
+        ring: "#0b7f9e",
+        ringOp: 0.3,
+        accent: "#0b7f9e",
+      }
+    : {
+        metal: "#a7b0c2",
+        wire: "#69e4ff",
+        wireOp: 0.16,
+        edge: "#8fd8ef",
+        edgeOp: 0.35,
+        fill: "#0a0f18",
+        fillOp: 0.6,
+        glow: 0.42,
+        ring: "#69e4ff",
+        ringOp: 0.2,
+        accent: "#69e4ff",
+      };
+
+const metal = (light, extra = {}) => ({
+  color: light ? "#4d5563" : "#a7b0c2",
   metalness: 0.92,
   roughness: 0.24,
-  envMapIntensity: 1.25,
+  envMapIntensity: light ? 1.0 : 1.25,
   ...extra,
 });
 
 /* 01 — HOME : the core */
 
-export function HomeZone({ z }) {
+export function HomeZone({ z, light }) {
+  const p = PAL(light);
   const ref = useZoneFade(z);
   const core = useRef();
   const shell = useRef();
@@ -97,18 +129,18 @@ export function HomeZone({ z }) {
       <pointLight position={[4, 3, 5]} intensity={60} distance={30} color="#69e4ff" />
       <pointLight position={[-5, -2, -3]} intensity={35} distance={26} color="#8a5cff" />
       <ambientLight intensity={0.18} />
-      <Glow scale={11} opacity={0.42} />
+      <Glow scale={11} opacity={p.glow} color={p.accent} />
       <mesh ref={core}>
         <icosahedronGeometry args={[1.15, 1]} />
-        <meshStandardMaterial {...metal({ flatShading: true })} />
+        <meshStandardMaterial {...metal(light, { flatShading: true })} />
       </mesh>
       <mesh ref={shell} scale={1.75}>
         <icosahedronGeometry args={[1.15, 1]} />
-        <meshBasicMaterial color="#69e4ff" wireframe transparent opacity={0.16} />
+        <meshBasicMaterial color={p.wire} wireframe transparent opacity={p.wireOp} />
       </mesh>
       <mesh ref={ring} rotation={[Math.PI / 2.3, 0.3, 0]}>
         <torusGeometry args={[2.6, 0.012, 8, 128]} />
-        <meshStandardMaterial {...metal({ color: "#6d7583", roughness: 0.38 })} />
+        <meshStandardMaterial {...metal(light, { color: light ? "#5a6270" : "#6d7583", roughness: 0.38 })} />
       </mesh>
     </group>
   );
@@ -116,7 +148,8 @@ export function HomeZone({ z }) {
 
 /* 02 — ABOUT : quiet dust + tilted ring */
 
-export function AboutZone({ z }) {
+export function AboutZone({ z, light }) {
+  const p = PAL(light);
   const ref = useZoneFade(z);
   const ring = useRef();
   useIdle(ref, z, 0.6, 0.15);
@@ -128,18 +161,18 @@ export function AboutZone({ z }) {
       <pointLight position={[-3, 2, 4]} intensity={30} distance={24} color="#69e4ff" />
       <mesh ref={ring} rotation={[1.1, 0.4, 0]}>
         <torusGeometry args={[5.2, 0.01, 8, 128]} />
-        <meshBasicMaterial color="#69e4ff" transparent opacity={0.14} />
+        <meshBasicMaterial color={p.ring} transparent opacity={p.ringOp * 0.7} />
       </mesh>
       <Float speed={1.2} rotationIntensity={0.4} floatIntensity={0.8}>
         <mesh position={[-2.2, 1.4, -2]}>
           <tetrahedronGeometry args={[0.45, 0]} />
-          <meshStandardMaterial {...metal({ flatShading: true })} />
+          <meshStandardMaterial {...metal(light, { flatShading: true })} />
         </mesh>
       </Float>
       <Float speed={0.9} rotationIntensity={0.3} floatIntensity={0.6}>
         <mesh position={[2.4, -1.2, -4]}>
           <octahedronGeometry args={[0.35, 0]} />
-          <meshStandardMaterial {...metal({ flatShading: true })} />
+          <meshStandardMaterial {...metal(light, { flatShading: true })} />
         </mesh>
       </Float>
     </group>
@@ -148,7 +181,8 @@ export function AboutZone({ z }) {
 
 /* 03 — BUILDS : floating frames */
 
-export function BuildsZone({ z }) {
+export function BuildsZone({ z, light }) {
+  const p = PAL(light);
   const ref = useZoneFade(z);
   const frames = useMemo(
     () => [
@@ -168,11 +202,11 @@ export function BuildsZone({ z }) {
         <Float key={i} speed={0.8 + i * 0.15} rotationIntensity={0.12} floatIntensity={0.5}>
           <mesh position={f.p} rotation={f.r} scale={f.s}>
             <planeGeometry args={[1, 1]} />
-            <meshBasicMaterial color="#69e4ff" transparent opacity={0.05} side={THREE.DoubleSide} />
+            <meshBasicMaterial color={p.fill} transparent opacity={0.06} side={THREE.DoubleSide} />
           </mesh>
           <lineSegments position={f.p} rotation={f.r} scale={f.s}>
             <edgesGeometry args={[new THREE.PlaneGeometry(1, 1)]} />
-            <lineBasicMaterial color="#8fd8ef" transparent opacity={0.35} />
+            <lineBasicMaterial color={p.edge} transparent opacity={p.edgeOp} />
           </lineSegments>
         </Float>
       ))}
@@ -195,7 +229,7 @@ const SHAPES = {
   cone: <coneGeometry args={[0.85, 1.35, 24]} />,
 };
 
-function LabObject({ item, position, hovered, selected }) {
+function LabObject({ item, position, hovered, selected, light }) {
   const ref = useRef();
   const mat = useRef();
   const target = hovered ? 0.8 : selected ? 0.74 : 0.66;
@@ -221,11 +255,11 @@ function LabObject({ item, position, hovered, selected }) {
           {SHAPES[item.shape] ?? SHAPES.icosahedron}
           <meshStandardMaterial
             ref={mat}
-            color="#9aa3b5"
+            color={light ? "#5a6270" : "#9aa3b5"}
             metalness={0.9}
             roughness={0.28}
             envMapIntensity={1.2}
-            emissive="#69e4ff"
+            emissive={light ? "#0b7f9e" : "#69e4ff"}
             emissiveIntensity={0.05}
           />
         </mesh>
@@ -234,7 +268,7 @@ function LabObject({ item, position, hovered, selected }) {
   );
 }
 
-export function LabZone({ z, active, disabled = false }) {
+export function LabZone({ z, active, disabled = false, light }) {
   const ref = useZoneFade(z);
   const group = useRef();
   const [hovered, setHovered] = useState(null);
@@ -311,6 +345,7 @@ export function LabZone({ z, active, disabled = false }) {
               position={position}
               hovered={hovered === item.id}
               selected={selected === item.id}
+              light={light}
             />
             {active && (
               <Html
@@ -333,7 +368,8 @@ export function LabZone({ z, active, disabled = false }) {
 
 /* 05 — GALLERY : empty frames drifting */
 
-export function GalleryZone({ z }) {
+export function GalleryZone({ z, light }) {
+  const p = PAL(light);
   const ref = useZoneFade(z);
   useIdle(ref, z, 0.45, 0.1);
   const frames = useMemo(
@@ -352,11 +388,11 @@ export function GalleryZone({ z }) {
           <group position={f.p} rotation={f.r} scale={f.s}>
             <mesh>
               <planeGeometry args={[1.3, 1.7]} />
-              <meshBasicMaterial color="#0a0f18" transparent opacity={0.6} side={THREE.DoubleSide} />
+              <meshBasicMaterial color={p.fill} transparent opacity={p.fillOp} side={THREE.DoubleSide} />
             </mesh>
             <lineSegments>
               <edgesGeometry args={[new THREE.PlaneGeometry(1.3, 1.7)]} />
-              <lineBasicMaterial color="#8fd8ef" transparent opacity={0.3} />
+              <lineBasicMaterial color={p.edge} transparent opacity={p.edgeOp * 0.85} />
             </lineSegments>
           </group>
         </Float>
@@ -367,7 +403,7 @@ export function GalleryZone({ z }) {
 
 /* 06 — NOTES : small stacked slabs */
 
-export function NotesZone({ z }) {
+export function NotesZone({ z, light }) {
   const ref = useZoneFade(z);
   useIdle(ref, z, 0.5, 0.12);
   return (
@@ -377,7 +413,7 @@ export function NotesZone({ z }) {
         <Float key={i} speed={0.8 + i * 0.2} rotationIntensity={0.15} floatIntensity={0.5}>
           <mesh position={[0, i * 0.55 - 0.55, -i * 0.9]} rotation={[0, 0.5 + i * 0.2, 0]}>
             <boxGeometry args={[1.7, 0.02, 1.15]} />
-            <meshStandardMaterial {...metal()} />
+            <meshStandardMaterial {...metal(light)} />
           </mesh>
         </Float>
       ))}
@@ -387,7 +423,8 @@ export function NotesZone({ z }) {
 
 /* 07 — NOW : the beacon */
 
-export function NowZone({ z }) {
+export function NowZone({ z, light }) {
+  const p = PAL(light);
   const ref = useZoneFade(z);
   const ring1 = useRef();
   const ring2 = useRef();
@@ -423,7 +460,7 @@ export function NowZone({ z }) {
       </mesh>
       <mesh ref={ring2} rotation={[Math.PI / 3, 0.5, 0]}>
         <torusGeometry args={[1.25, 0.006, 8, 96]} />
-        <meshBasicMaterial color="#69e4ff" transparent opacity={0.35} />
+        <meshBasicMaterial color={p.accent} transparent opacity={light ? 0.55 : 0.35} />
       </mesh>
     </group>
   );
@@ -431,7 +468,8 @@ export function NowZone({ z }) {
 
 /* 08 — CONTACT : distant echo of the core */
 
-export function ContactZone({ z }) {
+export function ContactZone({ z, light }) {
+  const p = PAL(light);
   const ref = useZoneFade(z);
   const core = useRef();
   useIdle(ref, z, 0.4, 0.2);
@@ -442,14 +480,14 @@ export function ContactZone({ z }) {
     <group ref={ref} position={[3.6, 0.4, z]}>
       <pointLight position={[3, 3, 5]} intensity={34} distance={24} color="#69e4ff" />
       <pointLight position={[-4, -2, -2]} intensity={20} distance={20} color="#8a5cff" />
-      <Glow scale={9} opacity={0.3} />
+      <Glow scale={9} opacity={p.glow * 0.7} color={p.accent} />
       <mesh ref={core} scale={0.8}>
         <icosahedronGeometry args={[1.1, 1]} />
-        <meshStandardMaterial {...metal({ flatShading: true })} />
+        <meshStandardMaterial {...metal(light, { flatShading: true })} />
       </mesh>
       <mesh rotation={[Math.PI / 2.5, 0.4, 0]}>
         <torusGeometry args={[2.2, 0.01, 8, 128]} />
-        <meshBasicMaterial color="#69e4ff" transparent opacity={0.2} />
+        <meshBasicMaterial color={p.ring} transparent opacity={p.ringOp} />
       </mesh>
     </group>
   );

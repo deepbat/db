@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { store } from "../lib/store";
 import { scrollToId, getLenis } from "../lib/scroll";
 import { identity } from "../data/site";
+import { currentTheme, toggleTheme } from "../lib/theme";
 
 export const NAV_LINKS = [
   { id: "home", n: "01", label: "HOME" },
@@ -18,6 +19,13 @@ export default function Nav() {
   const [scrolled, setScrolled] = useState(false);
   const [active, setActive] = useState("home");
   const [open, setOpen] = useState(false);
+  const [theme, setThemeState] = useState(currentTheme());
+
+  useEffect(() => {
+    const onTheme = () => setThemeState(currentTheme());
+    window.addEventListener("db:theme", onTheme);
+    return () => window.removeEventListener("db:theme", onTheme);
+  }, []);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -76,6 +84,21 @@ export default function Nav() {
               </a>
             ))}
           </nav>
+          <button
+            type="button"
+            className="theme-toggle"
+            onClick={toggleTheme}
+            aria-label={theme === "light" ? "Switch to dark theme" : "Switch to light theme"}
+            title={theme === "light" ? "Dark" : "Light"}
+          >
+            <svg className="icon-sun" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="12" r="4.2" />
+              <path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5.2 5.2l1.7 1.7M17.1 17.1l1.7 1.7M18.8 5.2l-1.7 1.7M6.9 17.1l-1.7 1.7" />
+            </svg>
+            <svg className="icon-moon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M20.6 13.6A8.4 8.4 0 1 1 10.4 3.4a6.8 6.8 0 0 0 10.2 10.2Z" />
+            </svg>
+          </button>
           <button
             type="button"
             className={`burger ${open ? "open" : ""}`}

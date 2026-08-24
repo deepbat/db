@@ -36,6 +36,22 @@ function Environment() {
   return null;
 }
 
+function Atmosphere({ light }) {
+  const { scene } = useThree();
+  const target = useMemo(
+    () => new THREE.Color(light ? "#edece7" : "#05070c"),
+    [light]
+  );
+  useFrame((_, dt) => {
+    if (!scene.background) scene.background = target.clone();
+    if (!scene.fog) scene.fog = new THREE.Fog(target.clone(), 8, 30);
+    const k = 1 - Math.exp(-6 * dt);
+    scene.background.lerp(target, k);
+    scene.fog.color.lerp(target, k);
+  });
+  return null;
+}
+
 function CameraRig() {
   const { camera } = useThree();
   const cur = useRef(new THREE.Vector3(0, 0, 4));
@@ -75,7 +91,7 @@ function CameraRig() {
   return null;
 }
 
-function Particles({ count }) {
+function Particles({ count, light }) {
   const ref = useRef();
   const positions = useMemo(() => {
     const arr = new Float32Array(count * 3);
@@ -105,11 +121,11 @@ function Particles({ count }) {
       <pointsMaterial
         size={0.045}
         sizeAttenuation
-        color="#7fb8d8"
+        color={light ? "#41586e" : "#7fb8d8"}
         transparent
-        opacity={0.5}
+        opacity={light ? 0.5 : 0.5}
         depthWrite={false}
-        blending={THREE.AdditiveBlending}
+        blending={light ? THREE.NormalBlending : THREE.AdditiveBlending}
       />
     </points>
   );
@@ -119,11 +135,17 @@ export default function Scene() {
   const quality = store.quality;
   const [labOn, setLabOn] = useState(false);
   const [coarse] = useState(isCoarsePointer);
+  const [light, setLight] = useState(store.theme === "light");
 
   useEffect(() => {
     const onSection = () => setLabOn(store.section === "lab");
+    const onTheme = () => setLight(store.theme === "light");
     window.addEventListener("db:section", onSection);
-    return () => window.removeEventListener("db:section", onSection);
+    window.addEventListener("db:theme", onTheme);
+    return () => {
+      window.removeEventListener("db:section", onSection);
+      window.removeEventListener("db:theme", onTheme);
+    };
   }, []);
 
   return (
@@ -138,20 +160,19 @@ export default function Scene() {
       camera={{ fov: 50, near: 0.1, far: 90, position: [0, 0, 4] }}
       style={{ position: "fixed", inset: 0, pointerEvents: "none" }}
     >
-      <color attach="background" args={["#05070c"]} />
-      <fog attach="fog" args={["#05070c", 8, 30]} />
+      <Atmosphere light={light} />
       <Environment />
       <CameraRig />
-      <Particles count={QUALITY[quality].particles} />
+      <Particles count={QUALITY[quality].particles} light={light} />
       <Suspense fallback={null}>
-        <HomeZone z={0} />
-        <AboutZone z={-ZONE_GAP} />
-        <BuildsZone z={-ZONE_GAP * 2} />
-        <LabZone z={-ZONE_GAP * 3} active={labOn && !coarse} disabled={coarse} />
-        <GalleryZone z={-ZONE_GAP * 4} />
-        <NotesZone z={-ZONE_GAP * 5} />
-        <NowZone z={-ZONE_GAP * 6} />
-        <ContactZone z={-ZONE_GAP * 7} />
+        <HomeZone z={0} light={light} />
+        <AboutZone z={-ZONE_GAP} light={light} />
+        <BuildsZone z={-ZONE_GAP * 2} light={light} />
+        <LabZone z={-ZONE_GAP * 3} active={labOn && !coarse} disabled={coarse} light={light} />
+        <GalleryZone z={-ZONE_GAP * 4} light={light} />
+        <NotesZone z={-ZONE_GAP * 5} light={light} />
+        <NowZone z={-ZONE_GAP * 6} light={light} />
+        <ContactZone z={-ZONE_GAP * 7} light={light} />
       </Suspense>
     </Canvas>
   );

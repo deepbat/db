@@ -25,6 +25,8 @@ export default function App() {
     store.reducedMotion = mqReduced.matches;
     store.quality = detectQuality();
     store.noWebgl = !webglAvailable();
+    store.theme =
+      document.documentElement.dataset.theme === "light" ? "light" : "dark";
     document.documentElement.classList.toggle("no-webgl", store.noWebgl);
 
     let lenis = null;

@@ -11,6 +11,7 @@ export const store = {
   noWebgl: false,
   quality: "high",
   menuOpen: false,
+  theme: "dark",
 };
 
 export function setSection(id) {
