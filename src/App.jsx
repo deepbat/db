@@ -1,102 +1,88 @@
-import { Suspense, lazy, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Lenis from "lenis";
-import { store, setSection } from "./lib/store";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { store } from "./lib/store";
 import { detectQuality, webglAvailable } from "./lib/quality";
 import { setLenis } from "./lib/scroll";
-import { computeAnchors } from "./lib/anchors";
+import { currentTheme } from "./lib/theme";
 import Nav from "./components/Nav";
 import Home from "./components/Home";
 import About from "./components/About";
 import Builds from "./components/Builds";
 import TechLab from "./components/TechLab";
 import Gallery from "./components/Gallery";
-import Notes from "./components/Notes";
 import Now from "./components/Now";
 import Contact from "./components/Contact";
 import Footer from "./components/Footer";
 
-const Scene = lazy(() => import("./three/Scene"));
+gsap.registerPlugin(ScrollTrigger);
 
 export default function App() {
-  const [sceneOn, setSceneOn] = useState(false);
+  const [theme, setTheme] = useState(currentTheme());
 
   useEffect(() => {
     const mqReduced = window.matchMedia("(prefers-reduced-motion: reduce)");
     store.reducedMotion = mqReduced.matches;
     store.quality = detectQuality();
     store.noWebgl = !webglAvailable();
-    store.theme =
-      document.documentElement.dataset.theme === "light" ? "light" : "dark";
+    store.theme = currentTheme();
     document.documentElement.classList.toggle("no-webgl", store.noWebgl);
 
+    const onTheme = (e) => setTheme(e.detail);
+    window.addEventListener("db:theme", onTheme);
+
     let lenis = null;
+    let raf = 0;
+    const tick = (time) => lenis.raf(time * 1000);
+
     if (!store.reducedMotion) {
       lenis = new Lenis({ duration: 1.15, smoothWheel: true });
       setLenis(lenis);
-      let raf = 0;
-      const loop = (time) => {
-        lenis.raf(time);
-        raf = requestAnimationFrame(loop);
-      };
-      raf = requestAnimationFrame(loop);
-      return () => {
-        cancelAnimationFrame(raf);
-        lenis.destroy();
-        setLenis(null);
-      };
+      lenis.on("scroll", ScrollTrigger.update);
+      gsap.ticker.add(tick);
+      gsap.ticker.lagSmoothing(0);
     }
-    return undefined;
-  }, []);
 
-  useEffect(() => {
-    const onScroll = () => {
-      store.scrollY = window.scrollY;
-      store.maxScroll = Math.max(
-        1,
-        document.documentElement.scrollHeight - window.innerHeight
-      );
-      store.scroll = Math.min(1, window.scrollY / store.maxScroll);
-    };
-    const onResize = () => {
-      onScroll();
-      computeAnchors();
-    };
-    const onPointer = (e) => {
-      store.mouseX = (e.clientX / window.innerWidth) * 2 - 1;
-      store.mouseY = (e.clientY / window.innerHeight) * 2 - 1;
-    };
-    const onClick = (e) => {
-      if (!store.labActive) return;
-      if (e.target.closest?.("[data-ui],a,button,input,textarea")) return;
-      store.clickQueued = true;
-    };
+    // Section reveals — subtle depth, once.
+    if (!store.reducedMotion) {
+      gsap.utils.toArray("[data-reveal]").forEach((el) => {
+        gsap.fromTo(
+          el,
+          { opacity: 0, y: 30 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 1,
+            ease: "power3.out",
+            scrollTrigger: { trigger: el, start: "top 88%", once: true },
+          }
+        );
+      });
+    }
 
-    onResize();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onResize);
-    window.addEventListener("pointermove", onPointer, { passive: true });
-    window.addEventListener("click", onClick, true);
-
-    const ro = new ResizeObserver(onResize);
-    ro.observe(document.body);
+    const idle = window.requestIdleCallback || ((cb) => window.setTimeout(cb, 400));
+    const idleId = idle(() => ScrollTrigger.refresh());
 
     return () => {
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onResize);
-      window.removeEventListener("pointermove", onPointer);
-      window.removeEventListener("click", onClick, true);
-      ro.disconnect();
+      window.removeEventListener("db:theme", onTheme);
+      ScrollTrigger.getAll().forEach((t) => t.kill());
+      if (lenis) {
+        gsap.ticker.remove(tick);
+        lenis.destroy();
+        setLenis(null);
+      }
+      (window.cancelIdleCallback || window.clearTimeout)(idleId);
     };
   }, []);
 
   useEffect(() => {
-    const sections = Array.from(document.querySelectorAll("[data-zone]"));
+    const sections = Array.from(document.querySelectorAll("main section[id]"));
     const io = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            setSection(entry.target.id);
-            window.dispatchEvent(new CustomEvent("db:section"));
+            window.dispatchEvent(new CustomEvent("db:section", { detail: entry.target.id }));
           }
         });
       },
@@ -106,51 +92,18 @@ export default function App() {
     return () => io.disconnect();
   }, []);
 
-  useEffect(() => {
-    const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("in");
-            io.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.12, rootMargin: "0px 0px -6% 0px" }
-    );
-    const els = document.querySelectorAll("[data-reveal]");
-    els.forEach((el) => io.observe(el));
-    return () => io.disconnect();
-  }, []);
-
-  useEffect(() => {
-    const w = window.requestIdleCallback || ((cb) => window.setTimeout(cb, 350));
-    const id = w(() => {
-      if (!store.noWebgl) setSceneOn(true);
-    });
-    return () => {
-      (window.cancelIdleCallback || window.clearTimeout)(id);
-    };
-  }, []);
-
   return (
     <>
       <a className="skip-link" href="#about">Skip to content</a>
-      {sceneOn && (
-        <Suspense fallback={null}>
-          <Scene />
-        </Suspense>
-      )}
       <div className="vignette" aria-hidden="true" />
       <div className="grain" aria-hidden="true" />
       <Nav />
       <main id="main">
-        <Home />
+        <Home light={theme === "light"} />
         <About />
         <Builds />
         <TechLab />
         <Gallery />
-        <Notes />
         <Now />
         <Contact />
       </main>

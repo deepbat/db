@@ -3,7 +3,7 @@ import { about } from "../data/site";
 
 export default function About() {
   return (
-    <section id="about" data-zone className="section about" aria-labelledby="about-title">
+    <section id="about" className="section about" aria-labelledby="about-title">
       <div className="container">
         <SectionHeader index="02" label="ABOUT" note="FIELD NOTES" />
         <h2 id="about-title" className="h2" data-reveal>{about.heading}</h2>

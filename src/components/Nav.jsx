@@ -10,9 +10,8 @@ export const NAV_LINKS = [
   { id: "builds", n: "03", label: "BUILDS" },
   { id: "lab", n: "04", label: "LAB" },
   { id: "gallery", n: "05", label: "GALLERY" },
-  { id: "notes", n: "06", label: "NOTES" },
-  { id: "now", n: "07", label: "NOW" },
-  { id: "contact", n: "08", label: "CONTACT" },
+  { id: "now", n: "06", label: "NOW" },
+  { id: "contact", n: "07", label: "CONTACT" },
 ];
 
 export default function Nav() {
@@ -31,7 +30,7 @@ export default function Nav() {
     const onScroll = () => setScrolled(window.scrollY > 40);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
-    const onSection = () => setActive(store.section);
+    const onSection = (e) => setActive(e.detail);
     window.addEventListener("db:section", onSection);
     return () => {
       window.removeEventListener("scroll", onScroll);

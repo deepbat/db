@@ -106,7 +106,7 @@ export default function Gallery() {
   };
 
   return (
-    <section id="gallery" data-zone className="section gallery" aria-labelledby="gallery-title">
+    <section id="gallery" className="section gallery" aria-labelledby="gallery-title">
       <div className="container">
         <SectionHeader index="05" label="GALLERY" note="PERSONAL ARCHIVE" />
         <div className="gallery-intro" data-reveal>

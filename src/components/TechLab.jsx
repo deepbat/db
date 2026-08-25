@@ -1,23 +1,24 @@
-import { useEffect, useState } from "react";
+import { useEffect, lazy, Suspense, useState } from "react";
 import SectionHeader from "./SectionHeader";
 import { lab } from "../data/site";
 import { store } from "../lib/store";
 import { isCoarsePointer } from "../lib/quality";
 
+const LabScene = lazy(() => import("../three/LabScene"));
+
 export default function TechLab() {
   const [selectedId, setSelectedId] = useState(null);
+  const [theme, setTheme] = useState(store.theme);
   const use3d = !store.noWebgl && !isCoarsePointer();
 
   useEffect(() => {
-    const onSelect = (e) => setSelectedId(e.detail ?? null);
-    window.addEventListener("db:lab-select", onSelect);
-    return () => window.removeEventListener("db:lab-select", onSelect);
+    const onTheme = (e) => setTheme(e.detail);
+    window.addEventListener("db:theme", onTheme);
+    return () => window.removeEventListener("db:theme", onTheme);
   }, []);
 
   const selected = lab.items.find((i) => i.id === selectedId) || null;
-
-  const select = (id) =>
-    window.dispatchEvent(new CustomEvent("db:lab-select", { detail: id }));
+  const select = (id) => setSelectedId(id);
 
   const panel = (inline) => (
     <aside
@@ -48,7 +49,7 @@ export default function TechLab() {
   );
 
   return (
-    <section id="lab" data-zone className="section lab" aria-labelledby="lab-title">
+    <section id="lab" className="section lab" aria-labelledby="lab-title">
       <div className="container">
         <SectionHeader index="04" label="TECH LAB" note={lab.intro.toUpperCase()} />
         <h2 id="lab-title" className="h2" data-reveal>
@@ -57,7 +58,9 @@ export default function TechLab() {
 
         {use3d ? (
           <>
-            <div className="lab-stage" aria-hidden="true" />
+            <Suspense fallback={<div className="lab-stage" aria-hidden="true" />}>
+              <LabScene light={theme === "light"} onSelect={select} selectedId={selectedId} />
+            </Suspense>
             {panel(false)}
             <div className="lab-chips" data-ui role="group" aria-label="Lab topics">
               {lab.items.map((item) => (

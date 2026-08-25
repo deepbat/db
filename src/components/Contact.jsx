@@ -3,7 +3,7 @@ import { contact, identity } from "../data/site";
 
 export default function Contact() {
   return (
-    <section id="contact" data-zone className="section contact" aria-labelledby="contact-title">
+    <section id="contact" className="section contact" aria-labelledby="contact-title">
       <div className="container">
         <SectionHeader index="08" label="CONTACT" note="SAY HELLO" />
         <h2 id="contact-title" className="h2 contact-h" data-reveal>

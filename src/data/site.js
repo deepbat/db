@@ -6,8 +6,6 @@
 
 export const identity = {
   name: "Deepak Batra",
-  firstName: "DEEPAK",
-  lastName: "BATRA",
   tagline: "Personal space for things I build, explore and find interesting.",
   location: "Jalandhar, India",
   coords: "31.33°N 75.58°E",
@@ -20,8 +18,8 @@ export const about = {
   heading: "Mostly curious.",
   paragraphs: [
     "I work in office administration — documents, records, schedules, the quiet machinery that keeps an office running. I like it orderly. I like knowing where things are.",
-    "Outside of that, technology is where my curiosity lives. AI, local LLMs, automation, PowerShell, Google Workspace, GitHub, web experiments — if it's interesting and I can take it apart or build with it, I'm in.",
-    "I build things mostly because I enjoy it: a desktop app for scholarship and grant work, small scripts that quietly save real time, websites that exist because I wanted to see if I could make them. Figuring things out is the point.",
+    "Outside of that, technology is where my curiosity lives — AI, local LLMs, automation, Windows and PowerShell, web experiments with Three.js. Software or hardware, if it's interesting and I can take it apart or build with it, I'm in.",
+    "I build things mostly because I enjoy figuring them out: a desktop app for scholarship and grant work, small scripts that quietly save real time, websites that exist because I wanted to see if I could make them.",
   ],
   facts: [
     { k: "BASE", v: "Jalandhar, India" },
@@ -37,8 +35,9 @@ export const builds = [
     index: "01",
     title: "Scholarship & Grant Software",
     blurb:
-      "A Windows desktop application that brings scholarship and grant management into one place — records, workflows and reporting that used to live in scattered files.",
-    tags: ["DESKTOP", "WINDOWS", "DATA"],
+      "A Windows desktop application I built for managing scholarship and grant-related records, workflows and reporting — the kind of work that used to live in scattered files.",
+    why: "I wanted to turn a paper-and-spreadsheets process into something orderly, and to learn what building real desktop software actually takes.",
+    stack: ["WINDOWS", "DESKTOP UI", "DATA & REPORTS"],
     hue: 190,
   },
   {
@@ -46,8 +45,9 @@ export const builds = [
     index: "02",
     title: "Personal Websites",
     blurb:
-      "This site and its ancestors. Ongoing experiments in modern web design, GitHub Pages and interactive graphics — currently deep in WebGL territory.",
-    tags: ["WEB", "THREE.JS", "GITHUB PAGES"],
+      "This site and its ancestors — ongoing experiments in modern web design and interactive graphics.",
+    why: "Each version is an experiment. The current one taught me most of what I know about 3D on the web.",
+    stack: ["REACT", "THREE.JS", "GITHUB PAGES"],
     hue: 265,
   },
   {
@@ -55,8 +55,9 @@ export const builds = [
     index: "03",
     title: "Automation",
     blurb:
-      "Small tools and scripts for office workflows — documentation, reporting and the repetitive parts of admin work, handed off to machines.",
-    tags: ["POWERSHELL", "GOOGLE WORKSPACE", "SCRIPTS"],
+      "Small tools and scripts that take over the repetitive parts of office work — documentation, reporting, file chores.",
+    why: "If a task happens twice, a script should handle it the third time. Most of these started as exactly that.",
+    stack: ["POWERSHELL", "GOOGLE WORKSPACE", "SCHEDULED TASKS"],
     hue: 35,
   },
   {
@@ -64,57 +65,51 @@ export const builds = [
     index: "04",
     title: "AI Experiments",
     blurb:
-      "Local LLMs, AI tools and CLI utilities. Testing what models can actually do on my own machine — without the hype.",
-    tags: ["LOCAL LLM", "CLI", "WORKFLOWS"],
+      "Local LLMs, AI tools and CLI utilities — testing what models can actually do on my own machine.",
+    why: "I wanted to know what the tools can really do on modest hardware, not what headlines claim.",
+    stack: ["LOCAL LLMS", "OLLAMA", "CLI TOOLS"],
     hue: 150,
   },
 ];
 
 export const lab = {
   heading: "Tech Lab",
-  intro: "A loose map of the things I play with.",
+  intro: "A workbench of things I explore.",
   hint: "Click an object to inspect it.",
   items: [
     {
       id: "ai",
       label: "AI",
       shape: "icosahedron",
-      desc: "Exploring what AI can practically do — assistants, tools and workflows, beyond the headlines.",
+      desc: "Exploring what AI can practically do — tools, assistants and workflows.",
       tools: "ChatGPT · Gemini · AI-assisted writing",
     },
     {
       id: "local-llm",
       label: "LOCAL LLM",
       shape: "torusKnot",
-      desc: "Running models on my own hardware. Private, offline, and honest about the limits.",
+      desc: "Experimenting with local AI models, tools and workflows.",
       tools: "Ollama · LM Studio · small open models",
     },
     {
       id: "automation",
       label: "AUTOMATION",
       shape: "octahedron",
-      desc: "If I have to do it twice, a script does it the third time.",
+      desc: "Scripts and workflows that quietly take over repetitive work.",
       tools: "Batch jobs · templates · macros",
-    },
-    {
-      id: "web",
-      label: "WEB",
-      shape: "box",
-      desc: "Websites as a playground — layout, motion and interactive graphics.",
-      tools: "HTML / CSS / JS · React · Three.js",
     },
     {
       id: "windows",
       label: "WINDOWS",
       shape: "dodecahedron",
-      desc: "Home turf. Tweaks, tools and knowing what's happening under the hood.",
+      desc: "Home turf — tweaks, tools and what's happening under the hood.",
       tools: "Windows 11 · Terminal · Sysinternals",
     },
     {
       id: "powershell",
       label: "POWERSHELL",
       shape: "tetrahedron",
-      desc: "My favourite hammer. Scripts that quietly do hours of work.",
+      desc: "My favourite hammer for quiet, repeatable work.",
       tools: "PowerShell 7 · modules · scheduled tasks",
     },
     {
@@ -128,69 +123,42 @@ export const lab = {
       id: "workspace",
       label: "GOOGLE WORKSPACE",
       shape: "capsule",
-      desc: "Docs, Sheets and Drive, pushed further with Apps Script and CLI tooling.",
+      desc: "Docs, Sheets and Drive, pushed beyond the defaults.",
       tools: "Apps Script · Sheets · Drive CLI",
     },
     {
-      id: "desktop",
-      label: "DESKTOP APPS",
-      shape: "ring",
-      desc: "Real software for real desks — like the scholarship & grant manager.",
-      tools: "Windows · UI work · installers",
+      id: "web",
+      label: "WEB",
+      shape: "box",
+      desc: "Websites as a playground — layout, motion and interaction.",
+      tools: "HTML / CSS / JS · React · Vite",
     },
     {
-      id: "experiments",
-      label: "EXPERIMENTS",
+      id: "three",
+      label: "THREE.JS",
       shape: "cone",
-      desc: "Everything else. Hardware, software, setups and odd ideas worth testing.",
-      tools: "Whatever's on the bench",
+      desc: "Learning to build small 3D worlds that run in a browser tab.",
+      tools: "WebGL · React Three Fiber · shaders",
+    },
+    {
+      id: "desktop",
+      label: "DESKTOP SOFTWARE",
+      shape: "ring",
+      desc: "Real apps for real desks — like the scholarship manager.",
+      tools: "Windows · UI work · packaging",
     },
   ],
 };
-
-export const notes = [
-  // Add / edit / remove notes freely — newest first.
-  {
-    date: "2026-08",
-    tag: "AI",
-    title: "Small models got good",
-    body: "Running a local LLM on modest hardware is finally useful for everyday drafting and summarising.",
-  },
-  {
-    date: "2026-07",
-    tag: "AUTOMATION",
-    title: "PowerShell pays rent",
-    body: "One scheduled script replaced a weekly copy-paste ritual. Boring win — the best kind.",
-  },
-  {
-    date: "2026-06",
-    tag: "WEB",
-    title: "Learning Three.js",
-    body: "Rebuilding this site taught me more about 3D on the web than any tutorial. Scroll is a camera.",
-  },
-  {
-    date: "2026-05",
-    tag: "GITHUB",
-    title: "GitHub Pages is underrated",
-    body: "Free hosting, Actions for builds, zero servers to babysit. Hard to beat for static sites.",
-  },
-  {
-    date: "2026-04",
-    tag: "WORK",
-    title: "Docs are a product",
-    body: "Treat internal documentation like something people use, not something people file.",
-  },
-];
 
 export const now = {
   updated: "AUG 2026",
   // Update this list whenever — it's meant to reflect the current moment.
   items: [
-    "Three.js & WebGL scenes",
-    "Local AI models",
-    "Automation scripts",
+    "Three.js",
+    "AI tools",
+    "Local AI",
+    "Automation",
     "Web experiments",
-    "PowerShell tooling",
   ],
 };
 

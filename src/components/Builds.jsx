@@ -33,7 +33,7 @@ function PreviewChip({ active, build, posRef }) {
       {build && (
         <>
           <span className="builds-chip-index">{build.index}</span>
-          <span className="builds-chip-label mono-label">{build.tags[0]}</span>
+          <span className="builds-chip-label mono-label">{build.stack[0]}</span>
         </>
       )}
     </div>
@@ -59,7 +59,7 @@ export default function Builds() {
   const hoveredBuild = builds.find((b) => b.id === hoverId) || null;
 
   return (
-    <section id="builds" data-zone className="section builds" aria-labelledby="builds-title">
+    <section id="builds" className="section builds" aria-labelledby="builds-title">
       <div className="container">
         <SectionHeader index="03" label="BUILDS" note="BUILT BECAUSE I COULD" />
         <h2 id="builds-title" className="h2" data-reveal>
@@ -88,8 +88,9 @@ export default function Builds() {
                 <div className="build-detail" id={`build-${b.id}`} role="region" aria-hidden={!open}>
                   <div className="build-detail-inner">
                     <p>{b.blurb}</p>
+                    <p className="build-why">{b.why}</p>
                     <div className="build-tags">
-                      {b.tags.map((t) => (
+                      {b.stack.map((t) => (
                         <span key={t} className="mono-label tag">{t}</span>
                       ))}
                     </div>

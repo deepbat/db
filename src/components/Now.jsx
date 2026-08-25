@@ -3,7 +3,7 @@ import { now } from "../data/site";
 
 export default function Now() {
   return (
-    <section id="now" data-zone className="section now" aria-labelledby="now-title">
+    <section id="now" className="section now" aria-labelledby="now-title">
       <div className="container">
         <SectionHeader index="07" label="NOW" note={`UPDATED ${now.updated}`} />
         <h2 id="now-title" className="h2" data-reveal>
