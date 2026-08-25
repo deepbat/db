@@ -1,56 +1,359 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>Deepak Batra — personal space</title>
-    <meta
-      name="description"
-      content="Personal space for things I build, explore and find interesting. AI, local LLMs, automation, web experiments, photography — from Jalandhar, India."
-    />
-    <meta name="theme-color" content="#05070c" />
-    <script>
-      try {
-        var t = localStorage.getItem("db-theme");
-        if (t !== "light" && t !== "dark") {
-          t = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
-        }
-        document.documentElement.dataset.theme = t;
-      } catch (e) {
-        document.documentElement.dataset.theme = "dark";
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="Deepak Batra — Personal space for things I build, explore and find interesting. AI, local LLMs, automation, web experiments, photography — from Jalandhar, India.">
+  <meta name="theme-color" content="#05070c">
+
+  <link rel="canonical" href="https://deepbat.github.io/db/">
+
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%2305070c'/%3E%3Ctext x='50' y='67' text-anchor='middle' font-family='monospace' font-size='38' fill='%2369e4ff'%3EDB%3C/text%3E%3C/svg%3E">
+
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://deepbat.github.io/db/">
+  <meta property="og:title" content="Deepak Batra — personal space">
+  <meta property="og:description" content="Things I build, explore and find interesting. A personal corner of the internet.">
+  <meta property="og:image" content="https://deepbat.github.io/db/images/hero.jpg">
+
+  <title>Deepak Batra — personal space</title>
+
+  <link rel="preload" as="image" href="images/hero.jpg">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+
+  <script>
+    try {
+      var t = localStorage.getItem("deepak-theme");
+      if (t !== "light" && t !== "dark") {
+        t = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
       }
-    </script>
-    <link rel="canonical" href="https://deepbat.github.io/db/" />
+      document.documentElement.setAttribute("data-theme", t);
+    } catch (e) {
+      document.documentElement.setAttribute("data-theme", "dark");
+    }
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#about">Skip to content</a>
+  <div class="grain" aria-hidden="true"></div>
 
-    <link
-      rel="icon"
-      type="image/svg+xml"
-      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2305070c'/%3E%3Cpath d='M20 44V20h9a8 8 0 0 1 0 16h-9' fill='none' stroke='%2369e4ff' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='45' cy='42' r='3.5' fill='%2369e4ff'/%3E%3C/svg%3E"
-    />
+  <header class="site-nav" id="top">
+    <div class="wrap nav-inner">
+      <a class="brand" href="#top" aria-label="Deepak Batra home">
+        <span class="brand-mark" aria-hidden="true"><i></i><b></b></span>
+        <span class="brand-name">DEEPAK BATRA</span>
+      </a>
+      <nav class="nav-links" aria-label="Primary navigation">
+        <a href="#about">About</a>
+        <a href="#builds">Builds</a>
+        <a href="#lab">Lab</a>
+        <a href="#gallery">Gallery</a>
+        <a href="#now">Now</a>
+        <a href="#contact">Contact</a>
+      </nav>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light theme" aria-pressed="false">
+        <span class="theme-toggle-icon" aria-hidden="true">☼</span>
+        <span class="theme-toggle-label">Light</span>
+      </button>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobileMenu" aria-label="Open navigation">
+        <span></span><span></span>
+      </button>
+    </div>
+  </header>
 
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://deepbat.github.io/db/" />
-    <meta property="og:title" content="Deepak Batra — personal space" />
-    <meta
-      property="og:description"
-      content="Things I build, explore and find interesting. A personal corner of the internet."
-    />
-    <meta property="og:image" content="https://deepbat.github.io/db/images/hero.webp" />
+  <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+    <div class="mobile-menu-top">
+      <span class="mono">NAVIGATE</span>
+      <button type="button" class="mobile-close" aria-label="Close navigation">×</button>
+    </div>
+    <a href="#about">01 <span>About</span></a>
+    <a href="#builds">02 <span>Builds</span></a>
+    <a href="#lab">03 <span>Lab</span></a>
+    <a href="#gallery">04 <span>Gallery</span></a>
+    <a href="#now">05 <span>Now</span></a>
+    <a href="#contact">06 <span>Contact</span></a>
+    <p>Personal space for things I build, explore and find interesting.</p>
+  </div>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preconnect" href="https://api.fontshare.com" />
-    <link
-      href="https://api.fontshare.com/v2/css?f[]=clash-display@500,600,700&f[]=general-sans@400,500,600&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap"
-      rel="stylesheet"
-    />
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+  <main id="main">
+    <!-- HERO -->
+    <section class="hero panel" aria-labelledby="heroTitle">
+      <div class="hero-bg" aria-hidden="true"></div>
+      <div class="hero-scrim" aria-hidden="true"></div>
+      <div class="hero-grid" aria-hidden="true"></div>
+      <div class="wrap hero-content">
+        <div class="eyebrow mono"><span class="live-dot"></span> Personal space for things I build, explore and find interesting.</div>
+        <div class="hero-index mono">01 — INTRODUCTION</div>
+        <h1 id="heroTitle">Hi, I'm Deepak.<br><em>I build things</em><br>because I <span>can.</span></h1>
+        <div class="hero-lower">
+          <p>AI, local LLMs, automation, web experiments, photography — from Jalandhar, India.</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#builds">View my work ↗</a>
+            <a class="button button-ghost" href="#contact">Get in touch ↗</a>
+          </div>
+        </div>
+      </div>
+      <div class="wrap hero-bottom">
+        <span class="mono">Based in Jalandhar, India / working everywhere</span>
+        <a href="#about">Scroll to explore ↓</a>
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section class="section panel" id="about" aria-labelledby="aboutTitle">
+      <div class="wrap">
+        <div class="section-line">
+          <span class="section-label mono">02 / About</span>
+          <span class="section-note mono">Field notes</span>
+        </div>
+        <div class="about-grid">
+          <figure class="media-frame">
+            <img src="images/hero.jpg" alt="Deepak Batra" loading="lazy">
+            <figcaption class="mono">GARDEN / MOUNTAINS / GOOD DAY</figcaption>
+          </figure>
+          <div class="copy">
+            <span class="kicker mono">THE WORK BEHIND THE WORK</span>
+            <h2 id="aboutTitle">Mostly curious.<br><em>The system matters more.</em></h2>
+            <p class="lede">I work in office administration — documents, records, schedules, the quiet machinery that keeps an office running. I like it orderly. I like knowing where things are.</p>
+            <p>Outside of that, technology is where my curiosity lives — AI, local LLMs, automation, Windows and PowerShell, web experiments with Three.js. Software or hardware, if it's interesting and I can take it apart or build with it, I'm in.</p>
+            <p>I build things mostly because I enjoy figuring them out: a desktop app for scholarship and grant work, small scripts that quietly save real time, websites that exist because I wanted to see if I could make them.</p>
+            <div class="pills">
+              <span>● Office Administration</span>
+              <span>● AI & Automation</span>
+              <span>● Web Experiments</span>
+              <span>● Photography</span>
+            </div>
+            <dl class="about-facts">
+              <div><dt class="mono">BASE</dt><dd>Jalandhar, India</dd></div>
+              <div><dt class="mono">DAYTIME</dt><dd>Office administration & documentation</dd></div>
+              <div><dt class="mono">AFTER HOURS</dt><dd>AI · automation · web experiments</dd></div>
+              <div><dt class="mono">ALSO INTO</dt><dd>Photography · family time</dd></div>
+            </dl>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BUILDS -->
+    <section class="section panel darker" id="builds" aria-labelledby="buildsTitle">
+      <div class="wrap">
+        <div class="section-line">
+          <span class="section-label cyan mono">03 / Builds</span>
+          <span class="section-note mono">Built because I could</span>
+        </div>
+        <div class="heading-row">
+          <h2 id="buildsTitle">Things I've made<br><em>with receipts.</em></h2>
+          <p>Key projects where curiosity became something real.</p>
+        </div>
+        <div class="project-list">
+
+          <article class="project-card">
+            <div class="project-visual">
+              <img src="images/gallery-02.jpg" alt="Scholarship software interface" loading="lazy">
+              <span class="tag mono">CASE 01 / DESKTOP</span>
+            </div>
+            <div class="project-copy">
+              <h3>Scholarship & Grant Software</h3>
+              <div class="evidence mono"><span>WINDOWS</span><span>DESKTOP UI</span><span>DATA & REPORTS</span></div>
+              <p>A Windows desktop application for managing scholarship and grant-related records, workflows and reporting — the kind of work that used to live in scattered files.</p>
+              <button class="case-toggle" type="button" aria-expanded="false">+ Read more</button>
+              <p class="case-detail">I wanted to turn a paper-and-spreadsheets process into something orderly, and to learn what building real desktop software actually takes.</p>
+            </div>
+          </article>
+
+          <article class="project-card">
+            <div class="project-visual">
+              <img src="images/gallery-04.jpg" alt="Personal website projects" loading="lazy">
+              <span class="tag mono">CASE 02 / WEB</span>
+            </div>
+            <div class="project-copy">
+              <h3>Personal Websites</h3>
+              <div class="evidence mono"><span>REACT</span><span>THREE.JS</span><span>GITHUB PAGES</span></div>
+              <p>This site and its ancestors — ongoing experiments in modern web design and interactive graphics.</p>
+              <button class="case-toggle" type="button" aria-expanded="false">+ Read more</button>
+              <p class="case-detail">Each version is an experiment. The current one taught me most of what I know about 3D on the web.</p>
+            </div>
+          </article>
+
+          <article class="project-card">
+            <div class="project-visual">
+              <img src="images/gallery-05.jpg" alt="Automation scripts" loading="lazy">
+              <span class="tag mono">CASE 03 / AUTOMATION</span>
+            </div>
+            <div class="project-copy">
+              <h3>Automation</h3>
+              <div class="evidence mono"><span>POWERSHELL</span><span>GOOGLE WORKSPACE</span><span>SCHEDULED TASKS</span></div>
+              <p>Small tools and scripts that take over the repetitive parts of office work — documentation, reporting, file chores.</p>
+              <button class="case-toggle" type="button" aria-expanded="false">+ Read more</button>
+              <p class="case-detail">If a task happens twice, a script should handle it the third time. Most of these started as exactly that.</p>
+            </div>
+          </article>
+
+          <article class="project-card">
+            <div class="project-visual">
+              <img src="images/gallery-07.jpg" alt="AI experiments" loading="lazy">
+              <span class="tag mono">CASE 04 / AI</span>
+            </div>
+            <div class="project-copy">
+              <h3>AI Experiments</h3>
+              <div class="evidence mono"><span>LOCAL LLMS</span><span>OLLAMA</span><span>CLI TOOLS</span></div>
+              <p>Local LLMs, AI tools and CLI utilities — testing what models can actually do on my own machine.</p>
+              <button class="case-toggle" type="button" aria-expanded="false">+ Read more</button>
+              <p class="case-detail">I wanted to know what the tools can really do on modest hardware, not what headlines claim.</p>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- TECH LAB -->
+    <section class="section panel" id="lab" aria-labelledby="labTitle">
+      <div class="wrap">
+        <div class="section-line">
+          <span class="section-label mono">04 / Tech Lab</span>
+          <span class="section-note mono">A workbench of things I explore</span>
+        </div>
+        <h2 id="labTitle">The lab bench.</h2>
+        <p class="section-copy">Click a card to learn more about what I work with.</p>
+        <div class="lab-grid" id="labGrid"></div>
+      </div>
+    </section>
+
+    <!-- GALLERY -->
+    <section class="section panel darker" id="gallery" aria-labelledby="galleryTitle">
+      <div class="wrap">
+        <div class="section-line">
+          <span class="section-label cyan mono">05 / Gallery</span>
+          <span class="section-note mono">Personal archive</span>
+        </div>
+        <div class="gallery-intro">
+          <div>
+            <h2 id="galleryTitle">Kept moments.</h2>
+            <p>A personal photo archive — people and places I like. Click a frame to view it full-screen.</p>
+          </div>
+          <img src="images/gallery-05.jpg" alt="Personal photo" loading="lazy">
+        </div>
+        <div class="gallery-grid" id="galleryGrid"></div>
+      </div>
+    </section>
+
+    <!-- NOW -->
+    <section class="section panel" id="now" aria-labelledby="nowTitle">
+      <div class="wrap">
+        <div class="section-line">
+          <span class="section-label mono">06 / Now</span>
+          <span class="section-note mono">Updated Aug 2026</span>
+        </div>
+        <h2 id="nowTitle">On the bench.</h2>
+        <div class="now-list">
+          <div class="now-item"><span class="now-dot" aria-hidden="true"></span><span>Three.js</span></div>
+          <div class="now-item"><span class="now-dot" aria-hidden="true"></span><span>AI tools</span></div>
+          <div class="now-item"><span class="now-dot" aria-hidden="true"></span><span>Local AI</span></div>
+          <div class="now-item"><span class="now-dot" aria-hidden="true"></span><span>Automation</span></div>
+          <div class="now-item"><span class="now-dot" aria-hidden="true"></span><span>Web experiments</span></div>
+        </div>
+        <p class="now-foot mono">THIS SECTION CHANGES WHEN MY ATTENTION DOES.</p>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section class="section panel contact-panel" id="contact" aria-labelledby="contactTitle">
+      <div class="wrap">
+        <div class="section-line">
+          <span class="section-label cyan mono">06 / Contact</span>
+          <span class="section-note mono">Say hello</span>
+        </div>
+        <div class="contact-grid">
+          <div>
+            <span class="kicker mono">A GOOD CONVERSATION STARTS HERE</span>
+            <h2 id="contactTitle">Want to say hello?<br><em>No forms. Pick whichever is easier.</em></h2>
+            <div class="contact-links">
+              <a href="https://wa.me/919779777570" target="_blank" rel="noopener">
+                WHATSAPP <span>+91 97797 77570</span> ↗
+              </a>
+              <a href="mailto:deepak.batra@outlook.com">
+                EMAIL <span>deepak.batra@outlook.com</span> ↗
+              </a>
+              <a href="https://linkedin.com/in/deepakbatra" target="_blank" rel="noopener">
+                LINKEDIN <span>/in/deepakbatra</span> ↗
+              </a>
+            </div>
+          </div>
+          <form id="contactForm" action="https://formsubmit.co/deepak.batra@outlook.com" method="POST">
+            <input type="hidden" name="_subject" value="New message from portfolio site">
+            <input type="hidden" name="_template" value="table">
+            <input class="hp" type="text" name="_honey" tabindex="-1" autocomplete="off">
+            <label>
+              <span class="mono">01 / NAME</span>
+              <input name="name" required autocomplete="name" placeholder="Your name">
+            </label>
+            <label>
+              <span class="mono">02 / EMAIL</span>
+              <input name="email" required type="email" autocomplete="email" placeholder="you@company.com">
+            </label>
+            <label>
+              <span class="mono">03 / MESSAGE</span>
+              <textarea name="message" required rows="5" placeholder="Tell me what needs untangling…"></textarea>
+            </label>
+            <button class="button button-primary" type="submit">Send message ↗</button>
+            <p id="formStatus" class="form-status" role="status"></p>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer-grid">
+      <div>
+        <a class="brand" href="#top">
+          <span class="brand-mark" aria-hidden="true"><i></i><b></b></span>
+          <span class="brand-name">DEEPAK BATRA</span>
+        </a>
+        <p>Things I build, explore and find interesting.</p>
+      </div>
+      <div>
+        <span class="mono">EXPLORE</span>
+        <a href="#about">About</a>
+        <a href="#builds">Builds</a>
+        <a href="#gallery">Gallery</a>
+        <a href="#lab">Lab</a>
+      </div>
+      <div>
+        <span class="mono">CONNECT</span>
+        <a href="mailto:deepak.batra@outlook.com">Email</a>
+        <a href="https://linkedin.com/in/deepakbatra">LinkedIn</a>
+        <a href="https://wa.me/919779777570">WhatsApp</a>
+      </div>
+      <div>
+        <span class="mono">LOCATION</span>
+        <p>Jalandhar, India</p>
+        <p>Available everywhere.</p>
+      </div>
+    </div>
+    <div class="wrap footer-bottom">
+      <span class="mono">© <span id="year"></span> DEEPAK BATRA / BUILT WITH CURIOSITY.</span>
+      <a href="#top">Back to start ↑</a>
+    </div>
+  </footer>
+
+  <div class="gallery-modal" id="galleryModal" aria-hidden="true">
+    <button class="modal-close" type="button" aria-label="Close gallery">×</button>
+    <div class="modal-image"><img id="modalImage" src="" alt=""></div>
+    <div class="modal-caption">
+      <span id="modalCount" class="mono"></span>
+      <p id="modalTitle"></p>
+      <small class="mono">← / → browse · esc close</small>
+    </div>
+    <button class="modal-prev" type="button" aria-label="Previous image">←</button>
+    <button class="modal-next" type="button" aria-label="Next image">→</button>
+  </div>
+
+  <script src="main.js"></script>
+</body>
 </html>
