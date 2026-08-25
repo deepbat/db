@@ -3,42 +3,64 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="description" content="Deepak Batra — Personal space for things I build, explore and find interesting. AI, local LLMs, automation, web experiments, photography — from Jalandhar, India.">
-  <meta name="theme-color" content="#05070c">
+  <meta name="description" content="Deepak Batra — Personal space for things I build, explore and find interesting. AI, local LLMs, automation, web experiments and photography.">
+  <meta name="theme-color" content="#071014">
 
+  <!-- Canonical -->
   <link rel="canonical" href="https://deepbat.github.io/db/">
 
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%2305070c'/%3E%3Ctext x='50' y='67' text-anchor='middle' font-family='monospace' font-size='38' fill='%2369e4ff'%3EDB%3C/text%3E%3C/svg%3E">
+  <!-- Favicon (inline SVG — no extra file needed) -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23071014'/%3E%3Crect x='18' y='18' width='64' height='64' rx='6' fill='none' stroke='%23D7FF3F' stroke-width='6'/%3E%3Ctext x='50' y='67' text-anchor='middle' font-family='monospace' font-size='38' fill='%23D7FF3F'%3EDB%3C/text%3E%3C/svg%3E">
 
+  <!-- Open Graph -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://deepbat.github.io/db/">
-  <meta property="og:title" content="Deepak Batra — personal space">
-  <meta property="og:description" content="Things I build, explore and find interesting. A personal corner of the internet.">
+  <meta property="og:title" content="Deepak Batra | Personal space">
+  <meta property="og:description" content="Personal space for things I build, explore and find interesting. AI, local LLMs, automation, web experiments and photography.">
   <meta property="og:image" content="https://deepbat.github.io/db/images/hero.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale" content="en_IN">
+  <meta property="og:site_name" content="Deepak Batra">
 
-  <title>Deepak Batra — personal space</title>
+  <!-- Twitter / X Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Deepak Batra | Personal space">
+  <meta name="twitter:description" content="Personal space for things I build, explore and find interesting.">
+  <meta name="twitter:image" content="https://deepbat.github.io/db/images/hero.jpg">
 
+  <!-- JSON-LD Person schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Deepak Batra",
+    "url": "https://deepbat.github.io/db/",
+    "image": "https://deepbat.github.io/db/images/hero.jpg",
+    "jobTitle": "Office Administration",
+    "description": "Personal space for things I build, explore and find interesting.",
+    "address": { "@type": "PostalAddress", "addressCountry": "IN" },
+    "sameAs": [
+      "https://instagram.com/deepakbatra",
+      "https://deepbat.github.io/db/"
+    ]
+  }
+  </script>
+
+  <title>Deepak Batra | Personal space</title>
+
+  <!-- LCP preload: hero.jpg is the largest contentful paint on most viewports -->
   <link rel="preload" as="image" href="images/hero.jpg">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
-
-  <script>
-    try {
-      var t = localStorage.getItem("deepak-theme");
-      if (t !== "light" && t !== "dark") {
-        t = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
-      }
-      document.documentElement.setAttribute("data-theme", t);
-    } catch (e) {
-      document.documentElement.setAttribute("data-theme", "dark");
-    }
-  </script>
 </head>
 <body>
-  <a class="skip-link" href="#about">Skip to content</a>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <canvas id="oceanCanvas" class="ocean-canvas" aria-hidden="true"></canvas>
+  <div id="waterVisual" class="water-visual" aria-hidden="true"></div>
   <div class="grain" aria-hidden="true"></div>
 
   <header class="site-nav" id="top">
@@ -48,312 +70,99 @@
         <span class="brand-name">DEEPAK BATRA</span>
       </a>
       <nav class="nav-links" aria-label="Primary navigation">
-        <a href="#about">About</a>
-        <a href="#builds">Builds</a>
-        <a href="#lab">Lab</a>
-        <a href="#gallery">Gallery</a>
-        <a href="#now">Now</a>
-        <a href="#contact">Contact</a>
+        <a href="#about">About</a><a href="#experience">What I do</a><a href="#skills">Explore</a><a href="#projects">Builds</a><a href="#showreel">Showreel</a><a href="#gallery">Gallery</a><a href="#recognition">Beyond</a><a href="#contact">Contact</a>
       </nav>
-      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light theme" aria-pressed="false">
-        <span class="theme-toggle-icon" aria-hidden="true">☼</span>
-        <span class="theme-toggle-label">Light</span>
-      </button>
-      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobileMenu" aria-label="Open navigation">
-        <span></span><span></span>
-      </button>
+      <span class="nav-status"><span></span> Personal space</span>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light theme" aria-pressed="false"><span class="theme-toggle-icon" aria-hidden="true">☼</span><span class="theme-toggle-label">Light</span></button>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobileMenu" aria-label="Open navigation"><span></span><span></span></button>
     </div>
   </header>
-
   <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
-    <div class="mobile-menu-top">
-      <span class="mono">NAVIGATE</span>
-      <button type="button" class="mobile-close" aria-label="Close navigation">×</button>
-    </div>
-    <a href="#about">01 <span>About</span></a>
-    <a href="#builds">02 <span>Builds</span></a>
-    <a href="#lab">03 <span>Lab</span></a>
-    <a href="#gallery">04 <span>Gallery</span></a>
-    <a href="#now">05 <span>Now</span></a>
-    <a href="#contact">06 <span>Contact</span></a>
+    <div class="mobile-menu-top"><span class="mono">NAVIGATE / 08</span><button type="button" class="mobile-close" aria-label="Close navigation">×</button></div>
+    <a href="#about">01 <span>About</span> ↗</a><a href="#experience">02 <span>What I do</span> ↗</a><a href="#skills">03 <span>Explore</span> ↗</a><a href="#projects">04 <span>Builds</span> ↗</a><a href="#showreel">05 <span>Showreel</span> ↗</a><a href="#gallery">06 <span>Gallery</span> ↗</a><a href="#recognition">07 <span>Beyond</span> ↗</a><a href="#contact">08 <span>Contact</span> ↗</a>
     <p>Personal space for things I build, explore and find interesting.</p>
   </div>
 
   <main id="main">
-    <!-- HERO -->
     <section class="hero panel" aria-labelledby="heroTitle">
       <div class="hero-bg" aria-hidden="true"></div>
+      <canvas id="chimeCanvas" class="chime-canvas" aria-hidden="true"></canvas>
+      <div id="dropField" class="drop-field" aria-hidden="true"></div>
       <div class="hero-scrim" aria-hidden="true"></div>
       <div class="hero-grid" aria-hidden="true"></div>
+      <canvas id="portalGL" class="portal-gl" aria-hidden="true"></canvas>
+      <div class="jungle-scene" aria-hidden="true">
+        <div class="jungle-stage">
+          <div class="jungle-layer back"></div>
+          <div class="jungle-halo"></div>
+          <div class="jungle-portal-wrap">
+            <div class="portal-glow"></div>
+            <div class="jungle-portal">
+              <span class="portal-sun"></span>
+              <span class="portal-mist a"></span>
+              <span class="portal-mist b"></span>
+              <span class="portal-cloud a"></span>
+              <span class="portal-cloud b"></span>
+            </div>
+          </div>
+          <div class="jungle-layer front"></div>
+        </div>
+      </div>
       <div class="wrap hero-content">
-        <div class="eyebrow mono"><span class="live-dot"></span> Personal space for things I build, explore and find interesting.</div>
+        <div class="eyebrow"><span class="live-dot"></span> Personal space for things I build, explore and find interesting.</div>
         <div class="hero-index mono">01 — INTRODUCTION</div>
-        <h1 id="heroTitle">Hi, I'm Deepak.<br><em>I build things</em><br>because I <span>can.</span></h1>
+        <h1 id="heroTitle">Hi, I’m Deepak.<br><em>I build things</em><br>because I <span>can.</span></h1>
         <div class="hero-lower">
-          <p>AI, local LLMs, automation, web experiments, photography — from Jalandhar, India.</p>
-          <div class="hero-actions">
-            <a class="button button-primary" href="#builds">View my work ↗</a>
-            <a class="button button-ghost" href="#contact">Get in touch ↗</a>
-          </div>
+          <p>AI, local LLMs, automation, web experiments and photography — things I build, explore and find interesting.</p>
+          <div class="hero-actions"><a class="button button-primary" href="#projects">See what I build ↗</a><a class="button button-ghost" href="#gallery">View gallery ↗</a></div>
         </div>
+        <div class="hero-stats"><div><strong>AI</strong><small class="mono">EXPLORING</small></div><div><strong>WEB</strong><small class="mono">BUILDING</small></div><div><strong>3D</strong><small class="mono">EXPERIMENTING</small></div></div>
       </div>
-      <div class="wrap hero-bottom">
-        <span class="mono">Based in Jalandhar, India / working everywhere</span>
-        <a href="#about">Scroll to explore ↓</a>
-      </div>
+      <div class="hero-instruction mono"><span class="instruction-dot"></span><span id="surfaceStatus">Drag the field · click to pulse · scroll to assemble</span></div>
+      <div class="audio-status mono"><span id="audioDot"></span><span id="audioStatus">Audio / tap to arm</span></div>
+      <div class="hud mono" aria-hidden="true"><span id="hudState">BOOT</span><span id="hudCount"></span></div>
+      <div class="wrap hero-bottom"><span class="mono">Based in Jalandhar, India / exploring everywhere</span><a href="#about">Scroll to explore ↓</a></div>
     </section>
 
-    <!-- ABOUT -->
-    <section class="section panel" id="about" aria-labelledby="aboutTitle">
-      <div class="wrap">
-        <div class="section-line">
-          <span class="section-label mono">02 / About</span>
-          <span class="section-note mono">Field notes</span>
-        </div>
-        <div class="about-grid">
-          <figure class="media-frame">
-            <img src="images/hero.jpg" alt="Deepak Batra" loading="lazy">
-            <figcaption class="mono">GARDEN / MOUNTAINS / GOOD DAY</figcaption>
-          </figure>
-          <div class="copy">
-            <span class="kicker mono">THE WORK BEHIND THE WORK</span>
-            <h2 id="aboutTitle">Mostly curious.<br><em>The system matters more.</em></h2>
-            <p class="lede">I work in office administration — documents, records, schedules, the quiet machinery that keeps an office running. I like it orderly. I like knowing where things are.</p>
-            <p>Outside of that, technology is where my curiosity lives — AI, local LLMs, automation, Windows and PowerShell, web experiments with Three.js. Software or hardware, if it's interesting and I can take it apart or build with it, I'm in.</p>
-            <p>I build things mostly because I enjoy figuring them out: a desktop app for scholarship and grant work, small scripts that quietly save real time, websites that exist because I wanted to see if I could make them.</p>
-            <div class="pills">
-              <span>● Office Administration</span>
-              <span>● AI & Automation</span>
-              <span>● Web Experiments</span>
-              <span>● Photography</span>
-            </div>
-            <dl class="about-facts">
-              <div><dt class="mono">BASE</dt><dd>Jalandhar, India</dd></div>
-              <div><dt class="mono">DAYTIME</dt><dd>Office administration & documentation</dd></div>
-              <div><dt class="mono">AFTER HOURS</dt><dd>AI · automation · web experiments</dd></div>
-              <div><dt class="mono">ALSO INTO</dt><dd>Photography · family time</dd></div>
-            </dl>
-          </div>
-        </div>
-      </div>
-    </section>
+    <section class="section panel" id="about" aria-labelledby="aboutTitle"><div class="wrap">
+      <div class="section-line"><span class="section-label mono">02 / About</span><span class="section-note mono">Mostly curious</span></div>
+      <div class="about-grid"><figure class="media-frame"><img src="images/hero.jpg" alt="Deepak Batra" loading="lazy"><figcaption class="mono">DEEPAK / FIELD NOTE 01</figcaption></figure><div class="copy"><span class="kicker mono">MOSTLY CURIOUS</span><h2 id="aboutTitle">Mostly curious.<br><em>The system matters more.</em></h2><p class="lede">I work in office administration and documentation, but technology is where much of my curiosity lives.</p><p>AI, local LLMs, automation, Windows and PowerShell, websites, Three.js, software and hardware — I enjoy taking things apart, figuring them out and building something useful.</p><p>I build things mostly because I enjoy figuring them out: a desktop application for scholarship and grant work, small scripts that save repetitive effort, and websites that exist because I wanted to see if I could make them.</p><div class="pills"><span>● Office Administration</span><span>● AI &amp; Automation</span><span>● Web Experiments</span><span>● Photography</span></div><a class="text-link" href="#gallery">See a few kept moments ↗</a></div></div>
+    </div></section>
 
-    <!-- BUILDS -->
-    <section class="section panel darker" id="builds" aria-labelledby="buildsTitle">
-      <div class="wrap">
-        <div class="section-line">
-          <span class="section-label cyan mono">03 / Builds</span>
-          <span class="section-note mono">Built because I could</span>
-        </div>
-        <div class="heading-row">
-          <h2 id="buildsTitle">Things I've made<br><em>with receipts.</em></h2>
-          <p>Key projects where curiosity became something real.</p>
-        </div>
-        <div class="project-list">
+    <section class="section panel darker" id="experience" aria-labelledby="experienceTitle"><div class="wrap">
+      <div class="section-line"><span class="section-label cyan mono">03 / What I do</span><span class="section-note mono">Day to day → after hours</span></div>
+      <div class="heading-row"><h2 id="experienceTitle">What keeps me busy<br><em>and what I keep exploring.</em></h2><p>A mix of office work, technology experiments, automation and things I build simply because they interest me.</p></div>
+      <div class="timeline"><article><span class="date mono">DAY TO DAY</span><b>01</b><div><h3>Office Administration</h3><p>Documents, records, coordination, schedules and the everyday work that keeps an office moving.</p></div><i>↗</i></article><article><span class="date mono">WHEN NEEDED</span><b>02</b><div><h3>Documentation &amp; Reporting</h3><p>Organising information, preparing reports and finding simpler ways to keep records clear and useful.</p></div><i>↗</i></article><article><span class="date mono">AFTER HOURS</span><b>03</b><div><h3>Technology Experiments</h3><p>AI, local LLMs, PowerShell, Windows, websites, Three.js and whatever else catches my attention.</p></div><i>↗</i></article><article><span class="date mono">WHEN I CAN</span><b>04</b><div><h3>Building Things</h3><p>Desktop software, small automation tools and personal websites built mostly because I wanted to figure them out.</p></div><i>↗</i></article></div>
+    </div></section>
 
-          <article class="project-card">
-            <div class="project-visual">
-              <img src="images/gallery-02.jpg" alt="Scholarship software interface" loading="lazy">
-              <span class="tag mono">CASE 01 / DESKTOP</span>
-            </div>
-            <div class="project-copy">
-              <h3>Scholarship & Grant Software</h3>
-              <div class="evidence mono"><span>WINDOWS</span><span>DESKTOP UI</span><span>DATA & REPORTS</span></div>
-              <p>A Windows desktop application for managing scholarship and grant-related records, workflows and reporting — the kind of work that used to live in scattered files.</p>
-              <button class="case-toggle" type="button" aria-expanded="false">+ Read more</button>
-              <p class="case-detail">I wanted to turn a paper-and-spreadsheets process into something orderly, and to learn what building real desktop software actually takes.</p>
-            </div>
-          </article>
+    <section class="section panel" id="skills" aria-labelledby="skillsTitle"><div class="wrap two-col">
+      <div><div class="section-line"><span class="section-label mono">04 / Explore</span><span class="section-note mono">Things I keep coming back to</span></div><h2 id="skillsTitle">Things I explore<br><em>just because they are interesting.</em></h2><p class="section-copy">AI, local LLMs, automation, Windows, PowerShell, Google Workspace, GitHub, web development, Three.js and desktop software.</p><div class="side-note"><b>↗</b><span class="mono">No percentages. Just things I keep learning.</span></div></div>
+      <div class="skill-list" id="skillList"></div>
+    </div></section>
 
-          <article class="project-card">
-            <div class="project-visual">
-              <img src="images/gallery-04.jpg" alt="Personal website projects" loading="lazy">
-              <span class="tag mono">CASE 02 / WEB</span>
-            </div>
-            <div class="project-copy">
-              <h3>Personal Websites</h3>
-              <div class="evidence mono"><span>REACT</span><span>THREE.JS</span><span>GITHUB PAGES</span></div>
-              <p>This site and its ancestors — ongoing experiments in modern web design and interactive graphics.</p>
-              <button class="case-toggle" type="button" aria-expanded="false">+ Read more</button>
-              <p class="case-detail">Each version is an experiment. The current one taught me most of what I know about 3D on the web.</p>
-            </div>
-          </article>
+    <section class="section panel darker" id="projects" aria-labelledby="projectsTitle"><div class="wrap">
+      <div class="section-line"><span class="section-label cyan mono">05 / Builds</span><span class="section-note mono">Built because I could</span></div><div class="heading-row"><h2 id="projectsTitle">Things I’ve made<br><em>and kept exploring.</em></h2><p>Projects where curiosity became something real.</p></div>
+      <div class="project-list"><article class="project-card"><div class="project-visual"><img src="images/gallery-02.jpg" alt="Scholarship and grant software" loading="lazy"><span class="tag mono">CASE 01 / DESKTOP</span><strong>WIN<br><small>DESKTOP APP</small></strong></div><div class="project-copy"><h3>Scholarship and Grant Software</h3><div class="evidence mono"><span>WINDOWS</span><span>DESKTOP UI</span><span>DATA &amp; REPORTS</span></div><p>A Windows desktop application I built for managing scholarship and grant-related records, workflows and reporting.</p><button class="case-toggle" type="button" aria-expanded="false">+ Read more</button><p class="case-detail">I wanted to turn a practical process into something orderly, and to learn what building real desktop software actually takes.</p></div></article><article class="project-card"><div class="project-visual"><img src="images/gallery-07.jpg" alt="Personal websites" loading="lazy"><span class="tag mono">CASE 02 / WEB</span><strong>WEB<small>EXPERIMENTS</small></strong></div><div class="project-copy"><h3>Personal Websites</h3><div class="evidence mono"><span>HTML</span><span>CSS</span><span>THREE.JS</span></div><p>Websites I have built as experiments in design, interaction and technology.</p><button class="case-toggle" type="button" aria-expanded="false">+ Read more</button><p class="case-detail">Each version is an experiment. I like seeing how far a browser can be pushed while keeping it useful.</p></div></article><article class="project-card"><div class="project-visual"><img src="images/gallery-05.jpg" alt="Personal photograph" loading="lazy"><span class="tag mono">CASE 03 / AUTOMATION</span><strong>LESS<br><small>REPETITION</small></strong></div><div class="project-copy"><h3>Automation</h3><div class="evidence mono"><span>POWERSHELL</span><span>WORKFLOWS</span><span>REPORTING</span></div><p>Small tools and scripts I build to reduce repetitive work and simplify workflows.</p><button class="case-toggle" type="button" aria-expanded="false">+ Read more</button><p class="case-detail">If something is repetitive and interesting enough to automate, I usually end up trying.</p></div></article><article class="project-card"><div class="project-visual"><img src="images/gallery-07.jpg" alt="AI experiment" loading="lazy"><span class="tag mono">CASE 04 / AI</span><strong>AI<small>EXPERIMENTS</small></strong></div><div class="project-copy"><h3>AI Experiments</h3><div class="evidence mono"><span>LOCAL LLMS</span><span>OLLAMA</span><span>CLI TOOLS</span></div><p>Experiments with AI tools, local LLMs, CLI utilities and AI-assisted workflows.</p><button class="case-toggle" type="button" aria-expanded="false">+ Read more</button><p class="case-detail">I like testing what these tools can actually do on my own machines, rather than stopping at what a headline says.</p></div></article></div>
+    </div></section>
 
-          <article class="project-card">
-            <div class="project-visual">
-              <img src="images/gallery-05.jpg" alt="Automation scripts" loading="lazy">
-              <span class="tag mono">CASE 03 / AUTOMATION</span>
-            </div>
-            <div class="project-copy">
-              <h3>Automation</h3>
-              <div class="evidence mono"><span>POWERSHELL</span><span>GOOGLE WORKSPACE</span><span>SCHEDULED TASKS</span></div>
-              <p>Small tools and scripts that take over the repetitive parts of office work — documentation, reporting, file chores.</p>
-              <button class="case-toggle" type="button" aria-expanded="false">+ Read more</button>
-              <p class="case-detail">If a task happens twice, a script should handle it the third time. Most of these started as exactly that.</p>
-            </div>
-          </article>
+    <section class="section panel" id="showreel" aria-labelledby="showreelTitle"><div class="wrap"><div class="section-line"><span class="section-label mono">06 / Showreel</span><span class="section-note mono">00:07 — a small experiment</span></div><div class="heading-row"><h2 id="showreelTitle">A little something<br><em>I like to keep.</em></h2><p>A short visual piece from my collection of experiments and things I enjoy making.</p></div><div class="video-frame"><video controls preload="metadata" poster="images/gallery-02.jpg" playsinline width="1280" height="720"><source src="images/showreel.mp4" type="video/mp4">Your browser does not support video playback.</video><div class="video-meta mono"><span>PLAY / 00:07</span><span>PROCESS STUDY 001</span></div></div></div></section>
 
-          <article class="project-card">
-            <div class="project-visual">
-              <img src="images/gallery-07.jpg" alt="AI experiments" loading="lazy">
-              <span class="tag mono">CASE 04 / AI</span>
-            </div>
-            <div class="project-copy">
-              <h3>AI Experiments</h3>
-              <div class="evidence mono"><span>LOCAL LLMS</span><span>OLLAMA</span><span>CLI TOOLS</span></div>
-              <p>Local LLMs, AI tools and CLI utilities — testing what models can actually do on my own machine.</p>
-              <button class="case-toggle" type="button" aria-expanded="false">+ Read more</button>
-              <p class="case-detail">I wanted to know what the tools can really do on modest hardware, not what headlines claim.</p>
-            </div>
-          </article>
+    <section class="section panel darker" id="gallery" aria-labelledby="galleryTitle"><div class="wrap"><div class="section-line"><span class="section-label cyan mono">07 / Gallery</span><span class="section-note mono">Personal archive</span></div><div class="gallery-intro"><div><h2 id="galleryTitle">Kept moments.<br><em>People and places.</em></h2><p>A personal photo archive. Some moments are worth keeping simply because they were good ones.</p></div><img src="images/gallery-05.jpg" alt="Personal photograph" loading="lazy"></div><div class="gallery-grid" id="galleryGrid"></div></div></section>
 
-        </div>
-      </div>
-    </section>
+    <section class="section panel" id="recognition" aria-labelledby="recognitionTitle"><div class="wrap"><div class="section-line"><span class="section-label mono">08 / Beyond</span><span class="section-note mono">Things I enjoy</span></div><div class="recognition-grid"><div><h2 id="recognitionTitle">Beyond the screen<br><em>there is real life.</em></h2><p class="section-copy">Technology is a big part of what I enjoy, but it is not all of it. Photography, family time, people and getting out with a camera matter too.</p></div><div class="recognition-list"><div><b>01</b><h3>Photography</h3><p>I like keeping photographs of people, places and ordinary moments that turn out not to be ordinary.</p></div><div><b>02</b><h3>Family time</h3><p>Some of my favourite time has nothing to do with a screen.</p></div><div><b>03</b><h3>Technology</h3><p>I enjoy finding a new tool and immediately wondering what else it can do.</p></div><div><b>04</b><h3>Building things</h3><p>Websites, software, experiments or small ideas. Making something is usually more interesting than just reading about it.</p></div></div></div></div></section>
 
-    <!-- TECH LAB -->
-    <section class="section panel" id="lab" aria-labelledby="labTitle">
-      <div class="wrap">
-        <div class="section-line">
-          <span class="section-label mono">04 / Tech Lab</span>
-          <span class="section-note mono">A workbench of things I explore</span>
-        </div>
-        <h2 id="labTitle">The lab bench.</h2>
-        <p class="section-copy">Click a card to learn more about what I work with.</p>
-        <div class="lab-grid" id="labGrid"></div>
-      </div>
-    </section>
-
-    <!-- GALLERY -->
-    <section class="section panel darker" id="gallery" aria-labelledby="galleryTitle">
-      <div class="wrap">
-        <div class="section-line">
-          <span class="section-label cyan mono">05 / Gallery</span>
-          <span class="section-note mono">Personal archive</span>
-        </div>
-        <div class="gallery-intro">
-          <div>
-            <h2 id="galleryTitle">Kept moments.</h2>
-            <p>A personal photo archive — people and places I like. Click a frame to view it full-screen.</p>
-          </div>
-          <img src="images/gallery-05.jpg" alt="Personal photo" loading="lazy">
-        </div>
-        <div class="gallery-grid" id="galleryGrid"></div>
-      </div>
-    </section>
-
-    <!-- NOW -->
-    <section class="section panel" id="now" aria-labelledby="nowTitle">
-      <div class="wrap">
-        <div class="section-line">
-          <span class="section-label mono">06 / Now</span>
-          <span class="section-note mono">Updated Aug 2026</span>
-        </div>
-        <h2 id="nowTitle">On the bench.</h2>
-        <div class="now-list">
-          <div class="now-item"><span class="now-dot" aria-hidden="true"></span><span>Three.js</span></div>
-          <div class="now-item"><span class="now-dot" aria-hidden="true"></span><span>AI tools</span></div>
-          <div class="now-item"><span class="now-dot" aria-hidden="true"></span><span>Local AI</span></div>
-          <div class="now-item"><span class="now-dot" aria-hidden="true"></span><span>Automation</span></div>
-          <div class="now-item"><span class="now-dot" aria-hidden="true"></span><span>Web experiments</span></div>
-        </div>
-        <p class="now-foot mono">THIS SECTION CHANGES WHEN MY ATTENTION DOES.</p>
-      </div>
-    </section>
-
-    <!-- CONTACT -->
-    <section class="section panel contact-panel" id="contact" aria-labelledby="contactTitle">
-      <div class="wrap">
-        <div class="section-line">
-          <span class="section-label cyan mono">06 / Contact</span>
-          <span class="section-note mono">Say hello</span>
-        </div>
-        <div class="contact-grid">
-          <div>
-            <span class="kicker mono">A GOOD CONVERSATION STARTS HERE</span>
-            <h2 id="contactTitle">Want to say hello?<br><em>No forms. Pick whichever is easier.</em></h2>
-            <div class="contact-links">
-              <a href="https://wa.me/919779777570" target="_blank" rel="noopener">
-                WHATSAPP <span>+91 97797 77570</span> ↗
-              </a>
-              <a href="mailto:deepak.batra@outlook.com">
-                EMAIL <span>deepak.batra@outlook.com</span> ↗
-              </a>
-              <a href="https://linkedin.com/in/deepakbatra" target="_blank" rel="noopener">
-                LINKEDIN <span>/in/deepakbatra</span> ↗
-              </a>
-            </div>
-          </div>
-          <form id="contactForm" action="https://formsubmit.co/deepak.batra@outlook.com" method="POST">
-            <input type="hidden" name="_subject" value="New message from portfolio site">
-            <input type="hidden" name="_template" value="table">
-            <input class="hp" type="text" name="_honey" tabindex="-1" autocomplete="off">
-            <label>
-              <span class="mono">01 / NAME</span>
-              <input name="name" required autocomplete="name" placeholder="Your name">
-            </label>
-            <label>
-              <span class="mono">02 / EMAIL</span>
-              <input name="email" required type="email" autocomplete="email" placeholder="you@company.com">
-            </label>
-            <label>
-              <span class="mono">03 / MESSAGE</span>
-              <textarea name="message" required rows="5" placeholder="Tell me what needs untangling…"></textarea>
-            </label>
-            <button class="button button-primary" type="submit">Send message ↗</button>
-            <p id="formStatus" class="form-status" role="status"></p>
-          </form>
-        </div>
-      </div>
-    </section>
+    <section class="section panel contact-panel" id="contact" aria-labelledby="contactTitle"><div class="wrap"><div class="section-line"><span class="section-label cyan mono">09 / Contact</span><span class="section-note mono">Say hello</span></div><div class="contact-grid"><div><span class="kicker mono">A GOOD CONVERSATION STARTS HERE</span><h2 id="contactTitle">Want to say hello?<br><em>Pick whichever is easier.</em></h2><p>This is my personal corner of the internet. If you want to say hello, WhatsApp or email is easiest.</p><div class="contact-links"><a href="mailto:deepak.batra@outlook.com">EMAIL <span>deepak.batra@outlook.com</span> ↗</a><a href="https://wa.me/919779777570" target="_blank" rel="noopener">WHATSAPP <span>+91 97797 77570</span> ↗</a></div></div><div class="contact-links-note"><span class="mono">NO FORM / NO FUSS</span><p>WhatsApp or email is all I need.</p></div></div></div></section>
   </main>
 
-  <footer class="footer">
-    <div class="wrap footer-grid">
-      <div>
-        <a class="brand" href="#top">
-          <span class="brand-mark" aria-hidden="true"><i></i><b></b></span>
-          <span class="brand-name">DEEPAK BATRA</span>
-        </a>
-        <p>Things I build, explore and find interesting.</p>
-      </div>
-      <div>
-        <span class="mono">EXPLORE</span>
-        <a href="#about">About</a>
-        <a href="#builds">Builds</a>
-        <a href="#gallery">Gallery</a>
-        <a href="#lab">Lab</a>
-      </div>
-      <div>
-        <span class="mono">CONNECT</span>
-        <a href="mailto:deepak.batra@outlook.com">Email</a>
-        <a href="https://linkedin.com/in/deepakbatra">LinkedIn</a>
-        <a href="https://wa.me/919779777570">WhatsApp</a>
-      </div>
-      <div>
-        <span class="mono">LOCATION</span>
-        <p>Jalandhar, India</p>
-        <p>Available everywhere.</p>
-      </div>
-    </div>
-    <div class="wrap footer-bottom">
-      <span class="mono">© <span id="year"></span> DEEPAK BATRA / BUILT WITH CURIOSITY.</span>
-      <a href="#top">Back to start ↑</a>
-    </div>
-  </footer>
+  <footer class="footer"><div class="wrap footer-grid"><div><a class="brand" href="#top"><span class="brand-mark" aria-hidden="true"><i></i><b></b></span><span class="brand-name">DEEPAK BATRA</span></a><p>Personal space for things I build, explore and find interesting.</p></div><div><span class="mono">EXPLORE</span><a href="#about">About</a><a href="#experience">What I do</a><a href="#projects">Builds</a><a href="#gallery">Gallery</a></div><div><span class="mono">CONNECT</span><a href="mailto:deepak.batra@outlook.com">Email</a><a href="https://wa.me/919779777570" target="_blank" rel="noopener">WhatsApp</a><a href="https://instagram.com/deepakbatra">Instagram</a></div><div><span class="mono">LOCATION</span><p>Jalandhar, India</p><p>Personal website<br>&amp; technology playground.</p></div></div><div class="wrap footer-bottom"><span class="mono">© <span id="year"></span> DEEPAK BATRA / BUILT TO KEEP GROWING.</span><a href="#top">Back to start ↑</a></div></footer>
 
-  <div class="gallery-modal" id="galleryModal" aria-hidden="true">
-    <button class="modal-close" type="button" aria-label="Close gallery">×</button>
-    <div class="modal-image"><img id="modalImage" src="" alt=""></div>
-    <div class="modal-caption">
-      <span id="modalCount" class="mono"></span>
-      <p id="modalTitle"></p>
-      <small class="mono">← / → browse · esc close</small>
-    </div>
-    <button class="modal-prev" type="button" aria-label="Previous image">←</button>
-    <button class="modal-next" type="button" aria-label="Next image">→</button>
-  </div>
+  <div class="gallery-modal" id="galleryModal" aria-hidden="true"><button class="modal-close" type="button" aria-label="Close gallery">×</button><div class="modal-image"><img id="modalImage" src="" alt=""></div><div class="modal-caption"><span id="modalCount" class="mono"></span><p id="modalTitle"></p><small class="mono">← / → browse · esc close</small></div><button class="modal-prev" type="button" aria-label="Previous image">←</button><button class="modal-next" type="button" aria-label="Next image">→</button></div>
 
+  <script type="importmap">
+    {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
+  </script>
+  <script type="module" src="portal3d.js"></script>
   <script src="main.js"></script>
+  <script>document.getElementById("chimeCanvas").style.pointerEvents = "none";</script>
 </body>
 </html>
