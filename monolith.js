@@ -186,14 +186,14 @@ import { MeshSurfaceSampler } from "three/addons/math/MeshSurfaceSampler.js";
     blending: THREE.AdditiveBlending,
     opacity: 0.5
   });
-  const aura = new THREE.Mesh(new THREE.PlaneGeometry(5.4, 5.4), auraMat);
+  const aura = new THREE.Mesh(new THREE.PlaneGeometry(4.2, 4.2), auraMat);
   aura.renderOrder = -1;
   scene.add(aura);
 
   const glowMaterials = [shellMat, auraMat];
 
-  const ringGeoA = new THREE.TorusGeometry(1.9, 0.016, 8, 180);
-  const ringGeoB = new THREE.TorusGeometry(2.2, 0.011, 8, 200);
+  const ringGeoA = new THREE.TorusGeometry(1.45, 0.014, 8, 160);
+  const ringGeoB = new THREE.TorusGeometry(1.7, 0.01, 8, 180);
   const ringMatA = new THREE.MeshBasicMaterial({
     color: PALETTE[1].clone(), transparent: true, opacity: 0.6,
     depthWrite: false, blending: THREE.AdditiveBlending
@@ -216,11 +216,11 @@ import { MeshSurfaceSampler } from "three/addons/math/MeshSurfaceSampler.js";
       depthWrite: false, blending: THREE.AdditiveBlending
     });
     const mesh = new THREE.Mesh(shardGeo, mat);
-    const base = 0.045 + Math.random() * 0.05;
+    const base = 0.038 + Math.random() * 0.042;
     mesh.scale.setScalar(base);
     mesh.userData = {
       base: base,
-      r: 1.55 + Math.random() * 0.85,
+      r: 1.18 + Math.random() * 0.55,
       sp: (0.3 + Math.random() * 0.55) * (i % 2 ? 1 : -1),
       ph: Math.random() * Math.PI * 2,
       tilt: Math.random() * Math.PI
@@ -240,9 +240,9 @@ import { MeshSurfaceSampler } from "three/addons/math/MeshSurfaceSampler.js";
   shock.visible = false;
   scene.add(shock);
   glowMaterials.push(shockMat);
-  const shockState = { life: 2, lastSection: -1 };
+  const shockState = { life: 2 };
 
-  const PARTICLE_COUNT = mqMobile.matches ? 1400 : 3000;
+  const PARTICLE_COUNT = mqMobile.matches ? 1300 : 2800;
   const samplerMesh = new THREE.Mesh(new THREE.IcosahedronGeometry(1.15, 1));
   const sampler = new MeshSurfaceSampler(samplerMesh).build();
   const pPositions = new Float32Array(PARTICLE_COUNT * 3);
@@ -304,12 +304,12 @@ import { MeshSurfaceSampler } from "three/addons/math/MeshSurfaceSampler.js";
     "float n=snoise(dir*uFreq+uTime*0.32)+snoise(dir*uFreq*2.1-uTime*0.21)*0.35;" +
     "vec3 target=position+normal*n*uMorph;" +
     "float s=1.0-uAssemble;" +
-    "vec3 scat=target+aDir*(2.0+aSpd*3.2);" +
+    "vec3 scat=target+aDir*(1.25+aSpd*1.9);" +
     "float ang=uSwirl*(0.4+aSpd*0.9)*(aRand.x>0.5?1.0:-1.0);" +
     "float ca=cos(ang),sa=sin(ang);" +
     "scat.xz=mat2(ca,-sa,sa,ca)*scat.xz;" +
-    "scat.y+=sin(uSwirl*1.7+aRand.y*6.2831)*0.4*s;" +
-    "scat.x+=cos(uSwirl*1.3+aRand.z*6.2831)*0.25*s;" +
+    "scat.y+=sin(uSwirl*1.7+aRand.y*6.2831)*0.3*s;" +
+    "scat.x+=cos(uSwirl*1.3+aRand.z*6.2831)*0.2*s;" +
     "vec3 p=mix(scat,target,uAssemble);" +
     "vec4 mv=modelViewMatrix*vec4(p,1.0);" +
     "gl_Position=projectionMatrix*mv;" +
@@ -412,11 +412,13 @@ import { MeshSurfaceSampler } from "three/addons/math/MeshSurfaceSampler.js";
     const halfW = halfH * camera.aspect;
     const fullW = halfW * 2;
     const fullH = halfH * 2;
-    let s = Math.min(1.05, fullW / 6.5, fullH / 8);
-    s = Math.min(1.05, Math.max(0.5, s)) * (narrow ? 0.85 : 1);
-    group.scale.setScalar(s);
-    group.position.x = narrow ? 0 : halfW * 0.52;
-    group.userData.baseY = narrow ? halfH * 0.32 : 0;
+    let s = Math.min(0.95, fullW / 7.2, fullH / 9);
+    s = Math.min(0.95, Math.max(0.42, s)) * (narrow ? 0.6 : 1);
+    group.userData.scale = s;
+    group.userData.baseX = narrow ? halfW * 0.3 : halfW * 0.58;
+    group.userData.baseY = narrow ? halfH * 0.42 : 0;
+    group.userData.tuckX = narrow ? halfW * 0.58 : halfW * 0.82;
+    group.userData.tuckY = narrow ? halfH * 0.38 : -halfH * 0.1;
   }
 
   function onScroll() {
@@ -438,6 +440,32 @@ import { MeshSurfaceSampler } from "three/addons/math/MeshSurfaceSampler.js";
     if (p < 0.4) return 0;
     const k = (p - 0.4) / 0.6;
     return k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+  }
+
+  const pageSections = Array.prototype.slice.call(document.querySelectorAll("main > section[id]"));
+  let activeSection = -1;
+
+  function setActiveSection(idx) {
+    if (idx === activeSection) return;
+    const isFirst = activeSection === -1;
+    activeSection = idx;
+    if (!isFirst && !reducedMotion && booted) {
+      triggerBurst(false);
+      shockState.life = 0;
+    }
+  }
+
+  if ("IntersectionObserver" in window && pageSections.length) {
+    const spy = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) setActiveSection(pageSections.indexOf(en.target));
+      });
+    }, { rootMargin: "-40% 0px -55% 0px", threshold: 0 });
+    pageSections.forEach(function (sec) { spy.observe(sec); });
+  } else {
+    window.addEventListener("scroll", function () {
+      setActiveSection(Math.min(pageSections.length - 1, Math.floor(state.p * pageSections.length)));
+    }, { passive: true });
   }
 
   function compose(t, dt) {
@@ -462,7 +490,13 @@ import { MeshSurfaceSampler } from "three/addons/math/MeshSurfaceSampler.js";
     group.rotation.y += state.speed * step;
     group.rotation.x = Math.sin(t * 0.4) * 0.12 + 0.16;
     group.rotation.z = Math.cos(t * 0.27) * 0.07;
-    group.position.y = (group.userData.baseY || 0) + Math.sin(t * 0.8) * 0.2;
+
+    const tuck = smoothstepJS(0.05, 0.3, state.p);
+    const bx = group.userData.baseX + (group.userData.tuckX - group.userData.baseX) * tuck;
+    const by = group.userData.baseY + (group.userData.tuckY - group.userData.baseY) * tuck;
+    group.position.x = damp(group.position.x, bx, 3, step);
+    group.position.y = damp(group.position.y, by, 3, step) + Math.sin(t * 0.8) * 0.16;
+    group.scale.setScalar(group.userData.scale * (1 - tuck * 0.22));
 
     if (burst.active) {
       burst.t += step / BURST_DURATION;
@@ -519,14 +553,6 @@ import { MeshSurfaceSampler } from "three/addons/math/MeshSurfaceSampler.js";
       s.material.opacity = (0.65 + pulse * 0.3) * themeDim;
     }
 
-    const section = Math.floor(state.p * SHAPES.length);
-    if (section !== shockState.lastSection) {
-      shockState.lastSection = section;
-      if (!reducedMotion && booted) {
-        triggerBurst(false);
-        shockState.life = 0;
-      }
-    }
     if (shockState.life < 1) {
       shockState.life += step * 1.15;
       const k = shockState.life;
@@ -534,7 +560,7 @@ import { MeshSurfaceSampler } from "three/addons/math/MeshSurfaceSampler.js";
       shock.visible = true;
       shock.position.copy(group.position);
       shock.quaternion.copy(camera.quaternion);
-      shock.scale.setScalar(0.7 + e * 3.6);
+      shock.scale.setScalar(0.7 + e * 2.6);
       shockMat.opacity = Math.max(0, (1 - k) * 0.65 * themeDim);
       shockMat.color.copy(uniforms.uColorA.value);
     } else {
