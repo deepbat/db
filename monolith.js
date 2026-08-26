@@ -241,6 +241,7 @@ import { MeshSurfaceSampler } from "three/addons/math/MeshSurfaceSampler.js";
   scene.add(shock);
   glowMaterials.push(shockMat);
   const shockState = { life: 2 };
+  const shockPos = new THREE.Vector3();
 
   const PARTICLE_COUNT = mqMobile.matches ? 1300 : 2800;
   const samplerMesh = new THREE.Mesh(new THREE.IcosahedronGeometry(1.15, 1));
@@ -287,7 +288,10 @@ import { MeshSurfaceSampler } from "three/addons/math/MeshSurfaceSampler.js";
     uSwirl: { value: 0 },
     uAssemble: { value: 1 },
     uOpacity: { value: 0 },
-    uSize: { value: 30 }
+    uSize: { value: 30 },
+    uMouse: { value: new THREE.Vector3(99, 99, 0) },
+    uMouseF: { value: 0 },
+    uKick: { value: 0 }
   };
 
   const particleVertex =
@@ -295,7 +299,8 @@ import { MeshSurfaceSampler } from "three/addons/math/MeshSurfaceSampler.js";
     "attribute vec4 aRand;" +
     "attribute vec3 aDir;" +
     "attribute float aSpd;" +
-    "uniform float uTime,uMorph,uFreq,uSwirl,uAssemble,uSize;" +
+    "uniform float uTime,uMorph,uFreq,uSwirl,uAssemble,uSize,uMouseF,uKick;" +
+    "uniform vec3 uMouse;" +
     "varying vec3 vColor;" +
     "varying float vA;" +
     NOISE_GLSL +
@@ -311,6 +316,10 @@ import { MeshSurfaceSampler } from "three/addons/math/MeshSurfaceSampler.js";
     "scat.y+=sin(uSwirl*1.7+aRand.y*6.2831)*0.3*s;" +
     "scat.x+=cos(uSwirl*1.3+aRand.z*6.2831)*0.2*s;" +
     "vec3 p=mix(scat,target,uAssemble);" +
+    "p+=normalize(position+vec3(0.001))*uKick*(0.22+aSpd*0.5);" +
+    "vec3 dm=p-uMouse;" +
+    "float md=length(dm);" +
+    "p+=(dm/max(md,0.001))*uMouseF*exp(-md*md*0.5)*(0.5+0.85*s);" +
     "vec4 mv=modelViewMatrix*vec4(p,1.0);" +
     "gl_Position=projectionMatrix*mv;" +
     "float tw=0.75+0.25*sin(uSwirl*3.0+aRand.w*40.0);" +
@@ -421,9 +430,14 @@ import { MeshSurfaceSampler } from "three/addons/math/MeshSurfaceSampler.js";
     group.userData.tuckY = narrow ? halfH * 0.38 : -halfH * 0.1;
   }
 
+  let lastScrollY = window.scrollY;
+  let energy = 0;
+
   function onScroll() {
     const max = document.documentElement.scrollHeight - window.innerHeight;
     scrollP = Math.min(1, Math.max(0, max > 0 ? window.scrollY / max : 0));
+    energy = Math.min(170, energy + Math.abs(window.scrollY - lastScrollY));
+    lastScrollY = window.scrollY;
     if (reducedMotion && booted) renderOnce();
   }
 
@@ -451,6 +465,7 @@ import { MeshSurfaceSampler } from "three/addons/math/MeshSurfaceSampler.js";
     activeSection = idx;
     if (!isFirst && !reducedMotion && booted) {
       triggerBurst(false);
+      shockPos.copy(group.position);
       shockState.life = 0;
     }
   }
@@ -468,6 +483,56 @@ import { MeshSurfaceSampler } from "three/addons/math/MeshSurfaceSampler.js";
     }, { passive: true });
   }
 
+  let pointerNX = 0, pointerNY = 0, pointerActive = false;
+  let kick = 0, pulseT = 0, rotY = 0, tiltXC = 0, tiltYC = 0;
+  const mouseWorld = new THREE.Vector3(99, 99, 0);
+  const mwLocalV = new THREE.Vector3();
+  const unprojV = new THREE.Vector3();
+
+  function interactiveTarget(el) {
+    return el && el.closest && el.closest("a,button,input,textarea,select,label,video,[role='button']");
+  }
+
+  function screenToWorld(cx, cy, out) {
+    unprojV.set((cx / window.innerWidth) * 2 - 1, -((cy / window.innerHeight) * 2 - 1), 0.5).unproject(camera);
+    const dir = unprojV.sub(camera.position).normalize();
+    const dist = -camera.position.z / dir.z;
+    out.copy(camera.position).addScaledVector(dir, dist);
+    return out;
+  }
+
+  function firePulse(cx, cy) {
+    if (reducedMotion || !booted) return;
+    kick = 1;
+    screenToWorld(cx, cy, shockPos);
+    shockState.life = 0;
+  }
+
+  let downX = 0, downY = 0, downT = 0;
+
+  window.addEventListener("pointermove", function (e) {
+    pointerNX = e.clientX / Math.max(1, window.innerWidth) - 0.5;
+    pointerNY = e.clientY / Math.max(1, window.innerHeight) - 0.5;
+    pointerActive = true;
+  }, { passive: true });
+
+  window.addEventListener("pointerleave", function () { pointerActive = false; });
+
+  window.addEventListener("pointerdown", function (e) {
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+    downX = e.clientX;
+    downY = e.clientY;
+    downT = performance.now();
+    if (e.pointerType !== "touch" && !interactiveTarget(e.target)) firePulse(e.clientX, e.clientY);
+  }, { passive: true });
+
+  window.addEventListener("pointerup", function (e) {
+    if (e.pointerType !== "touch") return;
+    const quick = performance.now() - downT < 320;
+    const still = Math.hypot(e.clientX - downX, e.clientY - downY) < 14;
+    if (quick && still && !interactiveTarget(e.target)) firePulse(e.clientX, e.clientY);
+  }, { passive: true });
+
   function compose(t, dt) {
     const step = dt || 0.016;
     state.p = damp(state.p, scrollP, 4, step);
@@ -475,20 +540,27 @@ import { MeshSurfaceSampler } from "three/addons/math/MeshSurfaceSampler.js";
     uniforms.uColorA.value.lerp(tmpA, 1 - Math.exp(-step * 3));
     uniforms.uColorB.value.lerp(tmpB, 1 - Math.exp(-step * 3));
 
+    energy *= Math.exp(-step * 3.4);
+    const eN = Math.min(1, energy / 130);
+
     const shape = sampleShape(state.p);
-    uniforms.uMorph.value = damp(uniforms.uMorph.value, shape.amp * motionScale, 2.5, step);
+    uniforms.uMorph.value = damp(uniforms.uMorph.value, shape.amp * motionScale + eN * 0.07, 2.5, step);
     uniforms.uFreq.value = damp(uniforms.uFreq.value, shape.freq, 2.5, step);
 
     uniforms.uTime.value = t * motionScale;
-    const pulse = 0.5 + 0.5 * Math.sin(t * 2.2);
+    pulseT += step * (2.2 + eN * 3.4);
+    const pulse = 0.5 + 0.5 * Math.sin(pulseT);
     uniforms.uPulse.value = pulse * (reducedMotion ? 0.25 : 1);
-    uniforms.uGlow.value = damp(uniforms.uGlow.value, 0.3 + state.p * 1.15, 3, step);
+    uniforms.uGlow.value = damp(uniforms.uGlow.value, 0.3 + state.p * 1.15 + eN * 0.95, 3, step);
 
-    const targetSpeed = (0.34 + shape.speed * 1.3) * (reducedMotion ? 0.15 : 1);
+    const targetSpeed = (0.34 + shape.speed * 1.3) * (reducedMotion ? 0.15 : 1) + eN * 1.6;
     state.speed = damp(state.speed, targetSpeed, 2, step);
 
-    group.rotation.y += state.speed * step;
-    group.rotation.x = Math.sin(t * 0.4) * 0.12 + 0.16;
+    rotY += state.speed * step;
+    tiltXC = damp(tiltXC, pointerActive ? -pointerNY * 0.16 : 0, 3, step);
+    tiltYC = damp(tiltYC, pointerActive ? pointerNX * 0.26 : 0, 3, step);
+    group.rotation.y = rotY + tiltYC;
+    group.rotation.x = Math.sin(t * 0.4) * 0.12 + 0.16 + tiltXC;
     group.rotation.z = Math.cos(t * 0.27) * 0.07;
 
     const tuck = smoothstepJS(0.05, 0.3, state.p);
@@ -497,6 +569,22 @@ import { MeshSurfaceSampler } from "three/addons/math/MeshSurfaceSampler.js";
     group.position.x = damp(group.position.x, bx, 3, step);
     group.position.y = damp(group.position.y, by, 3, step) + Math.sin(t * 0.8) * 0.16;
     group.scale.setScalar(group.userData.scale * (1 - tuck * 0.22));
+
+    if (pointerActive) {
+      screenToWorld(
+        (pointerNX + 0.5) * window.innerWidth,
+        (pointerNY + 0.5) * window.innerHeight,
+        mouseWorld
+      );
+    }
+    mwLocalV.copy(mouseWorld);
+    group.worldToLocal(mwLocalV);
+    particleUniforms.uMouse.value.lerp(mwLocalV, 1 - Math.exp(-step * 7));
+    const mfT = pointerActive && !mqMobile.matches ? 1 : 0;
+    particleUniforms.uMouseF.value = damp(particleUniforms.uMouseF.value, mfT, 4, step);
+
+    kick = Math.max(0, kick - step * 1.6);
+    particleUniforms.uKick.value = kick * kick;
 
     if (burst.active) {
       burst.t += step / BURST_DURATION;
@@ -526,21 +614,21 @@ import { MeshSurfaceSampler } from "three/addons/math/MeshSurfaceSampler.js";
     aura.position.copy(group.position);
     aura.position.y += Math.sin(t * 0.8) * 0.02;
     aura.quaternion.copy(camera.quaternion);
-    aura.scale.setScalar((1 + Math.sin(t * 1.3) * 0.07) * (1 + burstKick * 0.5));
-    auraMat.opacity = ((0.34 + pulse * 0.24 + state.p * 0.28) * themeDim) + burstKick * themeDim;
+    aura.scale.setScalar((1 + Math.sin(t * 1.3) * 0.07) * (1 + burstKick * 0.5 + eN * 0.12));
+    auraMat.opacity = ((0.34 + pulse * 0.24 + state.p * 0.28) * themeDim) + (burstKick + eN * 0.2) * themeDim;
     auraMat.color.copy(uniforms.uColorA.value).lerp(uniforms.uColorB.value, 0.5);
 
     ringMatA.color.copy(uniforms.uColorB.value);
     ringMatB.color.copy(uniforms.uColorA.value);
-    ringMatA.opacity = (0.5 + pulse * 0.25 + state.p * 0.2 + burstKick) * themeDim;
-    ringMatB.opacity = (0.36 + pulse * 0.2 + state.p * 0.18 + burstKick) * themeDim;
-    ringA.rotation.set(1.35, decoT * 0.42, decoT * 0.1);
-    ringB.rotation.set(-1.15, -decoT * 0.3, decoT * 0.16);
+    ringMatA.opacity = (0.5 + pulse * 0.25 + state.p * 0.2 + burstKick + eN * 0.25) * themeDim;
+    ringMatB.opacity = (0.36 + pulse * 0.2 + state.p * 0.18 + burstKick + eN * 0.2) * themeDim;
+    ringA.rotation.set(1.35, decoT * (0.42 + eN * 0.9), decoT * 0.1);
+    ringB.rotation.set(-1.15, -decoT * (0.3 + eN * 0.7), decoT * 0.16);
 
     for (let i = 0; i < shards.length; i++) {
       const s = shards[i];
       const d = s.userData;
-      const a = decoT * d.sp + d.ph;
+      const a = decoT * d.sp * (1 + eN * 1.4) + d.ph;
       s.position.set(
         Math.cos(a) * d.r,
         Math.sin(a) * d.r * Math.sin(d.tilt) * 0.6,
@@ -558,7 +646,7 @@ import { MeshSurfaceSampler } from "three/addons/math/MeshSurfaceSampler.js";
       const k = shockState.life;
       const e = 1 - Math.pow(1 - Math.min(1, k), 3);
       shock.visible = true;
-      shock.position.copy(group.position);
+      shock.position.copy(shockPos);
       shock.quaternion.copy(camera.quaternion);
       shock.scale.setScalar(0.7 + e * 2.6);
       shockMat.opacity = Math.max(0, (1 - k) * 0.65 * themeDim);
