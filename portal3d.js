@@ -98,7 +98,8 @@ import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
     uShock: { value: new THREE.Vector3(0, 0, -100) },
     uShockAge: { value: 10 },
     uSize: { value: 30 },
-    uAlpha: { value: 1 }
+    uAlpha: { value: 1 },
+    uLightMode: { value: 0 }
   };
 
   const vertexShader = `
@@ -174,6 +175,7 @@ import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
   const fragFinal = `
     precision mediump float;
     uniform float uAlpha;
+    uniform float uLightMode;
     varying vec3 vColor;
     varying float vAlpha;
     varying float vGlow;
@@ -182,6 +184,19 @@ import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
       float d = length(uv);
       float a = smoothstep(0.5, 0.06, d);
       vec3 c = vColor * (1.0 + vGlow);
+      /* Light mode: invert bright colors into dark saturated tones
+         so they contrast against the cream backdrop. */
+      if (uLightMode > 0.5) {
+        float lum = dot(c, vec3(0.299, 0.587, 0.114));
+        vec3 dark = mix(
+          vec3(0.08, 0.18, 0.28),
+          vec3(0.12, 0.22, 0.10),
+          smoothstep(0.5, 0.9, c.g)
+        );
+        dark = mix(dark, vec3(0.18, 0.08, 0.24), smoothstep(0.5, 0.9, c.r));
+        c = mix(c * 0.22, dark, 0.85);
+        a *= 1.4;
+      }
       gl_FragColor = vec4(c, a * vAlpha * uAlpha);
     }`;
 
@@ -477,9 +492,16 @@ import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
     if (old) old.dispose();
     scrimUniforms.uColor.value.set(light ? 0xf3f1e9 : 0x071014);
     renderer.setClearColor(light ? 0xf3f1e9 : 0x071014, 1);
-    if (bloom) bloom.strength = light ? 0.55 : 0.95;
+    if (bloom) bloom.strength = light ? 0.72 : 0.95;
     renderer.toneMappingExposure = light ? 1.0 : 1.05;
-    uniforms.uAlpha.value = light ? 0.85 : 1;
+    uniforms.uAlpha.value = 1;
+    uniforms.uLightMode.value = light ? 1 : 0;
+    /* Fix: additive blending makes bright particles invisible on light
+       backgrounds. Switch to normal blending in light mode so they read. */
+    if (material) {
+      material.blending = light ? THREE.NormalBlending : THREE.AdditiveBlending;
+      material.needsUpdate = true;
+    }
     if (reducedMotion && booted) renderOnce();
   }
 
@@ -551,7 +573,7 @@ import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
     scrim.scale.set(hh * 2 * camera.aspect, hh * 2, 1);
 
     bloomBoost *= 0.93;
-    if (bloom) bloom.strength = (themeIsLight ? 0.55 : 0.95) + bloomBoost;
+    if (bloom) bloom.strength = (themeIsLight ? 0.72 : 0.95) + bloomBoost;
 
     let label;
     if (w4 > 0.5) label = STATES[4];
