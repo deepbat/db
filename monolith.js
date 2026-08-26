@@ -22,10 +22,10 @@ import * as THREE from "three";
 
   const PALETTE = ["#22d3ee", "#d7ff3f", "#f472b6", "#818cf8"].map(function (c) { return new THREE.Color(c); });
   const SHAPES = [
-    { amp: 0.06, freq: 1.4, speed: 0.25 },
-    { amp: 0.16, freq: 2.1, speed: 0.65 },
-    { amp: 0.26, freq: 3.0, speed: 1.1 },
-    { amp: 0.11, freq: 2.6, speed: 0.85 }
+    { amp: 0.13, freq: 1.4, speed: 0.35 },
+    { amp: 0.28, freq: 2.1, speed: 0.85 },
+    { amp: 0.44, freq: 3.0, speed: 1.45 },
+    { amp: 0.20, freq: 2.6, speed: 1.05 }
   ];
 
   const uniforms = {
@@ -33,7 +33,7 @@ import * as THREE from "three";
     uMorph: { value: SHAPES[0].amp },
     uFreq: { value: SHAPES[0].freq },
     uPulse: { value: 0 },
-    uGlow: { value: 0.15 },
+    uGlow: { value: 0.3 },
     uColorA: { value: PALETTE[0].clone() },
     uColorB: { value: PALETTE[1].clone() }
   };
@@ -114,10 +114,10 @@ import * as THREE from "three";
     "float spec=pow(clamp(dot(reflect(-L,nrm),V),0.0,1.0),48.0);" +
     "float fres=pow(1.0-clamp(abs(dot(nrm,V)),0.0,1.0),2.1);" +
     "vec3 base=mix(uColorA,uColorB,fres);" +
-    "vec3 col=base*(0.20+diff*0.72);" +
-    "col+=uColorB*spec*(0.55+uPulse*0.8);" +
-    "col+=base*fres*(0.5+uGlow*1.1);" +
-    "col+=uColorA*uPulse*0.16;" +
+    "vec3 col=base*(0.26+diff*0.78);" +
+    "col+=uColorB*spec*(0.75+uPulse*1.4);" +
+    "col+=base*fres*(0.7+uGlow*1.6);" +
+    "col+=uColorA*uPulse*0.38;" +
     "gl_FragColor=vec4(col,0.94);}";
 
   const shellFragmentShader =
@@ -130,8 +130,8 @@ import * as THREE from "three";
     "vec3 nrm=normalize(cross(dFdx(vWorldPos),dFdy(vWorldPos)));" +
     "vec3 V=normalize(cameraPosition-vWorldPos);" +
     "float fres=pow(1.0-clamp(abs(dot(nrm,V)),0.0,1.0),3.0);" +
-    "vec3 col=mix(uColorA,uColorB,0.5+0.5*fres)*(0.18+fres*(0.55+uGlow))*(0.6+uPulse*0.5);" +
-    "gl_FragColor=vec4(col,fres*0.55);}";
+    "vec3 col=mix(uColorA,uColorB,0.5+0.5*fres)*(0.3+fres*(0.8+uGlow*1.4))*(0.7+uPulse*0.7);" +
+    "gl_FragColor=vec4(col,fres*0.8);}";
 
   const group = new THREE.Group();
   scene.add(group);
@@ -161,6 +161,97 @@ import * as THREE from "three";
   shell.scale.set(1.18, 1.72, 1.18);
   shell.renderOrder = 2;
   group.add(shell);
+
+  function makeAuraTexture() {
+    const c = document.createElement("canvas");
+    c.width = 256;
+    c.height = 256;
+    const ctx = c.getContext("2d");
+    const g = ctx.createRadialGradient(128, 128, 0, 128, 128, 128);
+    g.addColorStop(0, "rgba(255,255,255,1)");
+    g.addColorStop(0.25, "rgba(255,255,255,.42)");
+    g.addColorStop(0.55, "rgba(255,255,255,.14)");
+    g.addColorStop(1, "rgba(255,255,255,0)");
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, 256, 256);
+    return new THREE.CanvasTexture(c);
+  }
+
+  const auraMat = new THREE.MeshBasicMaterial({
+    map: makeAuraTexture(),
+    transparent: true,
+    depthWrite: false,
+    depthTest: false,
+    blending: THREE.AdditiveBlending,
+    opacity: 0.5
+  });
+  const aura = new THREE.Mesh(new THREE.PlaneGeometry(5.4, 5.4), auraMat);
+  aura.renderOrder = -1;
+  scene.add(aura);
+
+  const glowMaterials = [shellMat, auraMat];
+
+  const ringGeoA = new THREE.TorusGeometry(1.9, 0.016, 8, 180);
+  const ringGeoB = new THREE.TorusGeometry(2.2, 0.011, 8, 200);
+  const ringMatA = new THREE.MeshBasicMaterial({
+    color: PALETTE[1].clone(), transparent: true, opacity: 0.6,
+    depthWrite: false, blending: THREE.AdditiveBlending
+  });
+  const ringMatB = new THREE.MeshBasicMaterial({
+    color: PALETTE[0].clone(), transparent: true, opacity: 0.45,
+    depthWrite: false, blending: THREE.AdditiveBlending
+  });
+  const ringA = new THREE.Mesh(ringGeoA, ringMatA);
+  const ringB = new THREE.Mesh(ringGeoB, ringMatB);
+  group.add(ringA);
+  group.add(ringB);
+  glowMaterials.push(ringMatA, ringMatB);
+
+  const shards = [];
+  const shardGeo = new THREE.OctahedronGeometry(1, 0);
+  for (let i = 0; i < 14; i++) {
+    const mat = new THREE.MeshBasicMaterial({
+      color: PALETTE[1].clone(), transparent: true, opacity: 0.9,
+      depthWrite: false, blending: THREE.AdditiveBlending
+    });
+    const mesh = new THREE.Mesh(shardGeo, mat);
+    const base = 0.045 + Math.random() * 0.05;
+    mesh.scale.setScalar(base);
+    mesh.userData = {
+      base: base,
+      r: 1.55 + Math.random() * 0.85,
+      sp: (0.3 + Math.random() * 0.55) * (i % 2 ? 1 : -1),
+      ph: Math.random() * Math.PI * 2,
+      tilt: Math.random() * Math.PI
+    };
+    group.add(mesh);
+    shards.push(mesh);
+    glowMaterials.push(mat);
+  }
+
+  const shockMat = new THREE.MeshBasicMaterial({
+    color: PALETTE[0].clone(), transparent: true, opacity: 0,
+    side: THREE.DoubleSide, depthWrite: false, depthTest: false,
+    blending: THREE.AdditiveBlending
+  });
+  const shock = new THREE.Mesh(new THREE.RingGeometry(0.94, 1.0, 80), shockMat);
+  shock.renderOrder = 3;
+  shock.visible = false;
+  scene.add(shock);
+  glowMaterials.push(shockMat);
+  const shockState = { life: 2, lastSection: -1 };
+
+  let themeIsLight = document.documentElement.getAttribute("data-theme") === "light";
+
+  function applyTheme() {
+    themeIsLight = document.documentElement.getAttribute("data-theme") === "light";
+    glowMaterials.forEach(function (m) {
+      m.blending = themeIsLight ? THREE.NormalBlending : THREE.AdditiveBlending;
+      m.needsUpdate = true;
+    });
+  }
+  applyTheme();
+  new MutationObserver(applyTheme).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
 
   let scrollP = 0;
   const state = { p: 0, speed: 0.2 };
@@ -222,26 +313,81 @@ import * as THREE from "three";
   }
 
   function compose(t, dt) {
-    state.p = damp(state.p, scrollP, 4, dt || 0.016);
+    const step = dt || 0.016;
+    state.p = damp(state.p, scrollP, 4, step);
     samplePaletteInto(state.p);
-    uniforms.uColorA.value.lerp(tmpA, dt ? 1 - Math.exp(-dt * 3) : 1);
-    uniforms.uColorB.value.lerp(tmpB, dt ? 1 - Math.exp(-dt * 3) : 1);
+    uniforms.uColorA.value.lerp(tmpA, 1 - Math.exp(-step * 3));
+    uniforms.uColorB.value.lerp(tmpB, 1 - Math.exp(-step * 3));
 
     const shape = sampleShape(state.p);
-    uniforms.uMorph.value = damp(uniforms.uMorph.value, shape.amp * motionScale, 2.5, dt || 0.016);
-    uniforms.uFreq.value = damp(uniforms.uFreq.value, shape.freq, 2.5, dt || 0.016);
+    uniforms.uMorph.value = damp(uniforms.uMorph.value, shape.amp * motionScale, 2.5, step);
+    uniforms.uFreq.value = damp(uniforms.uFreq.value, shape.freq, 2.5, step);
 
     uniforms.uTime.value = t * motionScale;
-    uniforms.uPulse.value = (0.5 + 0.5 * Math.sin(t * 2.2)) * (reducedMotion ? 0.25 : 1);
-    uniforms.uGlow.value = damp(uniforms.uGlow.value, 0.15 + state.p * 0.85, 3, dt || 0.016);
+    const pulse = 0.5 + 0.5 * Math.sin(t * 2.2);
+    uniforms.uPulse.value = pulse * (reducedMotion ? 0.25 : 1);
+    uniforms.uGlow.value = damp(uniforms.uGlow.value, 0.3 + state.p * 1.15, 3, step);
 
-    const targetSpeed = (0.18 + shape.speed) * (reducedMotion ? 0.12 : 1);
-    state.speed = damp(state.speed, targetSpeed, 2, dt || 0.016);
+    const targetSpeed = (0.34 + shape.speed * 1.3) * (reducedMotion ? 0.15 : 1);
+    state.speed = damp(state.speed, targetSpeed, 2, step);
 
-    group.rotation.y += state.speed * dt;
-    group.rotation.x = Math.sin(t * 0.4) * 0.12;
+    group.rotation.y += state.speed * step;
+    group.rotation.x = Math.sin(t * 0.4) * 0.12 + 0.16;
     group.rotation.z = Math.cos(t * 0.27) * 0.07;
-    group.position.y = (group.userData.baseY || 0) + Math.sin(t * 0.8) * 0.12;
+    group.position.y = (group.userData.baseY || 0) + Math.sin(t * 0.8) * 0.2;
+
+    const decoT = t * (reducedMotion ? 0.3 : 1);
+    const themeDim = themeIsLight ? 0.55 : 1;
+
+    aura.position.copy(group.position);
+    aura.position.y += Math.sin(t * 0.8) * 0.02;
+    aura.quaternion.copy(camera.quaternion);
+    aura.scale.setScalar(1 + Math.sin(t * 1.3) * 0.07);
+    auraMat.opacity = (0.34 + pulse * 0.24 + state.p * 0.28) * themeDim;
+    auraMat.color.copy(uniforms.uColorA.value).lerp(uniforms.uColorB.value, 0.5);
+
+    ringMatA.color.copy(uniforms.uColorB.value);
+    ringMatB.color.copy(uniforms.uColorA.value);
+    ringMatA.opacity = (0.5 + pulse * 0.25 + state.p * 0.2) * themeDim;
+    ringMatB.opacity = (0.36 + pulse * 0.2 + state.p * 0.18) * themeDim;
+    ringA.rotation.set(1.35, decoT * 0.42, decoT * 0.1);
+    ringB.rotation.set(-1.15, -decoT * 0.3, decoT * 0.16);
+
+    for (let i = 0; i < shards.length; i++) {
+      const s = shards[i];
+      const d = s.userData;
+      const a = decoT * d.sp + d.ph;
+      s.position.set(
+        Math.cos(a) * d.r,
+        Math.sin(a) * d.r * Math.sin(d.tilt) * 0.6,
+        Math.sin(a) * d.r * Math.cos(d.tilt)
+      );
+      s.rotation.x = decoT * 1.7 + d.ph;
+      s.rotation.y = decoT * 1.3;
+      s.scale.setScalar(d.base * (0.85 + 0.3 * Math.sin(decoT * 2 + d.ph)));
+      s.material.color.copy(uniforms.uColorB.value);
+      s.material.opacity = (0.65 + pulse * 0.3) * themeDim;
+    }
+
+    const section = Math.floor(state.p * SHAPES.length);
+    if (section !== shockState.lastSection) {
+      shockState.lastSection = section;
+      if (!reducedMotion && booted && dt > 0) shockState.life = 0;
+    }
+    if (shockState.life < 1) {
+      shockState.life += step * 1.15;
+      const k = shockState.life;
+      const e = 1 - Math.pow(1 - Math.min(1, k), 3);
+      shock.visible = true;
+      shock.position.copy(group.position);
+      shock.quaternion.copy(camera.quaternion);
+      shock.scale.setScalar(0.7 + e * 3.6);
+      shockMat.opacity = (1 - k) * 0.65 * themeDim;
+      shockMat.color.copy(uniforms.uColorA.value);
+    } else {
+      shock.visible = false;
+      shockMat.opacity = 0;
+    }
   }
 
   function render() {
