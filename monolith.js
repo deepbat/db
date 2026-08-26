@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { MeshSurfaceSampler } from "three/addons/math/MeshSurfaceSampler.js";
 
 (function () {
   const canvas = document.getElementById("monolithCanvas");
@@ -241,6 +242,115 @@ import * as THREE from "three";
   glowMaterials.push(shockMat);
   const shockState = { life: 2, lastSection: -1 };
 
+  const PARTICLE_COUNT = mqMobile.matches ? 1400 : 3000;
+  const samplerMesh = new THREE.Mesh(new THREE.IcosahedronGeometry(1.15, 1));
+  const sampler = new MeshSurfaceSampler(samplerMesh).build();
+  const pPositions = new Float32Array(PARTICLE_COUNT * 3);
+  const pNormals = new Float32Array(PARTICLE_COUNT * 3);
+  const pRand = new Float32Array(PARTICLE_COUNT * 4);
+  const pDir = new Float32Array(PARTICLE_COUNT * 3);
+  const pSpd = new Float32Array(PARTICLE_COUNT);
+  const tv = new THREE.Vector3();
+  const tn = new THREE.Vector3();
+  for (let i = 0; i < PARTICLE_COUNT; i++) {
+    sampler.sample(tv, tn);
+    pPositions[i * 3] = tv.x;
+    pPositions[i * 3 + 1] = tv.y;
+    pPositions[i * 3 + 2] = tv.z;
+    pNormals[i * 3] = tn.x;
+    pNormals[i * 3 + 1] = tn.y;
+    pNormals[i * 3 + 2] = tn.z;
+    for (let k = 0; k < 4; k++) pRand[i * 4 + k] = Math.random();
+    let dx = Math.random() * 2 - 1;
+    let dy = Math.random() * 2 - 1;
+    let dz = Math.random() * 2 - 1;
+    const dl = Math.sqrt(dx * dx + dy * dy + dz * dz) || 1;
+    dx /= dl; dy /= dl; dz /= dl;
+    pDir[i * 3] = dx;
+    pDir[i * 3 + 1] = dy;
+    pDir[i * 3 + 2] = dz;
+    pSpd[i] = Math.random();
+  }
+  const particleGeo = new THREE.BufferGeometry();
+  particleGeo.setAttribute("position", new THREE.BufferAttribute(pPositions, 3));
+  particleGeo.setAttribute("aNormal", new THREE.BufferAttribute(pNormals, 3));
+  particleGeo.setAttribute("aRand", new THREE.BufferAttribute(pRand, 4));
+  particleGeo.setAttribute("aDir", new THREE.BufferAttribute(pDir, 3));
+  particleGeo.setAttribute("aSpd", new THREE.BufferAttribute(pSpd, 1));
+
+  const particleUniforms = {
+    uTime: uniforms.uTime,
+    uMorph: uniforms.uMorph,
+    uFreq: uniforms.uFreq,
+    uColorA: uniforms.uColorA,
+    uColorB: uniforms.uColorB,
+    uSwirl: { value: 0 },
+    uAssemble: { value: 1 },
+    uOpacity: { value: 0 },
+    uSize: { value: 30 }
+  };
+
+  const particleVertex =
+    "attribute vec3 aNormal;" +
+    "attribute vec4 aRand;" +
+    "attribute vec3 aDir;" +
+    "attribute float aSpd;" +
+    "uniform float uTime,uMorph,uFreq,uSwirl,uAssemble,uSize;" +
+    "varying vec3 vColor;" +
+    "varying float vA;" +
+    NOISE_GLSL +
+    "void main(){" +
+    "vec3 dir=normalize(position);" +
+    "float n=snoise(dir*uFreq+uTime*0.32)+snoise(dir*uFreq*2.1-uTime*0.21)*0.35;" +
+    "vec3 target=position+normal*n*uMorph;" +
+    "float s=1.0-uAssemble;" +
+    "vec3 scat=target+aDir*(2.0+aSpd*3.2);" +
+    "float ang=uSwirl*(0.4+aSpd*0.9)*(aRand.x>0.5?1.0:-1.0);" +
+    "float ca=cos(ang),sa=sin(ang);" +
+    "scat.xz=mat2(ca,-sa,sa,ca)*scat.xz;" +
+    "scat.y+=sin(uSwirl*1.7+aRand.y*6.2831)*0.4*s;" +
+    "scat.x+=cos(uSwirl*1.3+aRand.z*6.2831)*0.25*s;" +
+    "vec3 p=mix(scat,target,uAssemble);" +
+    "vec4 mv=modelViewMatrix*vec4(p,1.0);" +
+    "gl_Position=projectionMatrix*mv;" +
+    "float tw=0.75+0.25*sin(uSwirl*3.0+aRand.w*40.0);" +
+    "gl_PointSize=uSize*(0.5+aSpd*0.95)*tw/max(1.0,-mv.z);" +
+    "vColor=mix(uColorA,uColorB,aRand.x)*1.4;" +
+    "vA=0.45+0.55*aRand.z;}";
+
+  const particleFragment =
+    "uniform float uOpacity;" +
+    "varying vec3 vColor;" +
+    "varying float vA;" +
+    "void main(){" +
+    "float d=length(gl_PointCoord-vec2(0.5));" +
+    "float a=smoothstep(0.5,0.06,d);" +
+    "gl_FragColor=vec4(vColor*(0.8+vA),a*vA*uOpacity);}";
+
+  const particleMat = new THREE.ShaderMaterial({
+    uniforms: particleUniforms,
+    vertexShader: particleVertex,
+    fragmentShader: particleFragment,
+    transparent: true,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending
+  });
+  const particles = new THREE.Points(particleGeo, particleMat);
+  particles.scale.set(1, 1.55, 1);
+  particles.visible = false;
+  particles.frustumCulled = false;
+  group.add(particles);
+
+  const burst = { active: false, t: 1 };
+  const BURST_DURATION = 1.35;
+
+  function triggerBurst(force) {
+    if (reducedMotion) return;
+    if (burst.active && burst.t < 0.55 && !force) return;
+    burst.active = true;
+    burst.t = 0;
+  }
+
   let themeIsLight = document.documentElement.getAttribute("data-theme") === "light";
 
   function applyTheme() {
@@ -249,6 +359,8 @@ import * as THREE from "three";
       m.blending = themeIsLight ? THREE.NormalBlending : THREE.AdditiveBlending;
       m.needsUpdate = true;
     });
+    particleMat.blending = themeIsLight ? THREE.NormalBlending : THREE.AdditiveBlending;
+    particleMat.needsUpdate = true;
   }
   applyTheme();
   new MutationObserver(applyTheme).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
@@ -294,6 +406,7 @@ import * as THREE from "three";
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
+    particleUniforms.uSize.value = (narrow ? 24 : 30) * dpr;
 
     const halfH = Math.tan((camera.fov * Math.PI) / 360) * camera.position.z;
     const halfW = halfH * camera.aspect;
@@ -310,6 +423,21 @@ import * as THREE from "three";
     const max = document.documentElement.scrollHeight - window.innerHeight;
     scrollP = Math.min(1, Math.max(0, max > 0 ? window.scrollY / max : 0));
     if (reducedMotion && booted) renderOnce();
+  }
+
+  function smoothstepJS(e0, e1, x) {
+    const t = Math.min(1, Math.max(0, (x - e0) / (e1 - e0)));
+    return t * t * (3 - 2 * t);
+  }
+
+  function assembleCurve(p) {
+    if (p < 0.2) {
+      const k = p / 0.2;
+      return 1 - k * (2 - k);
+    }
+    if (p < 0.4) return 0;
+    const k = (p - 0.4) / 0.6;
+    return k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
   }
 
   function compose(t, dt) {
@@ -336,20 +464,42 @@ import * as THREE from "three";
     group.rotation.z = Math.cos(t * 0.27) * 0.07;
     group.position.y = (group.userData.baseY || 0) + Math.sin(t * 0.8) * 0.2;
 
+    if (burst.active) {
+      burst.t += step / BURST_DURATION;
+      if (burst.t >= 1) {
+        burst.t = 1;
+        burst.active = false;
+      }
+    }
+
+    const assemble = burst.active || burst.t < 1 ? assembleCurve(Math.min(1, burst.t)) : 1;
+    const pVis = burst.active
+      ? smoothstepJS(0, 0.05, burst.t) * (1 - smoothstepJS(0.78, 0.98, burst.t))
+      : 0;
+
+    particleUniforms.uSwirl.value = t;
+    particleUniforms.uAssemble.value = assemble;
+    particleUniforms.uOpacity.value = pVis;
+    particles.visible = pVis > 0.01;
+    const solidsVisible = assemble > 0.85;
+    core.visible = solidsVisible;
+    shell.visible = solidsVisible;
+
     const decoT = t * (reducedMotion ? 0.3 : 1);
     const themeDim = themeIsLight ? 0.55 : 1;
+    const burstKick = burst.active ? (1 - Math.min(1, burst.t)) * 0.35 : 0;
 
     aura.position.copy(group.position);
     aura.position.y += Math.sin(t * 0.8) * 0.02;
     aura.quaternion.copy(camera.quaternion);
-    aura.scale.setScalar(1 + Math.sin(t * 1.3) * 0.07);
-    auraMat.opacity = (0.34 + pulse * 0.24 + state.p * 0.28) * themeDim;
+    aura.scale.setScalar((1 + Math.sin(t * 1.3) * 0.07) * (1 + burstKick * 0.5));
+    auraMat.opacity = ((0.34 + pulse * 0.24 + state.p * 0.28) * themeDim) + burstKick * themeDim;
     auraMat.color.copy(uniforms.uColorA.value).lerp(uniforms.uColorB.value, 0.5);
 
     ringMatA.color.copy(uniforms.uColorB.value);
     ringMatB.color.copy(uniforms.uColorA.value);
-    ringMatA.opacity = (0.5 + pulse * 0.25 + state.p * 0.2) * themeDim;
-    ringMatB.opacity = (0.36 + pulse * 0.2 + state.p * 0.18) * themeDim;
+    ringMatA.opacity = (0.5 + pulse * 0.25 + state.p * 0.2 + burstKick) * themeDim;
+    ringMatB.opacity = (0.36 + pulse * 0.2 + state.p * 0.18 + burstKick) * themeDim;
     ringA.rotation.set(1.35, decoT * 0.42, decoT * 0.1);
     ringB.rotation.set(-1.15, -decoT * 0.3, decoT * 0.16);
 
@@ -372,7 +522,10 @@ import * as THREE from "three";
     const section = Math.floor(state.p * SHAPES.length);
     if (section !== shockState.lastSection) {
       shockState.lastSection = section;
-      if (!reducedMotion && booted && dt > 0) shockState.life = 0;
+      if (!reducedMotion && booted) {
+        triggerBurst(false);
+        shockState.life = 0;
+      }
     }
     if (shockState.life < 1) {
       shockState.life += step * 1.15;
@@ -382,7 +535,7 @@ import * as THREE from "three";
       shock.position.copy(group.position);
       shock.quaternion.copy(camera.quaternion);
       shock.scale.setScalar(0.7 + e * 3.6);
-      shockMat.opacity = (1 - k) * 0.65 * themeDim;
+      shockMat.opacity = Math.max(0, (1 - k) * 0.65 * themeDim);
       shockMat.color.copy(uniforms.uColorA.value);
     } else {
       shock.visible = false;
@@ -435,5 +588,8 @@ import * as THREE from "three";
   onScroll();
   booted = true;
   if (reducedMotion) renderOnce();
-  else startLoop();
+  else {
+    triggerBurst(true);
+    startLoop();
+  }
 })();
