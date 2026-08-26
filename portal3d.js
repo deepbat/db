@@ -187,7 +187,6 @@ import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
       /* Light mode: invert bright colors into dark saturated tones
          so they contrast against the cream backdrop. */
       if (uLightMode > 0.5) {
-        float lum = dot(c, vec3(0.299, 0.587, 0.114));
         vec3 dark = mix(
           vec3(0.08, 0.18, 0.28),
           vec3(0.12, 0.22, 0.10),
@@ -387,7 +386,7 @@ import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
   try {
     composer = new EffectComposer(renderer);
     composer.addPass(new RenderPass(scene, camera));
-    bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), themeIsLight ? 0.55 : 0.95, 0.75, 0.5);
+    bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), themeIsLight ? 0.55 : 0.95, 0.75, themeIsLight ? 0.97 : 0.5);
     composer.addPass(bloom);
     composer.addPass(new OutputPass());
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -492,7 +491,14 @@ import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
     if (old) old.dispose();
     scrimUniforms.uColor.value.set(light ? 0xf3f1e9 : 0x071014);
     renderer.setClearColor(light ? 0xf3f1e9 : 0x071014, 1);
-    if (bloom) bloom.strength = light ? 0.72 : 0.95;
+    if (bloom) {
+      bloom.strength = light ? 0.72 : 0.95;
+      /* Fix: the cream light-mode backdrop (~0.94 luminance) sat above the
+         dark-mode bloom threshold (0.5), so the whole background bloomed
+         and washed out the darkened particles. Raise the threshold in
+         light mode so only genuine highlights (shocks) bloom. */
+      bloom.threshold = light ? 0.97 : 0.5;
+    }
     renderer.toneMappingExposure = light ? 1.0 : 1.05;
     uniforms.uAlpha.value = 1;
     uniforms.uLightMode.value = light ? 1 : 0;
