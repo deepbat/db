@@ -1,12 +1,12 @@
 /* Portfolio data. Keep this file simple so content can be edited without touching the interaction engine. */
 window.SITE_CONTENT = {
   skills: [
-    { name: "AI", value: 100 },
-    { name: "Local LLMs", value: 100 },
-    { name: "Automation", value: 100 },
-    { name: "PowerShell", value: 100 },
-    { name: "Web / Three.js", value: 100 },
-    { name: "Desktop Software", value: 100 }
+    { name: "AI", value: 92 },
+    { name: "Local LLMs", value: 85 },
+    { name: "Automation", value: 88 },
+    { name: "PowerShell", value: 78 },
+    { name: "Web / Three.js", value: 74 },
+    { name: "Desktop Software", value: 70 }
   ],
   gallery: [
     { src: "images/gallery-01", alt: "Personal photograph 01" },
@@ -210,26 +210,24 @@ window.SITE_CONTENT = {
     });
   }
 
-  function renderSkills() { var list = document.getElementById("skillList"); if (!list) return; content.skills.forEach(function (skill, index) { var row = document.createElement("div"); row.className = "skill-row"; row.innerHTML = '<div class="skill-meta"><span class="num mono">0' + (index + 1) + '</span><h3>' + skill.name + '</h3><span class="value mono">EXPLORE</span></div><div class="skill-track"><i style="width:100%"></i></div>'; list.appendChild(row); }); }
   function renderGallery() { var grid = document.getElementById("galleryGrid"); if (!grid) return; content.gallery.forEach(function (item, index) { var button = document.createElement("button"); button.type = "button"; button.className = "gallery-item"; button.setAttribute("aria-label", "Open " + item.alt); button.innerHTML = '<picture><source srcset="' + item.src + '.webp" type="image/webp"><img src="' + item.src + '.jpg" alt="' + item.alt + '" loading="lazy"></picture><span class="mono">' + String(index + 1).padStart(2, "0") + ' / ' + item.alt + '</span>'; button.addEventListener("click", function () { openGallery(index); }); grid.appendChild(button); }); }
   var modal = document.getElementById("galleryModal"), modalImage = document.getElementById("modalImage"), modalTitle = document.getElementById("modalTitle"), modalCount = document.getElementById("modalCount"), currentPhoto = 0, _lastFocused = null;
   function openGallery(index) {
     currentPhoto = (index + content.gallery.length) % content.gallery.length;
     var item = content.gallery[currentPhoto];
-    modalImage.src = item.src + ".jpg";
+    var isModernFormat = document.querySelector('picture source[type="image/webp"]');
+    modalImage.src = item.src + (isModernFormat ? ".webp" : ".jpg");
     modalImage.alt = item.alt;
     modalTitle.textContent = item.alt;
     modalCount.textContent = String(currentPhoto + 1).padStart(2, "0") + " / " + String(content.gallery.length).padStart(2, "0");
     _lastFocused = document.activeElement;
     modal.setAttribute("aria-hidden", "false");
-    modal.style.visibility = "visible";
     // move focus into the modal so screen readers announce it
     var closeBtn = modal.querySelector(".modal-close");
     if (closeBtn) closeBtn.focus();
   }
   function closeGallery() {
     modal.setAttribute("aria-hidden", "true");
-    modal.style.visibility = "hidden";
     // return focus to the element that opened the modal
     if (_lastFocused && _lastFocused.focus) _lastFocused.focus();
     _lastFocused = null;
@@ -271,7 +269,7 @@ window.SITE_CONTENT = {
     content.skills.forEach(function (skill, index) {
       var row = document.createElement("div");
       row.className = "skill-row";
-      row.innerHTML = '<div class="skill-meta"><span class="num mono">0' + (index + 1) + '</span><h3>' + skill.name + '</h3><span class="value mono">EXPLORE</span></div><div class="skill-track"><i data-width="100" style="width:0%"></i></div>';
+      row.innerHTML = '<div class="skill-meta"><span class="num mono">0' + (index + 1) + '</span><h3>' + skill.name + '</h3><span class="value mono">EXPLORE</span></div><div class="skill-track"><i data-width="' + skill.value + '" style="width:0%"></i></div>';
       list.appendChild(row);
     });
     if (!("IntersectionObserver" in window)) {
@@ -285,7 +283,7 @@ window.SITE_CONTENT = {
         skillObs.unobserve(entry.target);
         var bar = entry.target.querySelector(".skill-track i");
         setTimeout(function () {
-          if (bar) bar.style.width = "100%";
+          if (bar) bar.style.width = (bar.dataset.width || 100) + '%';
         }, 80);
       });
     }, { threshold: 0.25 });
@@ -719,5 +717,27 @@ window.SITE_CONTENT = {
     window.addEventListener("resize", layoutLeaves);
     window.addEventListener("resize", buildCornerFoliage);
   });
+})();
+
+/* Scroll-triggered 3D perspective tilt on sections: each section rotates
+   from a slight 3D angle into flat as it enters the viewport. */
+(function () {
+  "use strict";
+  var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (reducedMotion) return;
+  var sections = Array.prototype.slice.call(document.querySelectorAll(".section"));
+  if (!sections.length || !("IntersectionObserver" in window)) return;
+  var obs = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) {
+        e.target.classList.add("section-visible");
+        e.target.classList.remove("section-hidden");
+      } else {
+        e.target.classList.remove("section-visible");
+        e.target.classList.add("section-hidden");
+      }
+    });
+  }, { threshold: 0.08, rootMargin: "0px 0px -10% 0px" });
+  sections.forEach(function (s) { obs.observe(s); });
 })();
 

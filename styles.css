@@ -392,3 +392,375 @@ html[data-theme="light"] .monolith-canvas{opacity:.9}
 .recognition-list>div h3,.recognition-list>div p{grid-column:2}
 .recognition-list>div b{grid-row:1/span 2}
 .gallery-intro img{max-width:240px}
+
+/* ==========================================================================
+   FUTURISTIC / 3D ENHANCEMENTS
+   ========================================================================== */
+
+/* --- 1. Translate3d GPU-accelerated hover on project cards ------------------ */
+.project-card{
+  transform:translate3d(0,0,0) perspective(1200px);
+  transform-style:preserve-3d;
+}
+.project-card:hover{
+  transform:translate3d(0,-4px,8px) perspective(1200px) rotateX(1.5deg);
+  box-shadow:0 12px 40px rgba(0,0,0,.35),0 0 20px rgba(215,255,63,.06);
+}
+
+/* --- 2. Scroll-triggered 3D perspective tilt on sections ------------------- */
+main{
+  perspective:1200px;
+  perspective-origin:50% 40%;
+}
+.section{
+  transform:translateZ(0) rotateX(0deg);
+  transform-origin:center top;
+  transition:transform .6s var(--ease),opacity .4s ease;
+  will-change:transform;
+}
+.section.section-visible{
+  transform:translateZ(0) rotateX(0deg);
+  opacity:1;
+}
+.section.section-hidden{
+  transform:translateZ(-60px) rotateX(2.5deg);
+  opacity:.85;
+}
+
+/* --- 3. Holographic glitch / chromatic aberration on hero h1 ---------------- */
+.hero h1{
+  position:relative;
+}
+.hero h1 em{
+  position:relative;
+  display:inline-block;
+}
+@keyframes holo-glitch{
+  0%,93%,100%{
+    text-shadow:none;
+  }
+  94%{
+    text-shadow:
+      -2px 0 rgba(215,255,63,.7),
+      2px 0 rgba(111,231,255,.7),
+      0 0 20px rgba(215,255,63,.25);
+  }
+  95%{
+    text-shadow:
+      2px 0 rgba(215,255,63,.5),
+      -1px 0 rgba(111,231,255,.5),
+      0 0 30px rgba(111,231,255,.2);
+  }
+  96%{
+    text-shadow:
+      -1px 1px rgba(244,114,182,.4),
+      1px -1px rgba(111,231,255,.4);
+  }
+  97%{
+    text-shadow:none;
+  }
+}
+.hero h1 em{
+  animation:holo-glitch 8s linear infinite;
+  text-shadow:0 0 40px rgba(215,255,63,.15);
+}
+@keyframes scanline-sweep{
+  0%{background-position:0 -200%}
+  100%{background-position:0 200%}
+}
+.hero h1::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:repeating-linear-gradient(
+    0deg,
+    transparent 0 2px,
+    rgba(215,255,63,.03) 2px 4px
+  );
+  background-size:100% 4px;
+  animation:scanline-sweep 12s linear infinite;
+  mix-blend-mode:screen;
+  opacity:.5;
+}
+@media (prefers-reduced-motion:reduce){
+  .hero h1 em{animation:none}
+  .hero h1::after{animation:none}
+}
+
+/* --- 4. Neon glow hover effects on buttons ---------------------------------- */
+.button-primary{
+  position:relative;
+  overflow:hidden;
+  transition:transform .16s var(--ease),background .16s ease,box-shadow .3s ease;
+}
+.button-primary::before{
+  content:"";
+  position:absolute;
+  inset:-2px;
+  border-radius:inherit;
+  background:linear-gradient(135deg,var(--lime),rgba(111,231,255,.6),var(--lime));
+  opacity:0;
+  z-index:-1;
+  filter:blur(12px);
+  transition:opacity .3s ease;
+}
+.button-primary:hover{
+  box-shadow:
+    0 0 12px rgba(215,255,63,.35),
+    0 0 28px rgba(215,255,63,.15),
+    0 0 56px rgba(215,255,63,.06);
+}
+.button-primary:hover::before{
+  opacity:1;
+}
+.button-ghost{
+  transition:transform .16s var(--ease),box-shadow .3s ease,border-color .16s ease,background .16s ease;
+}
+.button-ghost:hover{
+  box-shadow:
+    0 0 10px rgba(215,255,63,.2),
+    0 0 24px rgba(215,255,63,.08);
+}
+html[data-theme="light"] .button-primary:hover{
+  box-shadow:
+    0 0 12px rgba(96,123,0,.3),
+    0 0 28px rgba(96,123,0,.12);
+}
+
+/* --- 5. Animated gradient mesh background ----------------------------------- */
+.gradient-mesh{
+  position:fixed;
+  z-index:0;
+  inset:0;
+  pointer-events:none;
+  opacity:.12;
+  background:
+    radial-gradient(ellipse at 20% 50%,rgba(111,231,255,.18) 0%,transparent 50%),
+    radial-gradient(ellipse at 80% 20%,rgba(215,255,63,.12) 0%,transparent 45%),
+    radial-gradient(ellipse at 50% 80%,rgba(244,114,182,.08) 0%,transparent 50%);
+  animation:mesh-drift 25s ease-in-out infinite alternate;
+  mix-blend-mode:screen;
+}
+@keyframes mesh-drift{
+  0%{
+    background:
+      radial-gradient(ellipse at 20% 50%,rgba(111,231,255,.18) 0%,transparent 50%),
+      radial-gradient(ellipse at 80% 20%,rgba(215,255,63,.12) 0%,transparent 45%),
+      radial-gradient(ellipse at 50% 80%,rgba(244,114,182,.08) 0%,transparent 50%);
+  }
+  50%{
+    background:
+      radial-gradient(ellipse at 70% 30%,rgba(111,231,255,.14) 0%,transparent 50%),
+      radial-gradient(ellipse at 30% 70%,rgba(215,255,63,.1) 0%,transparent 45%),
+      radial-gradient(ellipse at 60% 50%,rgba(244,114,182,.12) 0%,transparent 50%);
+  }
+  100%{
+    background:
+      radial-gradient(ellipse at 50% 60%,rgba(111,231,255,.16) 0%,transparent 50%),
+      radial-gradient(ellipse at 60% 40%,rgba(215,255,63,.14) 0%,transparent 45%),
+      radial-gradient(ellipse at 20% 30%,rgba(244,114,182,.1) 0%,transparent 50%);
+  }
+}
+html[data-theme="light"] .gradient-mesh{opacity:.06;mix-blend-mode:multiply}
+
+/* --- 6. Floating 3D orbs (pure CSS) ---------------------------------------- */
+.orb-field{
+  position:fixed;
+  z-index:1;
+  inset:0;
+  pointer-events:none;
+  overflow:hidden;
+}
+.orb{
+  position:absolute;
+  border-radius:50%;
+  pointer-events:none;
+  will-change:transform;
+}
+.orb-a{
+  width:180px;height:180px;
+  left:8%;top:20%;
+  background:radial-gradient(circle at 35% 30%,rgba(111,231,255,.18),rgba(111,231,255,.04) 60%,transparent 72%);
+  box-shadow:0 0 60px 10px rgba(111,231,255,.06);
+  animation:orb-float-a 18s ease-in-out infinite;
+}
+.orb-b{
+  width:120px;height:120px;
+  right:12%;top:55%;
+  background:radial-gradient(circle at 35% 30%,rgba(215,255,63,.14),rgba(215,255,63,.03) 60%,transparent 72%);
+  box-shadow:0 0 50px 8px rgba(215,255,63,.05);
+  animation:orb-float-b 22s ease-in-out infinite;
+}
+.orb-c{
+  width:90px;height:90px;
+  left:45%;bottom:15%;
+  background:radial-gradient(circle at 35% 30%,rgba(244,114,182,.12),rgba(244,114,182,.03) 60%,transparent 72%);
+  box-shadow:0 0 40px 6px rgba(244,114,182,.04);
+  animation:orb-float-c 26s ease-in-out infinite;
+}
+@keyframes orb-float-a{
+  0%,100%{transform:translate3d(0,0,0) scale(1)}
+  33%{transform:translate3d(30px,-40px,20px) scale(1.08)}
+  66%{transform:translate3d(-20px,25px,-10px) scale(.94)}
+}
+@keyframes orb-float-b{
+  0%,100%{transform:translate3d(0,0,0) scale(1)}
+  33%{transform:translate3d(-25px,35px,-15px) scale(.92)}
+  66%{transform:translate3d(20px,-30px,10px) scale(1.1)}
+}
+@keyframes orb-float-c{
+  0%,100%{transform:translate3d(0,0,0) scale(1)}
+  50%{transform:translate3d(15px,-25px,15px) scale(1.06)}
+}
+html[data-theme="light"] .orb{opacity:.5}
+@media (prefers-reduced-motion:reduce){
+  .orb{animation:none!important;transform:none!important}
+}
+@media (max-width:760px){
+  .orb-a{width:100px;height:100px;left:5%;top:15%}
+  .orb-b{width:70px;height:70px;right:8%}
+  .orb-c{width:50px;height:50px}
+}
+
+/* --- 7. Cursor-reactive grid distortion (CSS-driven) ------------------------ */
+.hero-grid{
+  opacity:.16;
+  transition:opacity .3s ease;
+}
+body.gl3d .hero-grid{
+  opacity:0;
+}
+
+/* --- 8. 3D section dividers ------------------------------------------------- */
+.section-line{
+  position:relative;
+  perspective:800px;
+  margin-bottom:64px;
+}
+.section-line::after{
+  content:"";
+  position:absolute;
+  bottom:-32px;
+  left:0;
+  right:0;
+  height:1px;
+  background:linear-gradient(90deg,transparent,var(--lime),var(--cyan),transparent);
+  transform:rotateX(60deg) translateZ(4px);
+  transform-origin:center bottom;
+  opacity:.4;
+}
+html[data-theme="light"] .section-line::after{opacity:.25}
+
+/* --- 9. Scroll-synced monolith enhancement --------------------------------- */
+.monolith-canvas{
+  filter:drop-shadow(0 0 15px rgba(111,231,255,.12));
+  transition:filter .5s ease;
+}
+.monolith-canvas:hover{
+  filter:drop-shadow(0 0 25px rgba(111,231,255,.2));
+}
+html[data-theme="light"] .monolith-canvas{
+  filter:drop-shadow(0 0 12px rgba(0,94,111,.1));
+}
+
+/* --- 10. 3D card tilt on gallery (enhanced) --------------------------------- */
+.gallery-item{
+  transform-style:preserve-3d;
+}
+.gallery-item::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:linear-gradient(
+    115deg,
+    rgba(255,255,255,.18),
+    transparent 24%,
+    transparent 65%,
+    rgba(215,255,63,.12)
+  );
+  mix-blend-mode:screen;
+  opacity:0;
+  transition:opacity .3s ease;
+  z-index:2;
+}
+.gallery-item:hover::before{
+  opacity:.8;
+}
+
+/* --- 11. Enhanced timeline 3D hover ---------------------------------------- */
+.timeline article{
+  transform:translateZ(0) perspective(900px);
+  transform-style:preserve-3d;
+  will-change:transform;
+}
+.timeline article:hover{
+  transform:translateZ(4px) perspective(900px) rotateY(-0.8deg);
+}
+
+/* --- 12. Floating particles field (pure CSS keyframes) ---------------------- */
+@keyframes particle-rise{
+  0%{
+    transform:translateY(100vh) translateX(0) scale(0);
+    opacity:0;
+  }
+  10%{
+    opacity:.6;
+    transform:translateY(80vh) translateX(5px) scale(1);
+  }
+  90%{
+    opacity:.3;
+  }
+  100%{
+    transform:translateY(-10vh) translateX(-10px) scale(.5);
+    opacity:0;
+  }
+}
+.css-particle{
+  position:fixed;
+  width:3px;
+  height:3px;
+  border-radius:50%;
+  background:var(--cyan);
+  pointer-events:none;
+  z-index:1;
+  opacity:0;
+  animation:particle-rise var(--p-dur,18s) linear var(--p-delay,0s) infinite;
+}
+.css-particle:nth-child(even){background:var(--lime)}
+.css-particle:nth-child(3n){background:rgba(244,114,182,.6);width:2px;height:2px}
+@media (prefers-reduced-motion:reduce){
+  .css-particle{animation:none!important;opacity:0!important}
+}
+
+/* --- 13. Hero stat counters 3D pop ---------------------------------------- */
+.hero-stats div{
+  transition:transform .28s var(--ease);
+}
+.hero-stats div:hover{
+  transform:translate3d(0,-2px,6px) scale(1.04);
+}
+.hero-stats strong{
+  background:linear-gradient(180deg,var(--paper),rgba(215,255,63,.85));
+  -webkit-background-clip:text;background-clip:text;
+  color:transparent;
+}
+html[data-theme="light"] .hero-stats strong{
+  background-image:linear-gradient(180deg,var(--paper),rgba(96,123,0,.85));
+}
+
+/* --- 14. Glow ring on nav brand on hover ----------------------------------- */
+.brand{
+  transition:transform .2s var(--ease);
+}
+.brand:hover{
+  transform:translateZ(4px) scale(1.02);
+}
+.brand-mark{
+  transition:box-shadow .3s ease,border-color .3s ease;
+}
+.brand:hover .brand-mark{
+  box-shadow:0 0 14px rgba(215,255,63,.3),0 0 28px rgba(215,255,63,.1);
+  border-color:var(--lime);
+}
