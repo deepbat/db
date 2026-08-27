@@ -505,8 +505,10 @@ import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
     /* Fix: additive blending makes bright particles invisible on light
        backgrounds. Switch to normal blending in light mode so they read. */
     if (material) {
+      /* .blending is a GPU state flag, not part of the compiled shader
+         program, so it doesn't need needsUpdate — that was forcing a full
+         shader recompile (and a visible hitch) on every theme toggle. */
       material.blending = light ? THREE.NormalBlending : THREE.AdditiveBlending;
-      material.needsUpdate = true;
     }
     if (reducedMotion && booted) renderOnce();
   }

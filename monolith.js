@@ -364,12 +364,13 @@ import { MeshSurfaceSampler } from "three/addons/math/MeshSurfaceSampler.js";
 
   function applyTheme() {
     themeIsLight = document.documentElement.getAttribute("data-theme") === "light";
+    /* .blending is GPU state, not part of the compiled program — needsUpdate
+       forced a full shader recompile on every theme toggle for no benefit
+       (same fix already applied in portal3d.js). */
     glowMaterials.forEach(function (m) {
       m.blending = themeIsLight ? THREE.NormalBlending : THREE.AdditiveBlending;
-      m.needsUpdate = true;
     });
     particleMat.blending = themeIsLight ? THREE.NormalBlending : THREE.AdditiveBlending;
-    particleMat.needsUpdate = true;
   }
   applyTheme();
   new MutationObserver(applyTheme).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });

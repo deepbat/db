@@ -127,7 +127,7 @@ window.SITE_CONTENT = {
       if (!pointerDown) return;
       var p = point(event), moved = Math.hypot(p.x - downX, p.y - downY);
       if (!sculpting && moved < 11) { addRipple(p.x, p.y, .9, "lime"); spawnVisualRipple(p.x, p.y, "lime"); playChime(Math.round((p.x / Math.max(1, width)) * 15) - 7, .72); lastInteraction = performance.now(); setSurfaceStatus("ripple / chime"); }
-      pointerDown = false; sculpting = false; setTimeout(function () { setSurfaceStatus("Move to sway the jungle · step into the portal"); }, 620);
+      pointerDown = false; sculpting = false; setTimeout(function () { setSurfaceStatus("Drag the field · click to pulse"); }, 620);
     }
     function render(time) {
       var delta = Math.min(32, Math.max(0, time - lastTime)); lastTime = time; ctx.clearRect(0, 0, width, height);

@@ -528,100 +528,6 @@ html[data-theme="light"] .button-primary:hover{
     0 0 28px rgba(96,123,0,.12);
 }
 
-/* --- 5. Animated gradient mesh background ----------------------------------- */
-.gradient-mesh{
-  position:fixed;
-  z-index:0;
-  inset:0;
-  pointer-events:none;
-  opacity:.12;
-  background:
-    radial-gradient(ellipse at 20% 50%,rgba(111,231,255,.18) 0%,transparent 50%),
-    radial-gradient(ellipse at 80% 20%,rgba(215,255,63,.12) 0%,transparent 45%),
-    radial-gradient(ellipse at 50% 80%,rgba(244,114,182,.08) 0%,transparent 50%);
-  animation:mesh-drift 25s ease-in-out infinite alternate;
-  mix-blend-mode:screen;
-}
-@keyframes mesh-drift{
-  0%{
-    background:
-      radial-gradient(ellipse at 20% 50%,rgba(111,231,255,.18) 0%,transparent 50%),
-      radial-gradient(ellipse at 80% 20%,rgba(215,255,63,.12) 0%,transparent 45%),
-      radial-gradient(ellipse at 50% 80%,rgba(244,114,182,.08) 0%,transparent 50%);
-  }
-  50%{
-    background:
-      radial-gradient(ellipse at 70% 30%,rgba(111,231,255,.14) 0%,transparent 50%),
-      radial-gradient(ellipse at 30% 70%,rgba(215,255,63,.1) 0%,transparent 45%),
-      radial-gradient(ellipse at 60% 50%,rgba(244,114,182,.12) 0%,transparent 50%);
-  }
-  100%{
-    background:
-      radial-gradient(ellipse at 50% 60%,rgba(111,231,255,.16) 0%,transparent 50%),
-      radial-gradient(ellipse at 60% 40%,rgba(215,255,63,.14) 0%,transparent 45%),
-      radial-gradient(ellipse at 20% 30%,rgba(244,114,182,.1) 0%,transparent 50%);
-  }
-}
-html[data-theme="light"] .gradient-mesh{opacity:.06;mix-blend-mode:multiply}
-
-/* --- 6. Floating 3D orbs (pure CSS) ---------------------------------------- */
-.orb-field{
-  position:fixed;
-  z-index:1;
-  inset:0;
-  pointer-events:none;
-  overflow:hidden;
-}
-.orb{
-  position:absolute;
-  border-radius:50%;
-  pointer-events:none;
-  will-change:transform;
-}
-.orb-a{
-  width:180px;height:180px;
-  left:8%;top:20%;
-  background:radial-gradient(circle at 35% 30%,rgba(111,231,255,.18),rgba(111,231,255,.04) 60%,transparent 72%);
-  box-shadow:0 0 60px 10px rgba(111,231,255,.06);
-  animation:orb-float-a 18s ease-in-out infinite;
-}
-.orb-b{
-  width:120px;height:120px;
-  right:12%;top:55%;
-  background:radial-gradient(circle at 35% 30%,rgba(215,255,63,.14),rgba(215,255,63,.03) 60%,transparent 72%);
-  box-shadow:0 0 50px 8px rgba(215,255,63,.05);
-  animation:orb-float-b 22s ease-in-out infinite;
-}
-.orb-c{
-  width:90px;height:90px;
-  left:45%;bottom:15%;
-  background:radial-gradient(circle at 35% 30%,rgba(244,114,182,.12),rgba(244,114,182,.03) 60%,transparent 72%);
-  box-shadow:0 0 40px 6px rgba(244,114,182,.04);
-  animation:orb-float-c 26s ease-in-out infinite;
-}
-@keyframes orb-float-a{
-  0%,100%{transform:translate3d(0,0,0) scale(1)}
-  33%{transform:translate3d(30px,-40px,20px) scale(1.08)}
-  66%{transform:translate3d(-20px,25px,-10px) scale(.94)}
-}
-@keyframes orb-float-b{
-  0%,100%{transform:translate3d(0,0,0) scale(1)}
-  33%{transform:translate3d(-25px,35px,-15px) scale(.92)}
-  66%{transform:translate3d(20px,-30px,10px) scale(1.1)}
-}
-@keyframes orb-float-c{
-  0%,100%{transform:translate3d(0,0,0) scale(1)}
-  50%{transform:translate3d(15px,-25px,15px) scale(1.06)}
-}
-html[data-theme="light"] .orb{opacity:.5}
-@media (prefers-reduced-motion:reduce){
-  .orb{animation:none!important;transform:none!important}
-}
-@media (max-width:760px){
-  .orb-a{width:100px;height:100px;left:5%;top:15%}
-  .orb-b{width:70px;height:70px;right:8%}
-  .orb-c{width:50px;height:50px}
-}
 
 /* --- 7. Cursor-reactive grid distortion (CSS-driven) ------------------------ */
 .hero-grid{
@@ -699,40 +605,6 @@ html[data-theme="light"] .monolith-canvas{
   transform:translateZ(4px) perspective(900px) rotateY(-0.8deg);
 }
 
-/* --- 12. Floating particles field (pure CSS keyframes) ---------------------- */
-@keyframes particle-rise{
-  0%{
-    transform:translateY(100vh) translateX(0) scale(0);
-    opacity:0;
-  }
-  10%{
-    opacity:.6;
-    transform:translateY(80vh) translateX(5px) scale(1);
-  }
-  90%{
-    opacity:.3;
-  }
-  100%{
-    transform:translateY(-10vh) translateX(-10px) scale(.5);
-    opacity:0;
-  }
-}
-.css-particle{
-  position:fixed;
-  width:3px;
-  height:3px;
-  border-radius:50%;
-  background:var(--cyan);
-  pointer-events:none;
-  z-index:1;
-  opacity:0;
-  animation:particle-rise var(--p-dur,18s) linear var(--p-delay,0s) infinite;
-}
-.css-particle:nth-child(even){background:var(--lime)}
-.css-particle:nth-child(3n){background:rgba(244,114,182,.6);width:2px;height:2px}
-@media (prefers-reduced-motion:reduce){
-  .css-particle{animation:none!important;opacity:0!important}
-}
 
 /* --- 13. Hero stat counters 3D pop ---------------------------------------- */
 .hero-stats div{
@@ -763,4 +635,125 @@ html[data-theme="light"] .hero-stats strong{
 .brand:hover .brand-mark{
   box-shadow:0 0 14px rgba(215,255,63,.3),0 0 28px rgba(215,255,63,.1);
   border-color:var(--lime);
+}
+
+/* ==========================================================================
+   CONTROL ROOM — visual overhaul layer (appended deliberately: it layers on
+   top of the existing design system rather than rewriting it, so the WebGL
+   particle field, chime instrument and water surface stay untouched). Adds
+   panel bezels, rivets, toggle-switch buttons and console placards to push
+   the hero's Control Room concept out across the whole page.
+   ========================================================================== */
+
+:root{
+  --amber:#ffb454;
+  --rivet:rgba(212,240,238,.22);
+  --rivet-light:rgba(20,33,38,.28);
+  --metal-a:rgba(255,255,255,.05);
+  --metal-b:rgba(0,0,0,.16);
+  --panel-radius:2px;
+}
+
+/* --- Console panel bezel: brushed-metal edge + corner rivets, used on the
+   surfaces that already read as "instruments" (cards, forms, modal). --- */
+.console-panel{
+  position:relative;
+  background-image:linear-gradient(155deg,var(--metal-a) 0%,transparent 26%,transparent 74%,var(--metal-b) 100%);
+  box-shadow:inset 0 0 0 1px var(--rivet), inset 0 1px 0 rgba(255,255,255,.04);
+}
+.console-panel:before,.console-panel:after,.console-panel .rivet-tl,.console-panel .rivet-br{
+  content:"";
+  position:absolute;
+  width:3px;height:3px;
+  border-radius:50%;
+  background:var(--rivet);
+  box-shadow:0 1px 0 rgba(0,0,0,.4);
+  pointer-events:none;
+}
+.console-panel:before{top:7px;left:7px}
+.console-panel:after{bottom:7px;right:7px}
+.project-card,.contact-grid form,.gallery-modal .modal-image,.skill-row{position:relative}
+.project-card,.contact-grid form{
+  background-image:linear-gradient(155deg,var(--metal-a) 0%,transparent 30%,transparent 72%,var(--metal-b) 100%);
+  box-shadow:inset 0 0 0 1px var(--rivet), inset 0 1px 0 rgba(255,255,255,.04);
+}
+.project-card:before,.project-card:after,.contact-grid form:before,.contact-grid form:after{
+  content:"";position:absolute;width:3px;height:3px;border-radius:50%;
+  background:var(--rivet);box-shadow:0 1px 0 rgba(0,0,0,.4);pointer-events:none;
+}
+.project-card:before,.contact-grid form:before{top:8px;left:8px}
+.project-card:after,.contact-grid form:after{bottom:8px;right:8px}
+
+/* --- Section placards: labels read like engraved console tags. --- */
+.section-label{
+  position:relative;
+  padding:3px 8px 3px 10px;
+  border:1px solid var(--line);
+  border-left:2px solid var(--lime);
+  background:rgba(111,231,255,.03);
+}
+.section-label.cyan{border-left-color:var(--cyan)}
+.section-note{
+  padding:3px 8px;
+  border:1px solid var(--line);
+  opacity:.85;
+}
+
+/* --- Buttons as console toggle switches: LED dot + embossed edge. --- */
+.button{position:relative;padding-left:30px;box-shadow:inset 0 1px 0 rgba(255,255,255,.12),inset 0 -2px 0 rgba(0,0,0,.16)}
+.button:before{
+  content:"";position:absolute;left:14px;top:50%;width:6px;height:6px;
+  border-radius:50%;transform:translateY(-50%);
+  background:currentColor;box-shadow:0 0 0 3px rgba(255,255,255,.06),0 0 8px currentColor;
+}
+.button-primary:before{background:var(--ink);box-shadow:0 0 0 3px rgba(7,16,20,.14)}
+.button-ghost:before{background:var(--lime);box-shadow:0 0 0 3px rgba(215,255,63,.12),0 0 8px rgba(215,255,63,.5)}
+.button:active{box-shadow:inset 0 2px 0 rgba(0,0,0,.2)}
+
+/* --- Timeline index chips read as illuminated indicator lamps. --- */
+.timeline b{
+  position:relative;
+  box-shadow:0 0 0 1px rgba(111,231,255,.14),inset 0 0 6px rgba(111,231,255,.18);
+}
+.timeline article:hover b{
+  box-shadow:0 0 0 1px rgba(111,231,255,.3),0 0 10px rgba(111,231,255,.45),inset 0 0 6px rgba(111,231,255,.3);
+}
+
+/* --- Contact links styled as a patch panel: numbered jacks. --- */
+.contact-links a{position:relative;padding-left:16px}
+.contact-links a:before{
+  content:"";position:absolute;left:0;top:50%;width:6px;height:6px;
+  border-radius:1px;transform:translateY(-50%) rotate(45deg);
+  border:1px solid currentColor;opacity:.7;
+}
+
+/* --- Nav + footer: faint brushed-metal gradient ties them to the console
+   language without touching layout, blur or scroll behaviour already set. --- */
+.site-nav{background-image:linear-gradient(180deg,var(--metal-a),transparent 60%)}
+.footer{background-image:linear-gradient(0deg,transparent,var(--metal-b) 220%)}
+
+/* --- Gallery modal controls: bezelled console buttons. --- */
+.modal-close,.modal-prev,.modal-next{
+  box-shadow:inset 0 0 0 1px var(--rivet),inset 0 1px 0 rgba(255,255,255,.06);
+  border-radius:1px;
+}
+.modal-close:hover,.modal-prev:hover,.modal-next:hover{
+  border-color:var(--lime);color:var(--lime);
+  box-shadow:inset 0 0 0 1px rgba(215,255,63,.3),0 0 10px rgba(215,255,63,.18);
+}
+
+/* --- Skill rows: amber progress accent alongside the existing lime track,
+   giving the "explore" list a warning-strip read without changing markup. --- */
+.skill-track{position:relative;overflow:visible}
+.skill-track:after{
+  content:"";position:absolute;top:-3px;left:-3px;width:6px;height:9px;
+  background:var(--amber);opacity:.85;
+}
+
+/* --- Light theme: keep rivets and bezels legible on the paper palette. --- */
+html[data-theme="light"]{--rivet:var(--rivet-light);--metal-a:rgba(255,255,255,.5);--metal-b:rgba(20,33,38,.06)}
+html[data-theme="light"] .button:before{box-shadow:0 0 0 3px rgba(20,33,38,.06)}
+
+@media (prefers-reduced-motion:reduce){
+  .skill-track:after{transition:none}
 }
