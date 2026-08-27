@@ -423,12 +423,12 @@ import { MeshSurfaceSampler } from "three/addons/math/MeshSurfaceSampler.js";
     const fullW = halfW * 2;
     const fullH = halfH * 2;
     let s = Math.min(0.95, fullW / 7.2, fullH / 9);
-    s = Math.min(0.95, Math.max(0.42, s)) * (narrow ? 0.6 : 1);
+    s = Math.min(0.95, Math.max(0.42, s)) * (narrow ? 0.48 : 1);
     group.userData.scale = s;
-    group.userData.baseX = narrow ? halfW * 0.3 : halfW * 0.58;
-    group.userData.baseY = narrow ? halfH * 0.42 : 0;
-    group.userData.tuckX = narrow ? halfW * 0.58 : halfW * 0.82;
-    group.userData.tuckY = narrow ? halfH * 0.38 : -halfH * 0.1;
+    group.userData.baseX = narrow ? halfW * 0.42 : halfW * 0.58;
+    group.userData.baseY = narrow ? halfH * 0.62 : 0;
+    group.userData.tuckX = narrow ? halfW * 0.68 : halfW * 0.82;
+    group.userData.tuckY = narrow ? halfH * 0.58 : -halfH * 0.1;
   }
 
   let lastScrollY = window.scrollY;

@@ -9,18 +9,19 @@ window.SITE_CONTENT = {
     { name: "Desktop Software", value: 70 }
   ],
   gallery: [
-    { src: "images/gallery-01", alt: "Personal photograph 01" },
-    { src: "images/gallery-02", alt: "Personal photograph 02" },
-    { src: "images/gallery-03", alt: "Personal photograph 03" },
-    { src: "images/gallery-04", alt: "Personal photograph 04" },
-    { src: "images/gallery-05", alt: "Personal photograph 05" },
-    { src: "images/gallery-06", alt: "Personal photograph 06" },
-    { src: "images/gallery-07", alt: "Personal photograph 07" },
-    { src: "images/gallery-08", alt: "Personal photograph 08" },
-    { src: "images/gallery-09", alt: "Personal photograph 09" },
-    { src: "images/gallery-10", alt: "Personal photograph 10" },
-    { src: "images/gallery-11", alt: "Personal photograph 11" },
-    { src: "images/gallery-12", alt: "Personal photograph 12" }
+    { src: "images/gallery-01", alt: "Evening city architecture & illumination" },
+    { src: "images/gallery-02", alt: "Scholarship and grant management desktop UI" },
+    { src: "images/gallery-03", alt: "Urban perspective & geometry" },
+    { src: "images/gallery-04", alt: "Monochrome study in light and shadow" },
+    { src: "images/gallery-05", alt: "Open skies & landscape horizon" },
+    { src: "images/gallery-06", alt: "Architectural symmetry & textures" },
+    { src: "images/gallery-07", alt: "Interactive web experiments and 3D design" },
+    { src: "images/gallery-08", alt: "Natural light portrait" },
+    { src: "images/gallery-09", alt: "Minimalist geometry and structural lines" },
+    { src: "images/gallery-10", alt: "Dusk reflections and ambient glow" },
+    { src: "images/gallery-11", alt: "Candid travel moments" },
+    { src: "images/gallery-12", alt: "Abstract play of light and shadow" },
+    { src: "images/gallery-13", alt: "Atmospheric street photography" }
   ]
 };
 /* Standalone interaction engine. No framework or build step is required. */
@@ -77,13 +78,19 @@ window.SITE_CONTENT = {
     });
   }
 
+  var rippleCount = 0;
   function spawnVisualRipple(x, y, hue) {
+    if (rippleCount > 8) return;
+    rippleCount++;
     var ripple = document.createElement("span");
     ripple.className = "water-ripple" + (hue === "lime" ? " is-lime" : "");
     ripple.style.left = x + "px";
     ripple.style.top = y + "px";
     document.body.appendChild(ripple);
-    window.setTimeout(function () { ripple.remove(); }, 1750);
+    window.setTimeout(function () {
+      if (ripple.parentNode) ripple.parentNode.removeChild(ripple);
+      rippleCount = Math.max(0, rippleCount - 1);
+    }, 1750);
   }
 
   /* Water surface: a low-res responsive field keeps the page alive without hijacking controls. */
@@ -215,14 +222,13 @@ window.SITE_CONTENT = {
   function openGallery(index) {
     currentPhoto = (index + content.gallery.length) % content.gallery.length;
     var item = content.gallery[currentPhoto];
-    var isModernFormat = document.querySelector('picture source[type="image/webp"]');
-    modalImage.src = item.src + (isModernFormat ? ".webp" : ".jpg");
+    modalImage.src = item.src + ".webp";
+    modalImage.onerror = function () { modalImage.src = item.src + ".jpg"; };
     modalImage.alt = item.alt;
     modalTitle.textContent = item.alt;
     modalCount.textContent = String(currentPhoto + 1).padStart(2, "0") + " / " + String(content.gallery.length).padStart(2, "0");
     _lastFocused = document.activeElement;
     modal.setAttribute("aria-hidden", "false");
-    // move focus into the modal so screen readers announce it
     var closeBtn = modal.querySelector(".modal-close");
     if (closeBtn) closeBtn.focus();
   }
@@ -253,7 +259,7 @@ window.SITE_CONTENT = {
       button.addEventListener("click", function () {
         var open = card.classList.toggle("open");
         button.setAttribute("aria-expanded", String(open));
-        button.textContent = open ? "\u2212 Show less" : "+ Open the case";
+        button.textContent = open ? "\u2212 Show less" : "+ Read more";
         if (detail) {
           if (open) { detail.style.maxHeight = detail.scrollHeight + 40 + "px"; detail.style.opacity = "1"; detail.style.marginTop = "16px"; detail.style.paddingTop = "15px"; }
           else { detail.style.maxHeight = "0"; detail.style.opacity = "0"; detail.style.marginTop = "0"; detail.style.paddingTop = "0"; }
@@ -274,7 +280,6 @@ window.SITE_CONTENT = {
     });
     if (!("IntersectionObserver" in window)) {
       list.querySelectorAll(".skill-track i").forEach(function (b) { b.style.width = b.dataset.width + "%"; });
-      list.querySelectorAll(".value[data-val]").forEach(function (e) { e.textContent = e.dataset.val + "%"; });
       return;
     }
     var skillObs = new IntersectionObserver(function (entries) {
@@ -296,6 +301,7 @@ window.SITE_CONTENT = {
     var menu = document.getElementById("mobileMenu");
     var toggle = document.querySelector(".menu-toggle");
     var closeBtn = document.querySelector(".mobile-close");
+    var _lastNavFocus = null;
 
     var bar = document.createElement("div");
     bar.id = "scrollProgress";
@@ -328,12 +334,38 @@ window.SITE_CONTENT = {
       btt.classList.toggle("visible", sy > window.innerHeight * 0.8);
     }, { passive: true });
 
-    function closeMenu() { menu.classList.remove("open"); menu.setAttribute("aria-hidden", "true"); toggle.setAttribute("aria-expanded", "false"); document.body.style.overflow = ""; }
-    function openMenu() { menu.classList.add("open"); menu.setAttribute("aria-hidden", "false"); toggle.setAttribute("aria-expanded", "true"); document.body.style.overflow = "hidden"; }
+    function closeMenu() {
+      menu.classList.remove("open");
+      menu.setAttribute("aria-hidden", "true");
+      toggle.setAttribute("aria-expanded", "false");
+      document.body.style.overflow = "";
+      if (_lastNavFocus && _lastNavFocus.focus) _lastNavFocus.focus();
+      _lastNavFocus = null;
+    }
+    function openMenu() {
+      _lastNavFocus = document.activeElement;
+      menu.classList.add("open");
+      menu.setAttribute("aria-hidden", "false");
+      toggle.setAttribute("aria-expanded", "true");
+      document.body.style.overflow = "hidden";
+      if (closeBtn) closeBtn.focus();
+    }
     toggle.addEventListener("click", function () { menu.classList.contains("open") ? closeMenu() : openMenu(); });
     if (closeBtn) closeBtn.addEventListener("click", closeMenu);
     menu.querySelectorAll("a").forEach(function (a) { a.addEventListener("click", closeMenu); });
-    document.addEventListener("keydown", function (e) { if (e.key === "Escape" && menu.classList.contains("open")) closeMenu(); });
+    document.addEventListener("keydown", function (e) {
+      if (menu.classList.contains("open")) {
+        if (e.key === "Escape") closeMenu();
+        if (e.key === "Tab") {
+          var focusable = Array.prototype.slice.call(menu.querySelectorAll("button, [href], [tabindex]:not([tabindex=\"-1\"])"));
+          if (focusable.length) {
+            var first = focusable[0], last = focusable[focusable.length - 1];
+            if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+            else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+          }
+        }
+      }
+    });
   }
 
   function initContact() { var form = document.getElementById("contactForm"), status = document.getElementById("formStatus"); if (!form) return; form.addEventListener("submit", function (event) { event.preventDefault(); var submit = form.querySelector("button[type='submit']"); submit.disabled = true; submit.textContent = "Sending\u2026"; fetch(form.action, { method: "POST", body: new FormData(form), headers: { Accept: "application/json" } }).then(function (response) { if (!response.ok) throw new Error("Request failed"); form.reset(); status.textContent = "Message sent \u2014 I'll get back to you soon."; status.className = "form-status success"; }).catch(function () { status.textContent = "Something went wrong. Please email deepak.batra@outlook.com directly."; status.className = "form-status error"; }).finally(function () { submit.disabled = false; submit.textContent = "Send message \u2197"; }); }); }
@@ -346,9 +378,9 @@ window.SITE_CONTENT = {
     modal.addEventListener("touchend", function (e) { var dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy; if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) stepGallery(dx < 0 ? 1 : -1); }, { passive: true });
   }
 
-  /* Fix 8: Hero stats count-up */
+  /* Fix 8: Hero stats count-up (only for elements with numerical data-counter) */
   function initHeroStats() {
-    document.querySelectorAll(".hero-stats strong").forEach(function (el) {
+    document.querySelectorAll(".hero-stats strong[data-counter]").forEach(function (el) {
       var raw = el.textContent, num = parseFloat(raw), suffix = raw.replace(/[\d.]/g, "");
       if (isNaN(num)) return;
       var t0 = performance.now();
@@ -367,7 +399,7 @@ window.SITE_CONTENT = {
     if (year) year.textContent = new Date().getFullYear();
     renderSkills(); renderGallery(); initProjects(); initNavigation();
     initContact(); initModal(); initModalSwipe();
-    initWater(); initChimes(); initDropField(); init3dGallery();
+    initWater(); initChimes(); init3dGallery();
     initHeroStats(); initTouchHint();
   });
 })();
@@ -384,6 +416,8 @@ window.SITE_CONTENT = {
     theme = next === "light" ? "light" : "dark";
     root.setAttribute("data-theme", theme);
     root.style.colorScheme = theme;
+    var metaTheme = document.querySelector('meta[name="theme-color"]');
+    if (metaTheme) metaTheme.setAttribute("content", theme === "light" ? "#f3f1e9" : "#071014");
     if (!button) return;
     var light = theme === "light";
     button.setAttribute("aria-pressed", String(light));
