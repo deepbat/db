@@ -17,11 +17,9 @@ window.SITE_CONTENT = {
     { src: "images/gallery-06", alt: "Architectural symmetry & textures" },
     { src: "images/gallery-07", alt: "Interactive web experiments and 3D design" },
     { src: "images/gallery-08", alt: "Natural light portrait" },
-    { src: "images/gallery-09", alt: "Minimalist geometry and structural lines" },
     { src: "images/gallery-10", alt: "Dusk reflections and ambient glow" },
     { src: "images/gallery-11", alt: "Candid travel moments" },
-    { src: "images/gallery-12", alt: "Abstract play of light and shadow" },
-    { src: "images/gallery-13", alt: "Atmospheric street photography" }
+    { src: "images/gallery-12", alt: "Abstract play of light and shadow" }
   ]
 };
 /* Standalone interaction engine. No framework or build step is required. */
