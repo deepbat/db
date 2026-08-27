@@ -416,19 +416,19 @@ import { MeshSurfaceSampler } from "three/addons/math/MeshSurfaceSampler.js";
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
-    particleUniforms.uSize.value = (narrow ? 24 : 30) * dpr;
+    particleUniforms.uSize.value = (narrow ? 18 : 22) * dpr;
 
     const halfH = Math.tan((camera.fov * Math.PI) / 360) * camera.position.z;
     const halfW = halfH * camera.aspect;
     const fullW = halfW * 2;
     const fullH = halfH * 2;
-    let s = Math.min(0.95, fullW / 7.2, fullH / 9);
-    s = Math.min(0.95, Math.max(0.42, s)) * (narrow ? 0.48 : 1);
+    let s = Math.min(0.95, fullW / 7.2, fullH / 9) * 0.67;
+    s = Math.min(0.64, Math.max(0.28, s)) * (narrow ? 0.6 : 1);
     group.userData.scale = s;
-    group.userData.baseX = narrow ? halfW * 0.42 : halfW * 0.58;
-    group.userData.baseY = narrow ? halfH * 0.62 : 0;
+    group.userData.baseX = narrow ? halfW * 0.45 : halfW * 0.60;
+    group.userData.baseY = narrow ? halfH * 0.58 : 0;
     group.userData.tuckX = narrow ? halfW * 0.68 : halfW * 0.82;
-    group.userData.tuckY = narrow ? halfH * 0.58 : -halfH * 0.1;
+    group.userData.tuckY = narrow ? halfH * 0.52 : -halfH * 0.1;
   }
 
   let lastScrollY = window.scrollY;
@@ -615,7 +615,7 @@ import { MeshSurfaceSampler } from "three/addons/math/MeshSurfaceSampler.js";
     aura.position.copy(group.position);
     aura.position.y += Math.sin(t * 0.8) * 0.02;
     aura.quaternion.copy(camera.quaternion);
-    aura.scale.setScalar((1 + Math.sin(t * 1.3) * 0.07) * (1 + burstKick * 0.5 + eN * 0.12));
+    aura.scale.setScalar(0.72 * (1 + Math.sin(t * 1.3) * 0.07) * (1 + burstKick * 0.5 + eN * 0.12));
     auraMat.opacity = ((0.34 + pulse * 0.24 + state.p * 0.28) * themeDim) + (burstKick + eN * 0.2) * themeDim;
     auraMat.color.copy(uniforms.uColorA.value).lerp(uniforms.uColorB.value, 0.5);
 
