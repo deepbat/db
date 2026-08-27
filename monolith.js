@@ -300,7 +300,7 @@ import { MeshSurfaceSampler } from "three/addons/math/MeshSurfaceSampler.js";
     "attribute vec3 aDir;" +
     "attribute float aSpd;" +
     "uniform float uTime,uMorph,uFreq,uSwirl,uAssemble,uSize,uMouseF,uKick;" +
-    "uniform vec3 uMouse;" +
+    "uniform vec3 uMouse,uColorA,uColorB;" +
     "varying vec3 vColor;" +
     "varying float vA;" +
     NOISE_GLSL +
