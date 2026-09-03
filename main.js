@@ -9,19 +9,19 @@ window.SITE_CONTENT = {
     { name: "Desktop Software", value: 70 }
   ],
   gallery: [
-    { src: "images/gallery-01", alt: "Evening city architecture & illumination" },
-    { src: "images/gallery-02", alt: "Scholarship and grant management desktop UI" },
-    { src: "images/gallery-03", alt: "Urban perspective & geometry" },
-    { src: "images/gallery-04", alt: "Monochrome study in light and shadow" },
-    { src: "images/gallery-05", alt: "Open skies & landscape horizon" },
-    { src: "images/gallery-06", alt: "Architectural symmetry & textures" },
-    { src: "images/gallery-07", alt: "Interactive web experiments and 3D design" },
-    { src: "images/gallery-08", alt: "Natural light portrait" },
-    { src: "images/gallery-09", alt: "Minimalist geometry and structural lines" },
-    { src: "images/gallery-10", alt: "Dusk reflections and ambient glow" },
-    { src: "images/gallery-11", alt: "Candid travel moments" },
-    { src: "images/gallery-12", alt: "Abstract play of light and shadow" },
-    { src: "images/gallery-13", alt: "Atmospheric street photography" }
+    { src: "images/gallery-01", alt: "Evening city architecture & illumination", title: "Evening city", place: "Jalandhar, IN" },
+    { src: "images/gallery-02", alt: "Scholarship and grant management desktop UI", title: "Desktop UI", place: "Field screenshot" },
+    { src: "images/gallery-03", alt: "Urban perspective & geometry", title: "Urban geometry", place: "On foot" },
+    { src: "images/gallery-04", alt: "Monochrome study in light and shadow", title: "Light & shadow", place: "Studio" },
+    { src: "images/gallery-05", alt: "Open skies & landscape horizon", title: "Open horizon", place: "Punjab" },
+    { src: "images/gallery-06", alt: "Architectural symmetry & textures", title: "Architectural", place: "Old town" },
+    { src: "images/gallery-07", alt: "Interactive web experiments and 3D design", title: "Web experiments", place: "Screen" },
+    { src: "images/gallery-08", alt: "Natural light portrait", title: "Natural light", place: "Window seat" },
+    { src: "images/gallery-09", alt: "Minimalist geometry and structural lines", title: "Minimal lines", place: "Bridge" },
+    { src: "images/gallery-10", alt: "Dusk reflections and ambient glow", title: "Dusk reflections", place: "River bank" },
+    { src: "images/gallery-11", alt: "Candid travel moments", title: "Candid moment", place: "On the road" },
+    { src: "images/gallery-12", alt: "Abstract play of light and shadow", title: "Abstract light", place: "Late afternoon" },
+    { src: "images/gallery-13", alt: "Atmospheric street photography", title: "Atmospheric street", place: "Monsoon" }
   ]
 };
 /* Standalone interaction engine. No framework or build step is required. */
@@ -157,6 +157,10 @@ window.SITE_CONTENT = {
     resize(); addRipple(width * .42, height * .45, .65, "cyan"); addRipple(width * .68, height * .58, .42, "lime");
     window.addEventListener("resize", resize); window.addEventListener("pointerdown", down, { passive: true }); window.addEventListener("pointermove", move, { passive: true }); window.addEventListener("pointerup", up, { passive: true }); window.addEventListener("pointercancel", up, { passive: true }); raf = requestAnimationFrame(render);
     document.addEventListener("visibilitychange", function () { if (document.hidden) cancelAnimationFrame(raf); else raf = requestAnimationFrame(render); });
+    window.addEventListener("hero:visibility", function (e) {
+      if (e.detail && e.detail.visible) { if (!raf) raf = requestAnimationFrame(render); }
+      else { cancelAnimationFrame(raf); raf = 0; }
+    });
   }
 
   /* Hanging droplets: verlet strands follow the pointer and can be plucked. */
@@ -173,6 +177,11 @@ window.SITE_CONTENT = {
     function step() { strands.forEach(function (strand) { strand.particles.forEach(function (p, index) { if (index === 0 || p.grabbed) return; var vx = (p.x - p.ox) * .986, vy = (p.y - p.oy) * .986; p.ox = p.x; p.oy = p.y; p.x += vx; p.y += vy + .28; if (pointerX !== null && pointerY !== null) { var dx = p.x - pointerX, dy = p.y - pointerY, d = Math.hypot(dx, dy); if (d < 100 && d > .001) { var force = (1 - d / 100) * 4.8; p.x += dx / d * force; p.y += dy / d * force * .35; } } }); for (var iteration = 0; iteration < 5; iteration++) strand.particles.forEach(function (a, index) { if (index === strand.particles.length - 1) return; var b = strand.particles[index + 1], dx = b.x - a.x, dy = b.y - a.y, d = Math.hypot(dx, dy) || .001, diff = (d - strand.rest) / d, ox = dx * .5 * diff, oy = dy * .5 * diff; if (!a.pinned && !a.grabbed) { a.x += ox; a.y += oy; } if (!b.grabbed) { b.x -= ox; b.y -= oy; } }); }); }
     function render() { ctx.clearRect(0, 0, width, height); strands.forEach(function (strand) { var ps = strand.particles; ctx.beginPath(); ctx.moveTo(ps[0].x, ps[0].y); ps.slice(1).forEach(function (p) { ctx.lineTo(p.x, p.y); }); ctx.strokeStyle = "rgba(111,231,255,.28)"; ctx.lineWidth = 1; ctx.stroke(); ps.forEach(function (p, index) { if (index % 3 !== 2) return; var r = 4 + index % 4, grad = ctx.createRadialGradient(p.x - r * .35, p.y - r * .4, .5, p.x, p.y, r); grad.addColorStop(0, "rgba(244,255,255,.98)"); grad.addColorStop(.45, "rgba(111,231,255,.84)"); grad.addColorStop(1, "rgba(215,255,63,0)"); ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI * 2); ctx.fillStyle = grad; ctx.fill(); ctx.beginPath(); ctx.arc(p.x - r * .3, p.y - r * .38, r * .2, 0, Math.PI * 2); ctx.fillStyle = "rgba(255,255,255,.92)"; ctx.fill(); }); }); step(); raf = requestAnimationFrame(render); }
     resize(); window.addEventListener("resize", resize); hero.addEventListener("pointermove", move); hero.addEventListener("pointerleave", leave); hero.addEventListener("pointerdown", down, { passive: false }); window.addEventListener("pointerup", up); window.addEventListener("pointercancel", up); raf = requestAnimationFrame(render);
+    document.addEventListener("visibilitychange", function () { if (document.hidden) cancelAnimationFrame(raf); else raf = requestAnimationFrame(render); });
+    window.addEventListener("hero:visibility", function (e) {
+      if (e.detail && e.detail.visible) { if (!raf) raf = requestAnimationFrame(render); }
+      else { cancelAnimationFrame(raf); raf = 0; }
+    });
   }
 
   function initDropField() {
@@ -217,7 +226,21 @@ window.SITE_CONTENT = {
     });
   }
 
-  function renderGallery() { var grid = document.getElementById("galleryGrid"); if (!grid) return; content.gallery.forEach(function (item, index) { var button = document.createElement("button"); button.type = "button"; button.className = "gallery-item"; button.setAttribute("aria-label", "Open " + item.alt); button.innerHTML = '<picture><source srcset="' + item.src + '.webp" type="image/webp"><img src="' + item.src + '.jpg" alt="' + item.alt + '" loading="lazy"></picture><span class="mono">' + String(index + 1).padStart(2, "0") + ' / ' + item.alt + '</span>'; button.addEventListener("click", function () { openGallery(index); }); grid.appendChild(button); }); }
+  function renderGallery() {
+    var grid = document.getElementById("galleryGrid"); if (!grid) return;
+    content.gallery.forEach(function (item, index) {
+      var button = document.createElement("button");
+      button.type = "button";
+      button.className = "gallery-item";
+      button.setAttribute("aria-label", "Open " + (item.title || item.alt));
+      var caption = (item.title || item.alt) + (item.place ? ' — ' + item.place : '');
+      button.innerHTML =
+        '<picture><source srcset="' + item.src + '.webp" type="image/webp"><img src="' + item.src + '.jpg" alt="' + item.alt + '" loading="lazy" width="600" height="600"></picture>' +
+        '<span class="mono"><b>' + String(index + 1).padStart(2, "0") + '</b>' + caption + '</span>';
+      button.addEventListener("click", function () { openGallery(index); });
+      grid.appendChild(button);
+    });
+  }
   var modal = document.getElementById("galleryModal"), modalImage = document.getElementById("modalImage"), modalTitle = document.getElementById("modalTitle"), modalCount = document.getElementById("modalCount"), currentPhoto = 0, _lastFocused = null;
   function openGallery(index) {
     currentPhoto = (index + content.gallery.length) % content.gallery.length;
@@ -225,7 +248,9 @@ window.SITE_CONTENT = {
     modalImage.src = item.src + ".webp";
     modalImage.onerror = function () { modalImage.src = item.src + ".jpg"; };
     modalImage.alt = item.alt;
-    modalTitle.textContent = item.alt;
+    modalTitle.textContent = item.title || item.alt;
+    var meta = document.getElementById("modalMeta");
+    if (meta) meta.textContent = (item.place ? item.place : "") + (item.title && item.place ? " · " : "") + item.alt;
     modalCount.textContent = String(currentPhoto + 1).padStart(2, "0") + " / " + String(content.gallery.length).padStart(2, "0");
     _lastFocused = document.activeElement;
     modal.setAttribute("aria-hidden", "false");
@@ -378,11 +403,14 @@ window.SITE_CONTENT = {
     modal.addEventListener("touchend", function (e) { var dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy; if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) stepGallery(dx < 0 ? 1 : -1); }, { passive: true });
   }
 
-  /* Fix 8: Hero stats count-up (only for elements with numerical data-counter) */
+  /* Fix 8: Hero stats count-up (only for elements with numerical data-counter).
+     Preserves any trailing suffix like "+" so the visual readout still makes sense. */
   function initHeroStats() {
+    if (reducedMotion) return;
     document.querySelectorAll(".hero-stats strong[data-counter]").forEach(function (el) {
       var raw = el.textContent, num = parseFloat(raw), suffix = raw.replace(/[\d.]/g, "");
       if (isNaN(num)) return;
+      el.textContent = "0" + suffix;
       var t0 = performance.now();
       (function tick(now) { var p = Math.min((now - t0) / 1400, 1), ease = 1 - Math.pow(1 - p, 3); el.textContent = Math.round(ease * num) + suffix; if (p < 1) requestAnimationFrame(tick); })(t0);
     });
@@ -394,6 +422,31 @@ window.SITE_CONTENT = {
     if (hint && window.matchMedia("(pointer: coarse)").matches) hint.textContent = "Tap the portal to step in";
   }
 
+  /* Performance: pause hero canvases when the hero scrolls out of view.
+     Keeps the water + chimes from burning CPU while the user reads other sections. */
+  function initHeroPause() {
+    if (!("IntersectionObserver" in window)) return;
+    var hero = document.querySelector(".hero");
+    if (!hero) return;
+    var obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        var visible = e.isIntersecting;
+        document.body.classList.toggle("hero-out", !visible);
+        window.dispatchEvent(new CustomEvent("hero:visibility", { detail: { visible: visible } }));
+      });
+    }, { threshold: 0.01 });
+    obs.observe(hero);
+  }
+
+  /* Reduced-motion: also gate the heavy jungle DOM in JS, not just CSS. */
+  function initReducedMotionGuard() {
+    if (!reducedMotion) return;
+    var scene = document.querySelector(".jungle-scene");
+    if (scene) scene.style.display = "none";
+    var water = document.querySelector(".water-visual");
+    if (water) water.style.display = "none";
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     var year = document.getElementById("year");
     if (year) year.textContent = new Date().getFullYear();
@@ -401,6 +454,8 @@ window.SITE_CONTENT = {
     initContact(); initModal(); initModalSwipe();
     initWater(); initChimes(); init3dGallery();
     initHeroStats(); initTouchHint();
+    initHeroPause();
+    initReducedMotionGuard();
   });
 })();
 /* Persisted dark/light theme preference with a system fallback. */

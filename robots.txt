@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /react/
+
+Sitemap: https://deepbat.github.io/db/sitemap.xml
