@@ -21,7 +21,12 @@ window.SITE_CONTENT = {
     { src: "images/gallery-10", alt: "Dusk reflections and ambient glow", title: "Dusk reflections", place: "River bank" },
     { src: "images/gallery-11", alt: "Candid travel moments", title: "Candid moment", place: "On the road" },
     { src: "images/gallery-12", alt: "Abstract play of light and shadow", title: "Abstract light", place: "Late afternoon" },
-    { src: "images/gallery-13", alt: "Atmospheric street photography", title: "Atmospheric street", place: "Monsoon" }
+    { src: "images/gallery-13", alt: "Atmospheric street photography", title: "Atmospheric street", place: "Monsoon" },
+    { src: "images/family-01", alt: "Family birthday gathering", title: "Birthday gathering", place: "Home" },
+    { src: "images/family-02", alt: "Family birthday portrait", title: "Birthday portrait", place: "Home" },
+    { src: "images/family-03", alt: "Family celebration", title: "Family celebration", place: "Home" },
+    { src: "images/family-04", alt: "Family group photograph", title: "Family group", place: "Home" },
+    { src: "images/deepak-yellow", alt: "Deepak Batra portrait", title: "Self portrait", place: "Home" }
   ]
 };
 /* Standalone interaction engine. No framework or build step is required. */
