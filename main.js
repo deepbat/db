@@ -22,11 +22,11 @@ window.SITE_CONTENT = {
     { src: "images/gallery-11", alt: "Candid travel moments", title: "Candid moment", place: "On the road" },
     { src: "images/gallery-12", alt: "Abstract play of light and shadow", title: "Abstract light", place: "Late afternoon" },
     { src: "images/gallery-13", alt: "Atmospheric street photography", title: "Atmospheric street", place: "Monsoon" },
-    { src: "images/family-01", alt: "Family birthday gathering", title: "Birthday gathering", place: "Home" },
-    { src: "images/family-02", alt: "Family birthday portrait", title: "Birthday portrait", place: "Home" },
-    { src: "images/family-03", alt: "Family celebration", title: "Family celebration", place: "Home" },
-    { src: "images/family-04", alt: "Family group photograph", title: "Family group", place: "Home" },
-    { src: "images/deepak-yellow", alt: "Deepak Batra portrait", title: "Self portrait", place: "Home" }
+    { src: "images/family-01", ext: ".svg", alt: "Family birthday gathering", title: "Birthday gathering", place: "Home" },
+    { src: "images/family-02", ext: ".svg", alt: "Family birthday portrait", title: "Birthday portrait", place: "Home" },
+    { src: "images/family-03", ext: ".svg", alt: "Family celebration", title: "Family celebration", place: "Home" },
+    { src: "images/family-04", ext: ".svg", alt: "Family group photograph", title: "Family group", place: "Home" },
+    { src: "images/deepak-yellow", ext: ".svg", alt: "Deepak Batra portrait", title: "Self portrait", place: "Home" }
   ]
 };
 /* Standalone interaction engine. No framework or build step is required. */
@@ -239,8 +239,10 @@ window.SITE_CONTENT = {
       button.className = "gallery-item";
       button.setAttribute("aria-label", "Open " + (item.title || item.alt));
       var caption = (item.title || item.alt) + (item.place ? ' — ' + item.place : '');
+      var primaryExt = item.ext || ".webp";
+      var fallbackExt = item.ext || ".jpg";
       button.innerHTML =
-        '<picture><source srcset="' + item.src + '.webp" type="image/webp"><img src="' + item.src + '.jpg" alt="' + item.alt + '" loading="lazy" width="600" height="600"></picture>' +
+        '<picture><source srcset="' + item.src + primaryExt + '" type="' + (item.ext === ".svg" ? "image/svg+xml" : "image/webp") + '"><img src="' + item.src + primaryExt + '" onerror="' + (item.ext ? "" : "this.onerror=null;this.src=\'' + item.src + fallbackExt + '\';") + '" alt="' + item.alt + '" loading="lazy" width="600" height="600"></picture>' +
         '<span class="mono"><b>' + String(index + 1).padStart(2, "0") + '</b>' + caption + '</span>';
       button.addEventListener("click", function () { openGallery(index); });
       grid.appendChild(button);
@@ -250,8 +252,8 @@ window.SITE_CONTENT = {
   function openGallery(index) {
     currentPhoto = (index + content.gallery.length) % content.gallery.length;
     var item = content.gallery[currentPhoto];
-    modalImage.src = item.src + ".webp";
-    modalImage.onerror = function () { modalImage.src = item.src + ".jpg"; };
+    modalImage.src = item.src + (item.ext || ".webp");
+    modalImage.onerror = item.ext ? null : function () { modalImage.src = item.src + ".jpg"; };
     modalImage.alt = item.alt;
     modalTitle.textContent = item.title || item.alt;
     var meta = document.getElementById("modalMeta");
