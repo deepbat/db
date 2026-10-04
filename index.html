@@ -1,246 +1,73 @@
 <!doctype html>
 <html lang="en-IN">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="description" content="Deepak Batra — Personal space for things I build, explore and find interesting. AI, local LLMs, automation, web experiments and photography.">
-  <meta name="theme-color" content="#071014" media="(prefers-color-scheme: dark)">
-  <meta name="theme-color" content="#f3f1e9" media="(prefers-color-scheme: light)">
-
-  <!-- Canonical -->
-  <link rel="canonical" href="https://deepbat.github.io/db/">
-  <link rel="alternate" hreflang="en-IN" href="https://deepbat.github.io/db/">
-  <link rel="alternate" hreflang="x-default" href="https://deepbat.github.io/db/">
-
-  <!-- Favicon (inline SVG — no extra file needed) -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23071014'/%3E%3Crect x='18' y='18' width='64' height='64' rx='6' fill='none' stroke='%23D7FF3F' stroke-width='6'/%3E%3Ctext x='50' y='67' text-anchor='middle' font-family='monospace' font-size='38' fill='%23D7FF3F'%3EDB%3C/text%3E%3C/svg%3E">
-
-  <!-- Open Graph -->
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://deepbat.github.io/db/">
-  <meta property="og:title" content="Deepak Batra | Personal space">
-  <meta property="og:description" content="Personal space for things I build, explore and find interesting. AI, local LLMs, automation, web experiments and photography.">
-  <meta property="og:image" content="https://deepbat.github.io/db/images/hero.webp">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-  <meta property="og:locale" content="en_IN">
-  <meta property="og:site_name" content="Deepak Batra">
-
-  <!-- Twitter / X Card -->
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Deepak Batra | Personal space">
-  <meta name="twitter:description" content="Personal space for things I build, explore and find interesting.">
-  <meta name="twitter:image" content="https://deepbat.github.io/db/images/hero.webp">
-
-  <!-- JSON-LD Person schema -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Person",
-    "name": "Deepak Batra",
-    "url": "https://deepbat.github.io/db/",
-    "image": "https://deepbat.github.io/db/images/hero.webp",
-    "jobTitle": "Office Administration",
-    "email": "mailto:deepak.batra@outlook.com",
-    "telephone": "+91-97797-77570",
-    "description": "Personal space for things I build, explore and find interesting.",
-    "address": { "@type": "PostalAddress", "addressLocality": "Jalandhar", "addressCountry": "IN" },
-    "knowsAbout": [
-      "Artificial Intelligence", "Local LLMs", "Automation", "PowerShell",
-      "Web Development", "Three.js", "Desktop Software", "Photography",
-      "Office Administration", "Documentation"
-    ],
-    "sameAs": [
-      "https://github.com/deepbat",
-      "https://instagram.com/deepakbatra"
-    ]
-  }
-  </script>
-
-  <!-- WebSite schema with sitelinks search -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "Deepak Batra",
-    "url": "https://deepbat.github.io/db/",
-    "inLanguage": "en-IN"
-  }
-  </script>
-
-  <title>Deepak Batra — AI, Web, and Things I Build Because I Can</title>
-
-  <!-- LCP preload: hero.webp is the largest contentful paint on most viewports -->
-  <link rel="preload" as="image" href="images/hero.webp" type="image/webp" fetchpriority="high">
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Deepak Batra | Creative Technology</title>
+<meta name="description" content="Deepak Batra. Technology, systems, automation, AI experiments and things built because they can be built.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#07090b;--panel:#0c1114;--text:#f2f5f3;--muted:#8e9aa0;--line:#203038;--cyan:#35e8ff;--lime:#d7ff3f;--max:1320px}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font-family:"DM Sans",sans-serif;overflow-x:hidden}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.16;background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);background-size:48px 48px;mask-image:linear-gradient(to bottom,black,transparent 88%);z-index:-1}
+a{color:inherit;text-decoration:none}.wrap{width:min(calc(100% - 48px),var(--max));margin:auto}.mono{font-family:"IBM Plex Mono",monospace;letter-spacing:.08em;text-transform:uppercase}
+.nav{position:fixed;top:0;left:0;right:0;z-index:20;background:rgba(7,9,11,.72);backdrop-filter:blur(18px);border-bottom:1px solid rgba(53,232,255,.12)}.navin{height:72px;display:flex;align-items:center;justify-content:space-between}.brand{font:700 14px "Space Grotesk";letter-spacing:.16em}.brand i{display:inline-block;width:9px;height:9px;background:var(--lime);border-radius:50%;margin-right:9px;box-shadow:0 0 18px var(--lime)}.links{display:flex;gap:24px;font:11px "IBM Plex Mono";color:#aab4b8}.links a:hover{color:var(--cyan)}.status{font:10px "IBM Plex Mono";color:var(--lime)}
+.hero{min-height:100vh;padding:120px 0 48px;display:grid;grid-template-columns:1.15fr .85fr;gap:5vw;align-items:center;position:relative}.hero:after{content:"01 / INTRODUCTION";position:absolute;left:0;bottom:24px;font:10px "IBM Plex Mono";color:#56646a}.kicker{font:10px "IBM Plex Mono";color:var(--cyan);letter-spacing:.18em;text-transform:uppercase}.hero h1{font:700 clamp(64px,9vw,142px);line-height:.82;letter-spacing:-.07em;margin:18px 0 28px;font-family:"Space Grotesk"}.hero h1 em{font-style:normal;color:transparent;-webkit-text-stroke:1px #68777d}.hero h1 span{color:var(--lime)}.hero p{max-width:620px;color:#aab4b8;font-size:18px;line-height:1.55}.actions{display:flex;gap:12px;margin-top:30px;flex-wrap:wrap}.btn{padding:14px 18px;border:1px solid var(--line);font:11px "IBM Plex Mono";text-transform:uppercase;letter-spacing:.08em}.btn.primary{background:var(--lime);color:#071014;border-color:var(--lime)}.btn:hover{transform:translateY(-2px)}.hero-meta{display:flex;gap:42px;margin-top:58px}.stat strong{display:block;font:700 36px "Space Grotesk";color:var(--text)}.stat span{display:block;color:#68777d;font:9px "IBM Plex Mono";margin-top:4px}
+.portrait{position:relative;min-height:620px;border:1px solid var(--line);background:linear-gradient(145deg,#111a1f,#080b0d);overflow:hidden}.portrait:before{content:"";position:absolute;inset:16px;border:1px solid rgba(53,232,255,.18);pointer-events:none;z-index:2}.portrait img{width:100%;height:100%;min-height:620px;object-fit:cover;display:block;filter:saturate(.9) contrast(1.08)}.portrait .scan{position:absolute;left:0;right:0;top:42%;height:1px;background:var(--cyan);box-shadow:0 0 24px var(--cyan);opacity:.5}.portrait .label{position:absolute;bottom:18px;left:18px;right:18px;display:flex;justify-content:space-between;font:9px "IBM Plex Mono";color:#dce5e8;z-index:3}.portrait .corner{position:absolute;right:18px;top:18px;color:var(--lime);font:10px "IBM Plex Mono";z-index:3}
+.section{padding:120px 0;border-top:1px solid var(--line)}.section-head{display:flex;justify-content:space-between;align-items:end;margin-bottom:60px}.section-num{color:var(--cyan);font-size:10px}.section h2{font:600 clamp(42px,6vw,88px) "Space Grotesk";line-height:.9;letter-spacing:-.06em;margin:0}.section h2 em{font-style:normal;color:#66747a}.note{color:#657278;font:10px "IBM Plex Mono";text-transform:uppercase}
+.about{display:grid;grid-template-columns:.8fr 1.2fr;gap:10vw;align-items:start}.about p{font-size:21px;line-height:1.55;color:#b7c1c4;max-width:720px}.about p.small{font-size:15px;color:#7f8d92}.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:28px}.chip{border:1px solid var(--line);padding:9px 12px;color:#9aa6aa;font:10px "IBM Plex Mono"}
+.capabilities{display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--line)}.cap{padding:28px 18px;border-right:1px solid var(--line);min-height:170px}.cap:last-child{border-right:0}.cap b{display:block;color:var(--lime);font:11px "IBM Plex Mono";margin-bottom:35px}.cap h3{font:600 22px "Space Grotesk";margin:0 0 8px}.cap p{margin:0;color:#718086;font-size:13px;line-height:1.45}
+.builds{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.build{background:#0b1012;border:1px solid var(--line);padding:22px;min-height:320px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}.build:after{content:"";position:absolute;width:140px;height:140px;border-radius:50%;right:-70px;top:-70px;background:var(--cyan);filter:blur(55px);opacity:.12}.build .num{font:10px "IBM Plex Mono";color:var(--cyan)}.build h3{font:600 30px "Space Grotesk";letter-spacing:-.04em;margin:20px 0 8px}.build p{color:#829095;font-size:14px;line-height:1.5}.build small{color:#647279;font:9px "IBM Plex Mono";text-transform:uppercase}
+.gallery{display:grid;grid-template-columns:1.3fr .7fr .9fr;grid-auto-rows:220px;gap:10px}.gallery img{width:100%;height:100%;object-fit:cover;filter:saturate(.75) contrast(1.05);transition:.5s}.gallery a{overflow:hidden;border:1px solid var(--line);position:relative}.gallery a:first-child{grid-row:span 2}.gallery a:last-child{grid-column:2/4}.gallery a:hover img{transform:scale(1.04);filter:saturate(1) contrast(1.1)}
+.contact{display:grid;grid-template-columns:1.2fr .8fr;gap:10vw;align-items:end}.contact h2{font-size:clamp(50px,8vw,120px)}.contact p{color:#879399;font-size:17px;line-height:1.5}.contact-list{border-top:1px solid var(--line)}.contact-list a{display:flex;justify-content:space-between;padding:18px 0;border-bottom:1px solid var(--line);font:12px "IBM Plex Mono";color:#c4cdd0}.contact-list a:hover{color:var(--lime)}
+footer{padding:28px 0 40px;border-top:1px solid var(--line);color:#5d6a70;font:9px "IBM Plex Mono";display:flex;justify-content:space-between}
+.reveal{opacity:0;transform:translateY(24px);transition:.8s ease}.reveal.on{opacity:1;transform:none}
+@media(max-width:900px){.links,.status{display:none}.hero{grid-template-columns:1fr;padding-top:110px}.portrait,.portrait img{min-height:460px}.about,.contact{grid-template-columns:1fr;gap:42px}.capabilities{grid-template-columns:repeat(2,1fr)}.cap:nth-child(2n){border-right:0}.builds{grid-template-columns:1fr 1fr}.gallery{grid-template-columns:1fr 1fr;grid-auto-rows:180px}.gallery a:first-child{grid-row:span 2}.gallery a:last-child{grid-column:auto}.hero-meta{margin-top:36px}}
+@media(max-width:560px){.wrap{width:min(calc(100% - 28px),var(--max))}.hero h1{font-size:58px}.hero p{font-size:16px}.portrait,.portrait img{min-height:390px}.section{padding:78px 0}.section-head{display:block;margin-bottom:38px}.note{margin-top:14px}.capabilities,.builds,.gallery{grid-template-columns:1fr}.cap{border-right:0;border-bottom:1px solid var(--line)}.hero-meta{gap:22px}.stat strong{font-size:28px}.gallery{grid-auto-rows:240px}.gallery a:first-child{grid-row:auto}.actions .btn{width:100%;text-align:center}}
+</style>
 </head>
 <body>
-  <a class="skip-link" href="#main">Skip to content</a>
-  <canvas id="oceanCanvas" class="ocean-canvas" aria-hidden="true"></canvas>
-  <div id="waterVisual" class="water-visual" aria-hidden="true"></div>
-  <canvas id="monolithCanvas" class="monolith-canvas" aria-hidden="true"></canvas>
-  <div class="grain" aria-hidden="true"></div>
+<header class="nav"><div class="wrap navin"><a class="brand" href="#top"><i></i>DEEPAK BATRA</a><nav class="links"><a href="#about">ABOUT</a><a href="#capabilities">CAPABILITIES</a><a href="#builds">BUILDS</a><a href="#gallery">GALLERY</a><a href="#contact">CONTACT</a></nav><span class="status">● ONLINE / JALANDHAR</span></div></header>
 
-  <header class="site-nav" id="top">
-    <div class="wrap nav-inner">
-      <a class="brand" href="#top" aria-label="Deepak Batra home">
-        <span class="brand-mark" aria-hidden="true"><i></i><b></b></span>
-        <span class="brand-name">DEEPAK BATRA</span>
-      </a>
-      <nav class="nav-links" aria-label="Primary navigation">
-        <a href="#about">About</a><a href="#experience">What I do</a><a href="#skills">Explore</a><a href="#projects">Builds</a><a href="#gallery">Gallery</a><a href="#recognition">Beyond</a><a href="#contact">Contact</a>
-        <a href="https://github.com/deepbat" target="_blank" rel="noopener" class="nav-external" aria-label="GitHub (opens in new tab)">GitHub ↗</a>
-      </nav>
-      <span class="nav-status"><span></span> Personal space</span>
-      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light theme" aria-pressed="false"><span class="theme-toggle-icon" aria-hidden="true">☼</span><span class="theme-toggle-label">Light</span></button>
-      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobileMenu" aria-label="Open navigation"><span></span><span></span></button>
-    </div>
-  </header>
-  <div class="mobile-menu" id="mobileMenu" role="dialog" aria-modal="true" aria-label="Site navigation" aria-hidden="true">
-    <div class="mobile-menu-top"><span class="mono">NAVIGATE / 08</span><button type="button" class="mobile-close" aria-label="Close navigation">×</button></div>
-    <a href="#about">01 <span>About</span> ↗</a><a href="#experience">02 <span>What I do</span> ↗</a><a href="#skills">03 <span>Explore</span> ↗</a><a href="#projects">04 <span>Builds</span> ↗</a><a href="#gallery">05 <span>Gallery</span> ↗</a><a href="#recognition">06 <span>Beyond</span> ↗</a><a href="#contact">07 <span>Contact</span> ↗</a><a href="https://github.com/deepbat" target="_blank" rel="noopener">GITHUB <span>↗</span></a>
-    <p>Personal space for things I build, explore and find interesting.</p>
-  </div>
+<main id="top">
+<section class="wrap hero">
+<div class="reveal"><span class="kicker">Creative Technology / 2026</span><h1>Deepak<br><em>Batra</em><br><span>builds.</span></h1><p>I design and build thoughtful digital experiences at the intersection of technology, systems and people.</p><div class="actions"><a class="btn primary" href="#builds">Explore builds ↗</a><a class="btn" href="#contact">Start a conversation ↗</a></div><div class="hero-meta"><div class="stat"><strong>AI</strong><span>EXPERIMENTS</span></div><div class="stat"><strong>WEB</strong><span>INTERACTION</span></div><div class="stat"><strong>OPS</strong><span>AUTOMATION</span></div></div></div>
+<div class="portrait reveal"><img src="data:image/webp;base64,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" alt="Deepak Batra portrait"><span class="corner">01 / PORTRAIT</span><span class="scan"></span><div class="label"><span>28.17° N / 75.86° E</span><span>JALANDHAR / INDIA</span></div></div>
+</section>
 
-  <main id="main">
-    <section class="hero panel" aria-labelledby="heroTitle">
-      <div class="hero-bg" aria-hidden="true"></div>
-      <canvas id="chimeCanvas" class="chime-canvas" aria-hidden="true"></canvas>
-      <div id="dropField" class="drop-field" aria-hidden="true"></div>
-      <div class="hero-scrim" aria-hidden="true"></div>
-      <div class="hero-grid" aria-hidden="true"></div>
-      <canvas id="portalGL" class="portal-gl" aria-hidden="true"></canvas>
-      <div class="jungle-scene" aria-hidden="true">
-        <div class="jungle-stage">
-          <div class="jungle-layer back"></div>
-          <div class="jungle-halo"></div>
-          <div class="jungle-portal-wrap">
-            <div class="portal-glow"></div>
-            <div class="jungle-portal">
-              <span class="portal-sun"></span>
-              <span class="portal-mist a"></span>
-              <span class="portal-mist b"></span>
-              <span class="portal-cloud a"></span>
-              <span class="portal-cloud b"></span>
-            </div>
-          </div>
-          <div class="jungle-layer front"></div>
-        </div>
-      </div>
-      <div class="wrap hero-content">
-        <div class="eyebrow"><span class="live-dot"></span> Personal space for things I build, explore and find interesting.</div>
-        <div class="hero-index mono">01 — INTRODUCTION</div>
-        <h1 id="heroTitle">Hi, I’m Deepak.<br><em>I build things</em><br>because I <span>can.</span></h1>
-        <div class="hero-lower">
-          <p>AI, local LLMs, automation, web experiments and photography — things I build, explore and find interesting.</p>
-          <div class="hero-actions"><a class="button button-primary" href="#projects">See what I build ↗</a><a class="button button-ghost" href="#gallery">View gallery ↗</a></div>
-        </div>
-        <div class="hero-stats"><div><strong data-counter="6">6+</strong><small class="mono">YEARS EXPLORING AI</small></div><div><strong data-counter="12">12</strong><small class="mono">PROJECTS SHIPPED</small></div><div><strong data-counter="3">3</strong><small class="mono">INTERACTIVE EXPERIMENTS</small></div></div>
-      </div>
-      <div class="hero-instruction mono"><span class="instruction-dot"></span><span id="surfaceStatus">Drag the field · click to pulse · scroll to assemble</span></div>
-      <div class="audio-status mono"><span id="audioDot"></span><span id="audioStatus">Audio / tap to arm</span></div>
-      <div class="hud mono" aria-hidden="true"><span id="hudState">BOOT</span><span id="hudCount"></span></div>
-      <div class="wrap hero-bottom"><span class="mono">Based in Jalandhar, India / exploring everywhere</span><a href="#about">Scroll to explore ↓</a></div>
-    </section>
+<section class="section" id="about"><div class="wrap"><div class="section-head reveal"><div><span class="section-num mono">02 / ABOUT</span><h2>Mostly curious.<br><em>The system matters more.</em></h2></div><span class="note">PERSONAL / PRACTICAL / CURIOUS</span></div><div class="about"><div class="reveal"><p>I work in office administration and documentation, but technology is where much of my curiosity lives.</p></div><div class="reveal"><p class="small">AI, local LLMs, automation, Windows and PowerShell, websites, software and hardware. I enjoy taking things apart, figuring them out and building something useful.</p><div class="chips"><span class="chip">AI & AUTOMATION</span><span class="chip">LOCAL LLMs</span><span class="chip">WEB / THREE.JS</span><span class="chip">POWERSHELL</span><span class="chip">SOFTWARE</span><span class="chip">PHOTOGRAPHY</span></div></div></div></div></section>
 
-    <section class="section panel" id="about" aria-labelledby="aboutTitle"><div class="wrap">
-      <div class="section-line"><span class="section-label mono">02 / About</span><span class="section-note mono">Mostly curious</span></div>
-      <div class="about-grid"><figure class="media-frame"><picture><source srcset="images/hero.webp" type="image/webp"><img src="images/hero.jpg" alt="Portrait of Deepak Batra" loading="lazy" width="800" height="860"></picture><figcaption class="mono">DEEPAK / FIELD NOTE 01</figcaption></figure><div class="copy"><span class="kicker mono">MOSTLY CURIOUS</span><h2 id="aboutTitle">Mostly curious.<br><em>The system matters more.</em></h2><p class="lede">I work in office administration and documentation, but technology is where much of my curiosity lives.</p><p>AI, local LLMs, automation, Windows and PowerShell, websites, Three.js, software and hardware — I enjoy taking things apart, figuring them out and building something useful.</p><p>I build things mostly because I enjoy figuring them out: a desktop application for scholarship and grant work, small scripts that save repetitive effort, and websites that exist because I wanted to see if I could make them.</p><div class="pills"><span>● Office Administration</span><span>● AI &amp; Automation</span><span>● Web Experiments</span><span>● Photography</span></div><a class="text-link" href="#gallery">See a few kept moments ↗</a></div></div>
-    </div></section>
+<section class="section" id="capabilities"><div class="wrap"><div class="section-head reveal"><div><span class="section-num mono">03 / CAPABILITIES</span><h2>What I keep<br><em>exploring.</em></h2></div><span class="note">DAY TO DAY → AFTER HOURS</span></div><div class="capabilities reveal">
+<div class="cap"><b>01</b><h3>Creative Technology</h3><p>Turning ideas into unusual, usable digital experiences.</p></div>
+<div class="cap"><b>02</b><h3>Digital Products</h3><p>Practical software for real workflows and real people.</p></div>
+<div class="cap"><b>03</b><h3>Design Systems</h3><p>Interfaces that stay coherent as they grow.</p></div>
+<div class="cap"><b>04</b><h3>Interaction Design</h3><p>Motion, feedback and small details that make interfaces feel alive.</p></div>
+<div class="cap"><b>05</b><h3>Automation</h3><p>Removing repetitive work with scripts and smart systems.</p></div>
+</div></div></section>
 
-    <section class="section panel darker" id="experience" aria-labelledby="experienceTitle"><div class="wrap">
-      <div class="section-line"><span class="section-label cyan mono">03 / What I do</span><span class="section-note mono">Day to day → after hours</span></div>
-      <div class="heading-row"><h2 id="experienceTitle">What keeps me busy<br><em>and what I keep exploring.</em></h2><p>A mix of office work, technology experiments, automation and things I build simply because they interest me.</p></div>
-      <div class="timeline"><article><span class="date mono">DAY TO DAY</span><b>01</b><div><h3>Office Administration</h3><p>Documents, records, coordination, schedules and the everyday work that keeps an office moving.</p></div><i>↗</i></article><article><span class="date mono">WHEN NEEDED</span><b>02</b><div><h3>Documentation &amp; Reporting</h3><p>Organising information, preparing reports and finding simpler ways to keep records clear and useful.</p></div><i>↗</i></article><article><span class="date mono">AFTER HOURS</span><b>03</b><div><h3>Technology Experiments</h3><p>AI, local LLMs, PowerShell, Windows, websites, Three.js and whatever else catches my attention.</p></div><i>↗</i></article><article><span class="date mono">WHEN I CAN</span><b>04</b><div><h3>Building Things</h3><p>Desktop software, small automation tools and personal websites built mostly because I wanted to figure them out.</p></div><i>↗</i></article></div>
-    </div></section>
+<section class="section" id="builds"><div class="wrap"><div class="section-head reveal"><div><span class="section-num mono">04 / SELECTED BUILDS</span><h2>Built because<br><em>I could.</em></h2></div><span class="note">REAL PROJECTS / REAL EXPERIMENTS</span></div><div class="builds">
+<article class="build reveal"><div><span class="num mono">01 / DESKTOP</span><h3>Scholarship & Grant Software</h3><p>Windows software for scholarship and grant records, applicant workflows and reporting. Built as a practical replacement for an Excel-heavy process.</p></div><small>WPF · C# · SQLITE · PDF</small></article>
+<article class="build reveal"><div><span class="num mono">02 / WEB</span><h3>Personal Websites</h3><p>Interactive browser experiments using HTML, CSS, Canvas, WebAudio and Three.js. Each version is a self-imposed brief.</p></div><small>HTML · CSS · THREE.JS · WEBGL</small></article>
+<article class="build reveal"><div><span class="num mono">03 / AUTOMATION</span><h3>Office Automation</h3><p>Small tools and scheduled scripts that remove repetitive work from the week, mostly with PowerShell and Google Workspace.</p></div><small>POWERSHELL · APPS SCRIPT · TASK SCHEDULER</small></article>
+<article class="build reveal"><div><span class="num mono">04 / AI</span><h3>Local LLM Experiments</h3><p>Experiments with local language models, document Q&A, summarisation and private workflows that stay on-device.</p></div><small>OLLAMA · LLAMA.CPP · PYTHON</small></article>
+</div></div></section>
 
-    <section class="section panel" id="skills" aria-labelledby="skillsTitle"><div class="wrap two-col">
-      <div><div class="section-line"><span class="section-label mono">04 / Explore</span><span class="section-note mono">Things I keep coming back to</span></div><h2 id="skillsTitle">Things I explore<br><em>just because they are interesting.</em></h2><p class="section-copy">AI, local LLMs, automation, Windows, PowerShell, Google Workspace, GitHub, web development, Three.js and desktop software.</p><div class="side-note"><b>↗</b><span class="mono">No percentages. Just things I keep learning.</span></div></div>
-      <div class="skill-list" id="skillList"></div>
-    </div></section>
+<section class="section" id="gallery"><div class="wrap"><div class="section-head reveal"><div><span class="section-num mono">05 / GALLERY</span><h2>Kept moments.<br><em>People & places.</em></h2></div><span class="note">PERSONAL ARCHIVE</span></div><div class="gallery reveal">
+<a href="images/gallery-02.jpg"><img src="images/gallery-02.jpg" alt="Personal archive image" loading="lazy"></a>
+<a href="images/gallery-05.jpg"><img src="images/gallery-05.jpg" alt="Personal archive image" loading="lazy"></a>
+<a href="images/gallery-07.jpg"><img src="images/gallery-07.jpg" alt="Personal archive image" loading="lazy"></a>
+<a href="images/hero.jpg"><img src="images/hero.jpg" alt="Personal archive image" loading="lazy"></a>
+</div></div></section>
 
-    <section class="section panel darker" id="projects" aria-labelledby="projectsTitle"><div class="wrap">
-      <div class="section-line"><span class="section-label cyan mono">05 / Builds</span><span class="section-note mono">Built because I could</span></div><div class="heading-row"><h2 id="projectsTitle">Things I’ve made<br><em>and kept exploring.</em></h2><p>Projects where curiosity became something real.</p></div>
-            <div class="project-list">
-        <article class="project-card">
-          <div class="project-visual"><picture><source srcset="images/gallery-02.webp" type="image/webp"><img src="images/gallery-02.jpg" alt="Scholarship and grant software screenshot" loading="lazy" width="600" height="400"></picture><span class="tag mono">CASE 01 / DESKTOP</span><strong>WIN<br><small>DESKTOP APP</small></strong></div>
-          <div class="project-copy">
-            <h3>Scholarship & Grant Software</h3>
-            <div class="evidence mono"><span>WPF / .NET</span><span>SQLITE</span><span>PDF EXPORT</span></div>
-            <p>A Windows desktop application for managing scholarship and grant records, applicant workflows and reporting. Built end-to-end as a practical tool I actually use.</p>
-            <ul class="project-outcome"><li><b>STACK</b><span>WPF · C# · SQLite · ClosedXML</span></li><li><b>OUTCOME</b><span>Replaced an Excel-based workflow that took ~3 hours per cycle with a 10-minute guided process.</span></li></ul>
-            <button class="case-toggle" type="button" aria-expanded="false">+ Read more</button>
-            <p class="case-detail">I wanted to turn a practical process into something orderly, and to learn what building real desktop software actually takes — installers, data migrations, error states and all.</p>
-          </div>
-        </article>
-        <article class="project-card">
-          <div class="project-visual"><picture><source srcset="images/gallery-07.webp" type="image/webp"><img src="images/gallery-07.jpg" alt="Personal websites" loading="lazy" width="600" height="400"></picture><span class="tag mono">CASE 02 / WEB</span><strong>WEB<small>EXPERIMENTS</small></strong></div>
-          <div class="project-copy">
-            <h3>Personal Websites</h3>
-            <div class="evidence mono"><span>HTML / CSS</span><span>THREE.JS</span><span>WEBGL</span></div>
-            <p>Websites I have built as experiments in design, interaction and browser-native technology. Each version is a self-imposed brief.</p>
-            <ul class="project-outcome"><li><b>STACK</b><span>Vanilla JS · Three.js · Canvas2D · WebAudio</span></li><li><b>OUTCOME</b><span>This site is the current version — water physics, a 3D portal scene and a WebGL monolith, all in a single page.</span></li></ul>
-            <button class="case-toggle" type="button" aria-expanded="false">+ Read more</button>
-            <p class="case-detail">I like seeing how far a browser can be pushed while keeping it useful. No frameworks unless they earn their place.</p>
-          </div>
-        </article>
-        <article class="project-card">
-          <div class="project-visual"><picture><source srcset="images/gallery-05.webp" type="image/webp"><img src="images/gallery-05.jpg" alt="Automation project" loading="lazy" width="600" height="400"></picture><span class="tag mono">CASE 03 / AUTOMATION</span><strong>LESS<br><small>REPETITION</small></strong></div>
-          <div class="project-copy">
-            <h3>Office Automation</h3>
-            <div class="evidence mono"><span>POWERSHELL</span><span>GOOGLE APPS SCRIPT</span><span>SCHEDULED TASKS</span></div>
-            <p>Small tools and scheduled scripts that quietly remove repetitive work from the week. Mostly PowerShell, some Apps Script.</p>
-            <ul class="project-outcome"><li><b>STACK</b><span>PowerShell 7 · Google Workspace API · Windows Task Scheduler</span></li><li><b>OUTCOME</b><span>Daily report assembly that used to take 45 minutes now runs unattended before I get in.</span></li></ul>
-            <button class="case-toggle" type="button" aria-expanded="false">+ Read more</button>
-            <p class="case-detail">If something is repetitive and interesting enough to automate, I usually end up trying. Most tools live as small scripts that never needed a UI.</p>
-          </div>
-        </article>
-        <article class="project-card">
-          <div class="project-visual"><picture><source srcset="images/gallery-07.webp" type="image/webp"><img src="images/gallery-07.jpg" alt="AI experiment" loading="lazy" width="600" height="400"></picture><span class="tag mono">CASE 04 / AI</span><strong>AI<small>EXPERIMENTS</small></strong></div>
-          <div class="project-copy">
-            <h3>Local LLM Experiments</h3>
-            <div class="evidence mono"><span>OLLAMA</span><span>LLAMA / QWEN</span><span>CLI TOOLS</span></div>
-            <p>Experiments with locally-run language models — document Q&A, summarisation, OCR pipelines and CLI helpers that run entirely on my own machines.</p>
-            <ul class="project-outcome"><li><b>STACK</b><span>Ollama · llama.cpp · Python · LangChain (light)</span></li><li><b>OUTCOME</b><span>A private RAG setup over office documents that keeps every byte on-device.</span></li></ul>
-            <button class="case-toggle" type="button" aria-expanded="false">+ Read more</button>
-            <p class="case-detail">I like testing what these tools can actually do on my own machines, rather than stopping at what a headline says.</p>
-          </div>
-        </article>
-      </div>
-    </div></section>
-
-    <section class="section panel darker" id="gallery" aria-labelledby="galleryTitle"><div class="wrap"><div class="section-line"><span class="section-label cyan mono">06 / Gallery</span><span class="section-note mono">Personal archive</span></div><div class="gallery-intro"><div><h2 id="galleryTitle">Kept moments.<br><em>People and places.</em></h2><p>A personal photo archive. Some moments are worth keeping simply because they were good ones.</p></div><picture><source srcset="images/gallery-05.webp" type="image/webp"><img src="images/gallery-05.jpg" alt="Personal photograph" loading="lazy" width="320" height="224"></picture></div><div class="gallery-grid" id="galleryGrid"></div></div></section>
-
-    <section class="section panel" id="recognition" aria-labelledby="recognitionTitle"><div class="wrap"><div class="section-line"><span class="section-label mono">07 / Beyond</span><span class="section-note mono">Things I enjoy</span></div><div class="recognition-grid"><div><h2 id="recognitionTitle">Beyond the screen<br><em>there is real life.</em></h2><p class="section-copy">Technology is a big part of what I enjoy, but it is not all of it. Photography, family time, people and getting out with a camera matter too.</p></div><div class="recognition-list"><div><b>01</b><h3>Photography</h3><p>Walking around with a 35mm — people, late light, the kind of frames that only exist once. The gallery above is a small archive.</p></div><div><b>02</b><h3>Family time</h3><p>Sundays are for slow mornings, chai, and arguments about whose turn it is to pick the music.</p></div><div><b>03</b><h3>Technology</h3><p>Currently poking at local RAG setups and obsessing over whether Ollama can replace my clipboard habits.</p></div><div><b>04</b><h3>Building things</h3><p>This site is the latest in a long line of self-imposed briefs. The next one is probably a CLI that does too much.</p></div></div></div></div></section>
-
-    <section class="section panel contact-panel" id="contact" aria-labelledby="contactTitle"><div class="wrap"><div class="section-line"><span class="section-label cyan mono">08 / Contact</span><span class="section-note mono">Say hello</span></div><div class="contact-grid"><div><span class="kicker mono">A GOOD CONVERSATION STARTS HERE</span><h2 id="contactTitle">Want to say hello?<br><em>Pick whichever is easier.</em></h2><p>This is my personal corner of the internet. If you want to say hello, WhatsApp or email is easiest.</p><div class="contact-links"><a href="mailto:deepak.batra@outlook.com">EMAIL <span>deepak.batra@outlook.com</span> ↗</a><a href="https://wa.me/919779777570" target="_blank" rel="noopener">WHATSAPP <span>+91 97797 77570</span> ↗</a></div></div><div class="contact-links-note"><span class="mono">NO FORM / NO FUSS</span><p>WhatsApp or email is all I need.</p></div></div></div></section>
-  </main>
-
-  <footer class="footer"><div class="wrap footer-grid"><div><a class="brand" href="#top"><span class="brand-mark" aria-hidden="true"><i></i><b></b></span><span class="brand-name">DEEPAK BATRA</span></a><p>Personal space for things I build, explore and find interesting.</p></div><div><span class="mono">EXPLORE</span><a href="#about">About</a><a href="#experience">What I do</a><a href="#projects">Builds</a><a href="#gallery">Gallery</a></div><div><span class="mono">CONNECT</span><a href="mailto:deepak.batra@outlook.com">Email</a><a href="https://wa.me/919779777570" target="_blank" rel="noopener">WhatsApp</a><a href="https://github.com/deepbat" target="_blank" rel="noopener">GitHub</a><a href="https://instagram.com/deepakbatra" target="_blank" rel="noopener">Instagram</a></div><div><span class="mono">LOCATION</span><p>Jalandhar, India</p><p>Personal website<br>&amp; technology playground.</p></div></div><div class="wrap footer-bottom"><span class="mono">© <span id="year"></span> DEEPAK BATRA / BUILT TO KEEP GROWING.</span><a href="#top">Back to start ↑</a></div></footer>
-
-  <div class="gallery-modal" id="galleryModal" role="dialog" aria-modal="true" aria-label="Photo gallery modal" aria-hidden="true"><button class="modal-close" type="button" aria-label="Close gallery">×</button><div class="modal-image"><img id="modalImage" src="" alt=""></div><div class="modal-caption"><span id="modalCount" class="mono"></span><p id="modalTitle"></p><small id="modalMeta" class="mono"></small><small class="mono">← / → browse · esc close</small></div><button class="modal-prev" type="button" aria-label="Previous image">←</button><button class="modal-next" type="button" aria-label="Next image">→</button></div>
-
-  <noscript>
-    <style>
-      .ocean-canvas,.monolith-canvas,.chime-canvas,.portal-gl,.jungle-scene,.water-visual,.grain,.drop-field{display:none !important}
-      .hero{background:rgba(7,16,20,.85);min-height:auto;padding:160px 0 80px}
-      .hero-bg{opacity:.6}
-      .hero h1{font-size:clamp(40px,9vw,84px)}
-    </style>
-    <div style="background:#071014;color:#d7ff3f;padding:14px 20px;font:600 13px/1.4 system-ui;text-align:center;border-bottom:1px solid #1a2a30">
-      JavaScript is disabled — interactive elements are hidden but the page remains readable.
-    </div>
-  </noscript>
-
-  <script type="importmap">
-    {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
-  </script>
-  <script type="module" src="portal3d.js" defer></script>
-  <script type="module" src="monolith.js" defer></script>
-  <script src="main.js" defer></script>
+<section class="section" id="contact"><div class="wrap contact"><div class="reveal"><span class="section-num mono">06 / CONTACT</span><h2>Want to say<br><em>hello?</em></h2><p>This is my personal corner of the internet. WhatsApp or email is easiest.</p></div><div class="contact-list reveal"><a href="mailto:deepak.batra@outlook.com"><span>EMAIL</span><span>deepak.batra@outlook.com ↗</span></a><a href="https://wa.me/919779777570" target="_blank" rel="noopener"><span>WHATSAPP</span><span>+91 97797 77570 ↗</span></a><a href="https://github.com/deepbat" target="_blank" rel="noopener"><span>GITHUB</span><span>deepbat ↗</span></a><a href="https://instagram.com/deepakbatra" target="_blank" rel="noopener"><span>INSTAGRAM</span><span>@deepakbatra ↗</span></a></div></div></section>
+</main>
+<footer class="wrap"><span>© 2026 DEEPAK BATRA / BUILT TO KEEP GROWING.</span><span>JALANDHAR / INDIA</span></footer>
+<script>
+const io=new IntersectionObserver(es=>es.forEach(e=>e.isIntersecting&&e.target.classList.add("on")),{threshold:.12});
+document.querySelectorAll(".reveal").forEach(e=>io.observe(e));
+document.querySelectorAll(".gallery a").forEach(a=>a.addEventListener("click",e=>{e.preventDefault();window.open(a.href,"_blank","noopener")}));
+</script>
 </body>
 </html>
