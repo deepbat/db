@@ -1,52 +1,22 @@
-# Deepak Batra — Personal Site
+# Deepak Batra - Personal site
 
-Single-page personal site. No build step, no framework.
+Static portfolio at https://deepbat.github.io/db/.
 
-## Structure
+## Current design
 
-| File             | Owns                                                             |
-| ---------------- | ---------------------------------------------------------------- |
-| `index.html`     | Markup, SEO, schema.org JSON-LD, content                         |
-| `styles.css`     | All styles, light/dark theme, responsive, reduced-motion         |
-| `main.js`        | Navigation, scrollspy, scroll progress, back-to-top, theme, gallery, modals, project reveals, skill bars, hero stats |
-| `portal3d.js`    | Three.js WebGL portal (loaded as ES module)                      |
-| `monolith.js`    | Three.js WebGL monolith (loaded as ES module)                    |
-| `react/`         | A single `.jsx` artifact kept for future use; **not loaded**     |
-| `images/`        | JPG + WebP variants for all photos                               |
-| `robots.txt`     | Crawler hints + sitemap location                                 |
-| `sitemap.xml`    | Sitemap for crawlers                                             |
+Forest green, lime and warm cream, Lora serif headings and Inter body text. Original implementation inspired by the visual direction of tryatomiq.com, with Deepak's own identity, content, project links and existing photo archive. No Atomiq artwork, product claims or source code is used.
 
-## Editing content
+## Editing
 
-Skills and gallery items live at the top of `main.js` in `window.SITE_CONTENT`. Edit there, no JS knowledge required.
+- `index.html` contains the markup, SEO metadata, responsive CSS and small interaction script. No build step is needed.
+- Project details use native `details` elements.
+- Mobile navigation, gallery lightbox and keyboard controls are implemented in the inline script.
+- `images/` contains the existing JPG and WebP photo archive.
+- `robots.txt` and `sitemap.xml` are retained.
+- `styles.css`, `main.js`, `portal3d.js`, `monolith.js` and `react/` are earlier design artifacts. They are not loaded by the current page, and are retained for reference rather than deleted.
 
-## Editing the gallery
+The gallery opens full JPG photos from WebP thumbnails. Captions are deliberately neutral: earlier image labels did not match the actual photographs.
 
-Each entry in `SITE_CONTENT.gallery`:
+## Accessibility and checks
 
-```js
-{ src: "images/gallery-NN", alt: "...", title: "...", place: "..." }
-```
-
-`title` is the short headline; `place` is shown in the modal.
-
-## Performance notes
-
-- All `<script>` tags use `defer` (module scripts defer by default).
-- The hero has 3 canvases + a WebGL scene + a jungle DOM scene. They auto-pause via `IntersectionObserver` when the hero scrolls off-screen.
-- `<picture>` elements prefer `.webp` and fall back to `.jpg`.
-- The hero image is preloaded with `fetchpriority="high"`.
-
-## Accessibility
-
-- All interactive elements have `:focus-visible` rings.
-- A skip link jumps to `<main>`.
-- `prefers-reduced-motion` disables canvas animation, jungle DOM, drop beads, water ripples and 3D parallax.
-- The gallery modal traps focus and restores it on close.
-- Mobile menu traps focus and locks body scroll while open.
-
-## To do (manual)
-
-1. **Replace the About portrait** — currently uses `hero.jpg`. Drop a real portrait at `images/portrait.jpg` (and `.webp`) and swap the `<source>` in the About section.
-2. **Confirm GitHub username** — `https://github.com/deepbat` is a placeholder. Update in: `index.html` (nav, mobile menu, footer, JSON-LD), and this README.
-3. **Pick the real numbers** in `.hero-stats` — the current `6+`, `12`, `3` are illustrative.
+Skip link, keyboard focus styles, semantic headings, mobile navigation state, native disclosure controls and a native dialog photo viewer. Reduced-motion preferences disable animations. Local visual and interaction checks covered desktop, 390px and 320px layouts, navigation, disclosure controls, gallery controls and horizontal overflow.
