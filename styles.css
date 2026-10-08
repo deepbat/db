@@ -847,3 +847,35 @@ body.hero-out .jungle-scene{opacity:.0;transition:opacity .4s ease}
   .project-outcome span{overflow-wrap:anywhere}
   #backToTop{right:16px;bottom:64px;width:42px;height:42px}
 }
+
+
+/* MOBILE IMAGE + OVERLAY FIX — 08/10/2026 */
+@media (max-width:760px){
+  /* No decorative full-page rings or canvases over content. */
+  body .ocean-canvas,
+  body .water-visual,
+  body .monolith-canvas,
+  body .portal-gl,
+  body .jungle-scene,
+  body .chime-canvas,
+  body .drop-field{
+    display:none !important;
+    visibility:hidden !important;
+    opacity:0 !important;
+  }
+
+  /* Show complete project photographs instead of cropping their centre. */
+  .project-visual{
+    min-height:0 !important;
+    height:auto !important;
+  }
+  .project-visual img{
+    display:block;
+    width:100% !important;
+    height:auto !important;
+    min-height:0 !important;
+    aspect-ratio:auto !important;
+    object-fit:contain !important;
+    object-position:center !important;
+  }
+}
