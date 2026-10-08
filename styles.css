@@ -830,3 +830,20 @@ body.hero-out .ocean-canvas,body.hero-out .chime-canvas,body.hero-out .water-vis
 body.hero-out .jungle-scene{opacity:.0;transition:opacity .4s ease}
 
 
+
+
+/* MOBILE CLEANUP — 08/10/2026 */
+@media (max-width:760px){
+  .ocean-canvas,.water-visual,.monolith-canvas,.portal-gl,.jungle-scene,.chime-canvas,.drop-field{display:none !important}
+  main{perspective:none !important}
+  .section,.section.section-visible,.section.section-hidden{transform:none !important;opacity:1 !important;will-change:auto}
+  .gallery-intro picture{display:block;width:100%;max-width:240px;margin:28px auto 0}
+  .gallery-intro picture img{display:block;width:100% !important;max-width:240px !important;height:auto}
+  .gallery-grid{grid-template-columns:repeat(2,minmax(0,1fr)) !important;grid-auto-rows:130px !important;grid-auto-flow:dense;gap:10px}
+  .gallery-item,.gallery-item:nth-child(2),.gallery-item:nth-child(3),.gallery-item:nth-child(4),.gallery-item:nth-child(5),.gallery-item:nth-child(6),.gallery-item:nth-child(7),.gallery-item:nth-child(8),.gallery-item:nth-child(9),.gallery-item:nth-child(10),.gallery-item:nth-child(11),.gallery-item:nth-child(12),.gallery-item:nth-child(13){grid-column:span 1 !important;grid-row:span 2 !important}
+  .gallery-item:nth-child(3n){grid-row:span 2 !important}
+  .project-card,.project-copy,.project-outcome{min-width:0;max-width:100%}
+  .project-outcome li{grid-template-columns:70px minmax(0,1fr);min-width:0}
+  .project-outcome span{overflow-wrap:anywhere}
+  #backToTop{right:16px;bottom:64px;width:42px;height:42px}
+}
