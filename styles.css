@@ -879,3 +879,19 @@ body.hero-out .jungle-scene{opacity:.0;transition:opacity .4s ease}
     object-position:center !important;
   }
 }
+
+
+/* MOBILE GALLERY CLEANUP — 08/10/2026 */
+@media (max-width:760px){
+  /* Give gallery its own solid layer so decorative fixed effects cannot show through. */
+  #gallery{
+    position:relative;
+    z-index:12 !important;
+    background:rgba(7,16,20,.98) !important;
+  }
+  #gallery .gallery-intro,
+  #gallery .gallery-grid{
+    position:relative;
+    z-index:13;
+  }
+}
