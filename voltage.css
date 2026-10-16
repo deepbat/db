@@ -1,0 +1,24 @@
+.voltage-button{position:relative;display:inline-block;isolation:isolate}
+.voltage-button .voltage-link{position:relative;z-index:2;display:inline-flex;align-items:center;justify-content:center;color:#fff;background:#0D1127;padding:1rem 3rem;border-radius:5rem;border:5px solid #5978F3;font:500 1.2rem/1em "DM Sans",Arial,sans-serif;letter-spacing:.035em;white-space:nowrap;transition:background .3s,transform .16s ease;min-width:0}
+.voltage-button .voltage-link:hover{cursor:pointer;background:#0F1C53}
+.voltage-button .voltage-link:active{transform:scale(.97)}
+.voltage-button svg{display:block;position:absolute;z-index:3;top:-.75em;left:-.25em;width:calc(100% + .5em);height:calc(100% + 1.5em);pointer-events:none;opacity:0;transition:opacity .4s;transition-delay:.1s;overflow:visible}
+.voltage-button .voltage-link:hover~svg,.voltage-button .voltage-link:focus-visible~svg,.voltage-button:hover svg{opacity:1}
+.voltage-button svg path{stroke-dasharray:100;fill:none;filter:url(#glow)}
+.voltage-button svg path.line-1{stroke:#f6de8d;stroke-dashoffset:0;animation:spark-1 3s linear infinite}
+.voltage-button svg path.line-2{stroke:#6bfeff;stroke-dashoffset:500;animation:spark-2 3s linear infinite}
+.voltage-button .dots{opacity:0;transition:opacity .3s;transition-delay:.4s;position:absolute;inset:0;z-index:4;pointer-events:none}
+.voltage-button:hover .dots,.voltage-button .voltage-link:focus-visible~.dots{opacity:1}
+.voltage-button .dots .dot{width:.65rem;height:.65rem;background:#fff;border-radius:100%;position:absolute;opacity:0;box-shadow:0 0 10px rgba(255,255,255,.8)}
+.voltage-button .dots .dot-1{top:0;left:20%;animation:fly-up 3s linear infinite}
+.voltage-button .dots .dot-2{top:0;left:55%;animation:fly-up 3s linear .5s infinite}
+.voltage-button .dots .dot-3{top:0;left:80%;animation:fly-up 3s linear 1s infinite}
+.voltage-button .dots .dot-4{bottom:0;left:30%;animation:fly-down 3s linear 2.5s infinite}
+.voltage-button .dots .dot-5{bottom:0;left:65%;animation:fly-down 3s linear 1.5s infinite}
+@keyframes spark-1{to{stroke-dashoffset:-1000}}
+@keyframes spark-2{to{stroke-dashoffset:-500}}
+@keyframes fly-up{0%{opacity:0;transform:translateY(0) scale(.2)}5%{opacity:1;transform:translateY(-1.5rem) scale(.4)}10%,100%{opacity:0;transform:translateY(-3rem) scale(.2)}}
+@keyframes fly-down{0%{opacity:0;transform:translateY(0) scale(.2)}5%{opacity:1;transform:translateY(1.5rem) scale(.4)}10%,100%{opacity:0;transform:translateY(3rem) scale(.2)}}
+.hero-actions{align-items:center;gap:14px}
+@media(max-width:760px){.hero-actions{display:grid;grid-template-columns:1fr;gap:14px;width:min(100%,320px)}.voltage-button,.voltage-button .voltage-link{width:100%}.voltage-button .voltage-link{padding:.9rem 1.25rem;font-size:1rem}.voltage-button svg{height:calc(100% + 1.2em)}}
+@media(prefers-reduced-motion:reduce){.voltage-button svg path,.voltage-button .dots .dot{animation:none}.voltage-button svg,.voltage-button .dots{transition:none}}
