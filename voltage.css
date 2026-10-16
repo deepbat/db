@@ -31,3 +31,8 @@
 .nav-links a.nav-external:hover{color:white;background:#0F1C53}
 @media(max-width:980px){.nav-links{gap:4px}.nav-links a{padding:6px 8px;font-size:10px}}
 @media(max-width:760px){.nav-links{display:none}}
+
+/* SCROLL STABILITY: prevent section reveal transforms from making lower content appear to shiver while scrolling. */
+.section,.section.section-visible,.section.section-hidden{transform:none !important;opacity:1 !important;transition:none !important;will-change:auto !important}
+html{scroll-behavior:auto}
+.monolith-canvas{transform:translateZ(0);backface-visibility:hidden}
